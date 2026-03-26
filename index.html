@@ -1054,7 +1054,7 @@
             .header-title { font-size: 22px; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
             .header-breadcrumb { font-size: 13px; justify-content: center; }
             .header-desc { max-width: 100%; font-size: 13px; text-align: center; }
-            .header-back { font-size: 15px; font-weight: 600; }
+            .header-back { font-size: 17px; font-weight: 700; }
             .breadcrumb { font-size: 11px; margin-bottom: 0; }
             .header-controls { width: 100%; align-items: stretch; flex-direction: column; gap: 0; }
             .header-right { display: none !important; }
@@ -3527,26 +3527,10 @@ function _showCeoOnboarding() {
     mc.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;min-height:80dvh;padding:20px">' +
         '<div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 36px;max-width:400px;width:100%;box-shadow:var(--shadow-lg);text-align:center">' +
         '<div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">Benvenuto, Alberto</div>' +
-        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Per accedere, segui questi passaggi:</div>' +
-        '<div style="text-align:left;margin-bottom:20px">' +
-        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">1. Clicca su "Copia codice"</div>' +
-        '<button id="ceoCopyTokenBtn" onclick="_ceoCopyToken()" style="width:100%;padding:14px;background:var(--blue,#2563EB);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">' +
-        '<span style="font-size:18px">&#128203;</span> Copia codice</button>' +
-        '</div>' +
-        '<div style="text-align:left;margin-bottom:20px">' +
-        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">2. Incolla qui sotto</div>' +
-        '<input id="ceoTokenInput" type="text" placeholder="Incolla qui il codice..." style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.2s;box-sizing:border-box" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
-        '</div>' +
-        '<div style="text-align:left;margin-bottom:8px">' +
-        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">3. Clicca "Continua"</div>' +
-        '</div>' +
-        '<button onclick="_ceoOnboardSubmit()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.2s" onmouseenter="this.style.background=\'var(--accent-strong)\'" onmouseleave="this.style.background=\'var(--accent)\'">Continua</button>' +
+        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Clicca per accedere alla tua dashboard.</div>' +
+        '<button id="ceoAccessBtn" onclick="_ceoQuickAccess()" style="width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.2s" onmouseenter="this.style.background=\'var(--accent-strong)\'" onmouseleave="this.style.background=\'var(--accent)\'">Accedi</button>' +
         '<div id="ceoOnboardError" style="margin-top:12px;font-size:13px;color:var(--red);display:none"></div>' +
         '</div></div>';
-    setTimeout(function() {
-        var inp = document.getElementById('ceoTokenInput');
-        if (inp) { inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') _ceoOnboardSubmit(); }); }
-    }, 100);
 }
 
 function _ceoCopyToken() {
@@ -3577,41 +3561,26 @@ function _ceoCopyToken() {
     }
 }
 
-function _ceoOnboardSubmit() {
-    var inp = document.getElementById('ceoTokenInput');
+function _ceoQuickAccess() {
+    var btn = document.getElementById('ceoAccessBtn');
     var errEl = document.getElementById('ceoOnboardError');
-    if (!inp) return;
-    var token = inp.value.trim();
-    if (!token) {
-        if (errEl) { errEl.textContent = 'Inserisci il codice per continuare.'; errEl.style.display = 'block'; }
-        return;
-    }
-    // Chiudi tastiera iOS — Safari mantiene lo scroll offset della tastiera
-    inp.blur();
-    document.activeElement && document.activeElement.blur();
-    window.scrollTo(0, 0);
-    setTimeout(function() { window.scrollTo(0, 0); }, 50);
-    setTimeout(function() { window.scrollTo(0, 0); }, 150);
-    setTimeout(function() { window.scrollTo(0, 0); }, 400);
-    // Validate token with a test API call
-    if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; }
+    var token = CEO_FIXED_TOKEN;
+    if (btn) { btn.textContent = 'Accesso in corso...'; btn.style.opacity = '0.7'; }
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
         headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
     }).then(function(r) {
         if (r.ok || r.status === 404) {
-            // 404 is fine — file may not exist yet
             safeSetItem('pb_gh_token_ceo', token);
             window.scrollTo(0, 0);
-            // Reload CEO view
             _ceoData = null;
             _ceoActions = null;
             render();
-        } else if (r.status === 401) {
-            if (errEl) { errEl.textContent = 'Codice non valido. Controlla e riprova.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; }
         } else {
+            if (btn) { btn.textContent = 'Accedi'; btn.style.opacity = '1'; }
             if (errEl) { errEl.textContent = 'Errore di connessione. Riprova.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; }
         }
     }).catch(function() {
+        if (btn) { btn.textContent = 'Accedi'; btn.style.opacity = '1'; }
         if (errEl) { errEl.textContent = 'Errore di rete. Controlla la connessione.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; }
     });
 }
