@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T20:55:28.619Z",
+  "publishedAt": "2026-03-26T20:59:49.813Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -144,12 +144,31 @@
           "tags": [
             "test"
           ],
-          "activityLog": []
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Risposta inviata ad Alberto: Ok"
+            }
+          ],
+          "ceoHasUpdate": false,
+          "ceoUpdates": [
+            {
+              "type": "update",
+              "note": "Fatto ho rivisto tutto",
+              "at": "2026-03-26T20:58:33.922Z"
+            }
+          ],
+          "cooResponses": [
+            {
+              "note": "Ok",
+              "at": "2026-03-26T20:59:49.813Z"
+            }
+          ]
         },
         {
           "id": "testB_1774558526794",
           "title": "TEST-B: Alberto completa questa task",
-          "status": "in_progress",
+          "status": "da_verificare",
           "assignee": "Alberto",
           "priority": "medium",
           "dueDate": "2026-03-27",
@@ -159,7 +178,15 @@
           "tags": [
             "test"
           ],
-          "activityLog": []
+          "activityLog": [],
+          "ceoUpdates": [
+            {
+              "type": "complete",
+              "note": "",
+              "at": "2026-03-26T20:58:40.910Z"
+            }
+          ],
+          "ceoCompletedAt": "2026-03-26T20:58:40.910Z"
         },
         {
           "id": "testC_1774558526794",
@@ -177,11 +204,15 @@
           "activityLog": []
         }
       ],
-      "ceoHasProjectNote": false,
+      "ceoHasProjectNote": true,
       "ceoProjectNotes": [
         {
           "note": "Anticipiamo tutto di 7 gg",
           "at": "2026-03-26T19:45:45.476Z"
+        },
+        {
+          "note": "Anticipiamo di 5gg",
+          "at": "2026-03-26T20:58:56.919Z"
         }
       ],
       "cooProjectResponses": [
