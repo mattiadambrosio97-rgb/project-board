@@ -3294,14 +3294,6 @@ function renderCEOHome() {
         html += '</div>';
     }
 
-    // Quick stats bar — compatta
-    html += '<div style="display:flex;gap:6px;margin-bottom:18px">';
-    html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--accent)">' + pct + '%</div><div style="font-size:10px;color:var(--text-muted);font-weight:600">Globale</div></div>';
-    html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--text)">' + projects.length + '</div><div style="font-size:10px;color:var(--text-muted);font-weight:600">Progetti</div></div>';
-    if (blockedCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--red)">' + blockedCount + '</div><div style="font-size:10px;color:var(--red);font-weight:600">Bloccate</div></div>';
-    if (overdueCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--red)">' + overdueCount + '</div><div style="font-size:10px;color:var(--red);font-weight:600">Scadute</div></div>';
-    html += '</div>';
-
     // ========== FEED CEO — sezioni separate per chiarezza ==========
     var _ceoTaskItems = [];
     projects.forEach(function(p) {
@@ -3418,10 +3410,18 @@ function renderCEOHome() {
         secCooReplied.forEach(function(item) { html += _renderCeoTaskCard(item); });
     }
 
-    // === SEZIONE 2: Da leggere (risorse non lette) ===
+    // === SEZIONE 2: Da leggere (risorse non lette) — accordion ===
     if (unreadResources.length > 0) {
-        html += _ceoSectionHeader('Da leggere', unreadResources.length, 'var(--accent)', '&#128233;');
+        html += '<div style="margin-top:20px">';
+        html += '<div onclick="var p=document.getElementById(\'ceoUnreadPanel\');var c=document.getElementById(\'ceoUnreadChev\');if(p.style.display===\'none\'){p.style.display=\'block\';c.style.transform=\'rotate(90deg)\'}else{p.style.display=\'none\';c.style.transform=\'rotate(0deg)\'}" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:10px">';
+        html += '<span id="ceoUnreadChev" style="font-size:12px;color:var(--accent);transition:transform 0.2s">&#9654;</span>';
+        html += '<span style="font-size:15px;font-weight:800;color:var(--accent)">&#128233; Da leggere</span>';
+        html += '<span style="background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px">' + unreadResources.length + '</span>';
+        html += '</div>';
+        html += '<div id="ceoUnreadPanel" style="display:none">';
         unreadResources.forEach(function(res) { html += _renderCeoResCard(res, false); });
+        html += '</div>';
+        html += '</div>';
     }
 
     // === SEZIONE 3: Le tue task ===
@@ -3478,6 +3478,14 @@ function renderCEOHome() {
         html += renderLaunchCalendar(activeLaunches, false);
         html += '</div>';
     }
+
+    // Quick stats bar — tra lanci e project cards
+    html += '<div style="display:flex;gap:6px;margin-bottom:18px">';
+    html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--accent)">' + pct + '%</div><div style="font-size:10px;color:var(--text-muted);font-weight:600">Globale</div></div>';
+    html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--text)">' + projects.length + '</div><div style="font-size:10px;color:var(--text-muted);font-weight:600">Progetti</div></div>';
+    if (blockedCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--red)">' + blockedCount + '</div><div style="font-size:10px;color:var(--red);font-weight:600">Bloccate</div></div>';
+    if (overdueCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--red)">' + overdueCount + '</div><div style="font-size:10px;color:var(--red);font-weight:600">Scadute</div></div>';
+    html += '</div>';
 
     // ========== PROJECT CARDS — protagonisti ==========
     html += '<div class="ceo-projects-grid">';
