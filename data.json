@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T19:43:13.410Z",
+  "publishedAt": "2026-03-26T19:46:15.626Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -232,7 +232,7 @@
         {
           "id": "test_ceo_1_1774554140410",
           "title": "🧪 TEST-CEO: Revisione grafica landing",
-          "status": "in_progress",
+          "status": "da_verificare",
           "assignee": "Alberto",
           "priority": "high",
           "dueDate": "2026-03-27",
@@ -247,7 +247,15 @@
               "date": "2026-03-26",
               "text": "Task creata per test sync"
             }
-          ]
+          ],
+          "ceoUpdates": [
+            {
+              "type": "complete",
+              "note": "",
+              "at": "2026-03-26T19:45:22.548Z"
+            }
+          ],
+          "ceoCompletedAt": "2026-03-26T19:45:22.548Z"
         },
         {
           "id": "test_ceo_2_1774554140410",
@@ -283,6 +291,19 @@
               "text": "In attesa decisione Alberto"
             }
           ]
+        }
+      ],
+      "ceoHasProjectNote": false,
+      "ceoProjectNotes": [
+        {
+          "note": "Anticipiamo tutto di 7 gg",
+          "at": "2026-03-26T19:45:45.476Z"
+        }
+      ],
+      "cooProjectResponses": [
+        {
+          "note": "Ok va bene",
+          "at": "2026-03-26T19:46:15.625Z"
         }
       ]
     },
