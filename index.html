@@ -1056,9 +1056,9 @@
             .header-desc { max-width: 100%; font-size: 12px; text-align: center; }
             .breadcrumb { font-size: 11px; margin-bottom: 0; }
             .header-controls { width: 100%; align-items: stretch; flex-direction: column; gap: 0; }
-            .header-right { justify-content: center; gap: 6px; margin-top: 6px; }
-            /* Riga bottoni azione */
-            .header-actions-row { display: flex !important; gap: 6px; width: 100%; margin-top: 8px; justify-content: center; }
+            .header-right { display: none !important; }
+            /* Tutti i bottoni su una riga */
+            .header-actions-row { display: flex !important; gap: 6px; width: 100%; margin-top: 8px; justify-content: center; align-items: center; flex-wrap: nowrap; }
             .header-actions-row .add-btn { flex: 1; text-align: center; font-size: 13px; padding: 8px 6px; min-height: 38px; }
             .header-actions-row .ceo-publish-btn { flex: 0 0 auto; font-size: 12px; padding: 8px 10px; min-height: 38px; }
             .header-actions-row .copy-data-btn { flex: 0 0 auto; font-size: 12px; padding: 8px 10px; min-height: 38px; }
@@ -1454,12 +1454,14 @@
                 <button class="icon-btn" title="Aggiorna dati e app" onclick="_smartRefresh()" style="font-size:16px">&#8635;</button>
                 <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Tema chiaro/scuro" style="font-size:18px"></button>
             </div>
-            <!-- Riga 2: pulsanti azione (visibili solo mobile) -->
+            <!-- Riga unica bottoni mobile -->
             <div class="header-actions-row mobile-only" id="headerActionsRow">
                 <button class="add-btn" id="addBtn" onclick="handleAdd()">+ Nuovo</button>
                 <button class="add-btn" id="addTaskBtn" onclick="quickAddTask()" style="background:var(--surface);color:var(--accent);border:1px solid var(--accent);box-shadow:none">+ Task</button>
-                <button class="copy-data-btn ceo-publish-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
-                <button class="copy-data-btn" title="Vedi vista CEO" onclick="previewCEO()" style="background:var(--surface);color:var(--text);border:1px solid var(--border);font-size:12px;padding:8px 10px;min-height:38px;border-radius:10px;font-weight:700;cursor:pointer">&#128065; CEO</button>
+                <button class="copy-data-btn ceo-publish-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640;</button>
+                <button class="copy-data-btn" title="Vedi vista CEO" onclick="previewCEO()" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">&#128065;</button>
+                <button class="icon-btn" title="Aggiorna" onclick="_smartRefresh()" style="font-size:16px">&#8635;</button>
+                <button class="icon-btn" id="themeToggleBtnMobile" onclick="toggleTheme()" title="Tema" style="font-size:16px"></button>
             </div>
         </div>
     </div>
@@ -2839,8 +2841,11 @@ function toggleTheme() {
     updateThemeIcon();
 }
 function updateThemeIcon() {
+    var ico = document.body.classList.contains('dark') ? '&#9728;' : '&#9790;';
     var btn = document.getElementById('themeToggleBtn');
-    if (btn) btn.innerHTML = document.body.classList.contains('dark') ? '&#9728;' : '&#9790;';
+    if (btn) btn.innerHTML = ico;
+    var btn2 = document.getElementById('themeToggleBtnMobile');
+    if (btn2) btn2.innerHTML = ico;
 }
 
 // ========== NAVIGATION ==========
