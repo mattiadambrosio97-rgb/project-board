@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:45.216Z",
+  "publishedAt": "2026-03-26T21:28:48.102Z",
   "projects": [],
   "team": [
     {
@@ -52,15 +52,6 @@
       "brand": "ADT",
       "startDate": "2026-04-21",
       "endDate": "2026-04-28",
-      "projectId": "",
-      "notes": ""
-    },
-    {
-      "id": "ln_s5",
-      "name": "Lancio USR Kick Off",
-      "brand": "USR",
-      "startDate": "2026-04-12",
-      "endDate": "2026-04-16",
       "projectId": "",
       "notes": ""
     }
