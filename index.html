@@ -3816,7 +3816,7 @@ function renderTeamHome() {
             var listGroups = [
                 { key: 'blocked', label: 'Bloccate', color: 'var(--red)', items: [] },
                 { key: 'todo', label: 'Da fare', color: 'var(--slate)', items: [] },
-                { key: 'in_progress', label: 'In corso', color: 'var(--blue,#2563EB)', items: [] },
+                { key: 'in_progress', label: 'In corso', color: 'var(--yellow,#F59E0B)', items: [] },
                 { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal)', items: [] }
             ];
             myTasks.forEach(function(item) {
@@ -3919,7 +3919,7 @@ function _renderTeamTaskCard(item, todayStr) {
     var ta = (_getTeamMemberActions().taskActions || {})[t.id];
     if (ta && ta.status) {
         var stLabel = ta.status === 'in_progress' ? 'In corso' : ta.status === 'done' ? 'Completata' : ta.status === 'blocked' ? 'Bloccata' : ta.status;
-        var stColor = ta.status === 'in_progress' ? 'var(--blue,#2563EB)' : ta.status === 'done' ? 'var(--green)' : 'var(--red)';
+        var stColor = ta.status === 'in_progress' ? 'var(--yellow,#F59E0B)' : ta.status === 'done' ? 'var(--green)' : 'var(--red)';
         h += '<div style="margin-top:6px;font-size:12px;font-weight:700;color:' + stColor + '">Il tuo stato: ' + stLabel + '</div>';
     }
     h += '</div>';
@@ -3992,7 +3992,7 @@ function renderTeamTaskDetail() {
     // Bottoni rapidi stato
     html += '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">';
     var quickBtns = [
-        { key: 'in_progress', label: 'In corso', color: 'var(--blue,#2563EB)', icon: '&#9654;' },
+        { key: 'in_progress', label: 'In corso', color: 'var(--yellow,#F59E0B)', icon: '&#9654;' },
         { key: 'done', label: 'Fatto', color: 'var(--green)', icon: '&#10003;' },
         { key: 'blocked', label: 'Bloccata', color: 'var(--red)', icon: '&#9888;' }
     ];
@@ -4284,13 +4284,18 @@ function teamBoardColumnPopup(statusKey) {
             }
             if (t.note) h += '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
             h += '</div>';
+            // Commento rapido
+            h += '<div style="display:flex;gap:6px;margin-top:8px">';
+            h += '<input id="popupNote_' + t.id + '" type="text" placeholder="Commento..." style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--font);background:var(--surface);color:var(--text)" onclick="event.stopPropagation()">';
+            h += '<button onclick="event.stopPropagation();teamPopupComment(\'' + t.id + '\',\'' + statusKey + '\')" style="padding:6px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap">Invia</button>';
+            h += '</div>';
             // Pulsanti rapidi cambio stato
             if (statusKey !== 'done') {
-                h += '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">';
-                if (statusKey !== 'in_progress') h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'in_progress\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--blue,#2563EB);color:#fff;font-size:12px;font-weight:700;cursor:pointer">In corso</button>';
-                if (statusKey !== 'todo') h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'todo\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--slate);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Da fare</button>';
-                h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'done\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Fatto</button>';
-                if (statusKey !== 'blocked') h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'blocked\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Bloccata</button>';
+                h += '<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">';
+                if (statusKey !== 'in_progress') h += '<button onclick="event.stopPropagation();teamPopupQuickStatus(\'' + t.id + '\',\'in_progress\',\'' + statusKey + '\')" style="flex:1;min-width:70px;padding:5px 8px;border:none;border-radius:6px;background:var(--yellow,#F59E0B);color:#fff;font-size:11px;font-weight:700;cursor:pointer">In corso</button>';
+                if (statusKey !== 'todo') h += '<button onclick="event.stopPropagation();teamPopupQuickStatus(\'' + t.id + '\',\'todo\',\'' + statusKey + '\')" style="flex:1;min-width:70px;padding:5px 8px;border:none;border-radius:6px;background:var(--slate);color:#fff;font-size:11px;font-weight:700;cursor:pointer">Da fare</button>';
+                h += '<button onclick="event.stopPropagation();teamPopupQuickStatus(\'' + t.id + '\',\'done\',\'' + statusKey + '\')" style="flex:1;min-width:70px;padding:5px 8px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:11px;font-weight:700;cursor:pointer">Fatto</button>';
+                if (statusKey !== 'blocked') h += '<button onclick="event.stopPropagation();teamPopupQuickStatus(\'' + t.id + '\',\'blocked\',\'' + statusKey + '\')" style="flex:1;min-width:70px;padding:5px 8px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:11px;font-weight:700;cursor:pointer">Bloccata</button>';
                 h += '</div>';
             }
             h += '</div>';
@@ -4298,6 +4303,21 @@ function teamBoardColumnPopup(statusKey) {
     }
     h += '</div></div>';
     document.body.insertAdjacentHTML('beforeend', h);
+}
+
+function teamPopupComment(taskId, statusKey) {
+    var input = document.getElementById('popupNote_' + taskId);
+    var note = input ? input.value.trim() : '';
+    if (!note) { alert('Scrivi un commento.'); return; }
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    if (!myActions.taskActions[taskId].updates) myActions.taskActions[taskId].updates = [];
+    myActions.taskActions[taskId].updates.push({ note: note, at: new Date().toISOString() });
+    teamPushActions(function(ok) {
+        if (!ok) { alert('Errore. Riprova.'); return; }
+        if (input) { input.value = ''; input.placeholder = 'Inviato!'; }
+    });
 }
 
 function teamPopupQuickStatus(taskId, newStatus, oldStatusKey) {
@@ -4733,7 +4753,7 @@ function renderCEOProject(pid) {
     // Stats: visual breakdown
     html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px">';
     html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--accent)">' + ppct + '%</div><div style="font-size:11px;color:var(--text-muted)">Completo</div></div>';
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--blue)">' + inProgress + '</div><div style="font-size:11px;color:var(--text-muted)">In corso</div></div>';
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--yellow,#F59E0B)">' + inProgress + '</div><div style="font-size:11px;color:var(--text-muted)">In corso</div></div>';
     html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--slate)">' + todo + '</div><div style="font-size:11px;color:var(--text-muted)">Da fare</div></div>';
     html += '<div style="background:' + (blocked > 0 ? 'var(--red-bg, #FEF2F2)' : 'var(--surface)') + ';border:1px solid ' + (blocked > 0 ? 'var(--red)' : 'var(--border)') + ';border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:' + (blocked > 0 ? 'var(--red)' : 'var(--green)') + '">' + blocked + '</div><div style="font-size:11px;color:var(--text-muted)">Bloccate</div></div>';
     html += '</div>';
