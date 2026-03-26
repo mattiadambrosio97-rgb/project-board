@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:21.094Z",
+  "publishedAt": "2026-03-26T21:28:23.359Z",
   "projects": [],
   "team": [
     {
@@ -161,14 +161,5 @@
       "color": "#10A37F"
     }
   ],
-  "resources": [
-    {
-      "id": "res_commercialisti_001",
-      "title": "Lista commercialisti Palermo — leggila e dimmi quale preferisci",
-      "type": "link",
-      "url": "commercialisti-palermo.html",
-      "content": "",
-      "createdAt": "2026-03-26T12:30:00.000Z"
-    }
-  ]
+  "resources": []
 }
