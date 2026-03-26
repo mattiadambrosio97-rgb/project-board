@@ -4203,26 +4203,49 @@ function _smartRefresh() {
     // 2) Fetch nuova versione HTML con cache-bust per forzare bypass
     fetch(window.location.pathname + '?_cb=' + Date.now(), { cache: 'no-store' })
         .then(function() {
-            // 3) Aggiorna dati in-app (se COO su GH Pages, fetch CEO actions)
             if (CEO_MODE) {
                 loadCEOData(function() {
-                    // 4) Ricarica pagina con cache-bust
                     var u = new URL(window.location.href);
                     u.searchParams.set('_cb', Date.now());
                     window.location.replace(u.toString());
                 }, true);
             } else {
-                var u = new URL(window.location.href);
-                u.searchParams.set('_cb', Date.now());
-                window.location.replace(u.toString());
+                // COO: pull data.json da GitHub → merge nel localStorage
+                _pullFromGitHub(function() {
+                    var u = new URL(window.location.href);
+                    u.searchParams.set('_cb', Date.now());
+                    window.location.replace(u.toString());
+                });
             }
         })
         .catch(function() {
-            // Fallback: ricarica comunque
             var u = new URL(window.location.href);
             u.searchParams.set('_cb', Date.now());
             window.location.replace(u.toString());
         });
+}
+
+// COO: Pull data.json da GitHub e merge nel localStorage
+function _pullFromGitHub(callback) {
+    var token = getGHToken();
+    if (!token) { if (callback) callback(); return; }
+    _ghFetchJSON(GH_DATA_FILE, token).then(function(remoteData) {
+        if (!remoteData) { if (callback) callback(); return; }
+        // Confronta timestamp: se remote è più recente, aggiorna localStorage
+        var localPublish = safeGetItem('pb_last_publish') || '';
+        var remotePublish = remoteData.publishedAt || '';
+        if (remotePublish > localPublish) {
+            // Remote ha dati più recenti (es. modificati da Claude) → importa
+            if (remoteData.projects) saveProjects(remoteData.projects);
+            if (remoteData.team) saveTeam(remoteData.team);
+            if (remoteData.launches) saveLaunches(remoteData.launches);
+            if (remoteData.ceoLinks) saveCeoLinks(remoteData.ceoLinks);
+            if (remoteData.resources) saveResources(remoteData.resources);
+            safeSetItem('pb_last_publish', remotePublish);
+            console.log('Pull da GitHub: dati aggiornati (' + remotePublish + ')');
+        }
+        if (callback) callback();
+    }).catch(function() { if (callback) callback(); });
 }
 
 // ========== PUBLISH TO GITHUB (CEO sync) ==========
@@ -4380,6 +4403,7 @@ function publishForCEO(retryCount) {
     }).then(function(r) {
         if (r.ok) {
             window._lastCooPublish = Date.now();
+            safeSetItem('pb_last_publish', new Date().toISOString());
             _updateSyncIndicator();
             _showToast('Pubblicato per il CEO!');
         } else {
