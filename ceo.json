@@ -1,1 +1,16 @@
-{"lastUpdate":"","taskActions":{},"resourceActions":{}}
+{
+  "lastUpdate": "2026-03-26T14:19:24.373Z",
+  "taskActions": {
+    "task_budget": {
+      "status": "complete",
+      "updates": [
+        {
+          "type": "complete",
+          "note": "Budget approvato, 3000 va bene",
+          "at": "2026-03-26T14:19:24.373Z"
+        }
+      ]
+    }
+  },
+  "resourceActions": {}
+}
