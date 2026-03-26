@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T22:46:36.920Z",
+  "publishedAt": "2026-03-26T23:00:00.000Z",
   "projects": [
     {
       "id": "id_1774561315044_2num0g",
@@ -125,6 +125,214 @@
               "text": "Stato cambiato in: Completata"
             }
           ]
+        }
+      ]
+    },
+    {
+      "id": "proj_test_rebrand",
+      "name": "Rebranding ADT 2026",
+      "description": "Nuovo logo, palette colori, brand guidelines",
+      "status": "attivo",
+      "launchDate": "2026-04-15",
+      "tasks": [
+        {
+          "id": "task_t1_logo",
+          "title": "Nuove proposte logo ADT",
+          "status": "in_progress",
+          "assignee": "Kevin",
+          "dueDate": "2026-03-28",
+          "estimateHours": 8,
+          "recurrence": null,
+          "note": "3 proposte diverse: moderna, classica, minimal. Formato AI + PNG.",
+          "ceoNote": "Alberto vuole qualcosa di pulito, niente effetti 3D",
+          "nextCheck": "2026-03-27",
+          "doneWhen": "3 proposte approvate da Alberto",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "branding"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774310800000,
+          "completedAt": null,
+          "activityLog": [
+            {
+              "date": "2026-03-24",
+              "text": "Stato cambiato in: In corso"
+            }
+          ]
+        },
+        {
+          "id": "task_t2_palette",
+          "title": "Palette colori + tipografia",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-02",
+          "estimateHours": 4,
+          "recurrence": null,
+          "note": "Definire palette primaria (3 colori) + font heading e body. Consegnare su Figma.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "File Figma con palette e font completo",
+          "dependsLabel": "Dopo approvazione logo",
+          "tags": [
+            "design"
+          ],
+          "dependsOn": [
+            "task_t1_logo"
+          ],
+          "comments": [],
+          "createdAt": 1774310800000,
+          "completedAt": null,
+          "activityLog": []
+        }
+      ]
+    },
+    {
+      "id": "proj_test_social",
+      "name": "Contenuti Social Aprile",
+      "description": "Piano editoriale e grafiche per Instagram/TikTok",
+      "status": "attivo",
+      "launchDate": null,
+      "tasks": [
+        {
+          "id": "task_t3_template",
+          "title": "Template post Instagram (carosello)",
+          "status": "blocked",
+          "assignee": "Kevin",
+          "dueDate": "2026-03-25",
+          "estimateHours": 5,
+          "recurrence": null,
+          "note": "Template carosello 5 slide per tips di guida. Serve accesso a Canva Pro.",
+          "ceoNote": "Ho mandato l'invito Canva, controlla la mail",
+          "nextCheck": "",
+          "doneWhen": "Template riutilizzabile su Canva",
+          "dependsLabel": "In attesa accesso Canva Pro",
+          "tags": [
+            "social",
+            "design"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774138000000,
+          "completedAt": null,
+          "activityLog": [
+            {
+              "date": "2026-03-22",
+              "text": "Stato cambiato in: Bloccata"
+            }
+          ]
+        },
+        {
+          "id": "task_t4_reel",
+          "title": "3 Reel \"Before/After\" coaching",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-05",
+          "estimateHours": 6,
+          "recurrence": null,
+          "note": "Montaggio video prima/dopo coaching con telemetria sovrapposta. File da Alberto.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "3 reel pronti per pubblicazione",
+          "dependsLabel": "",
+          "tags": [
+            "video",
+            "social"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774397200000,
+          "completedAt": null,
+          "activityLog": []
+        },
+        {
+          "id": "task_t5_stories",
+          "title": "Pack stories highlights (6 copertine)",
+          "status": "da_verificare",
+          "assignee": "Kevin",
+          "dueDate": "2026-03-27",
+          "estimateHours": 3,
+          "recurrence": null,
+          "note": "Copertine per highlights: Chi Siamo, Coaching, Risultati, Simulatore, Team, Contatti",
+          "ceoNote": "",
+          "nextCheck": "2026-03-27",
+          "doneWhen": "6 copertine approvate",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "social"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774224400000,
+          "completedAt": null,
+          "activityLog": [
+            {
+              "date": "2026-03-23",
+              "text": "Stato cambiato in: In corso"
+            },
+            {
+              "date": "2026-03-25",
+              "text": "Stato cambiato in: Da verificare"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "proj_test_evento",
+      "name": "Evento Track Day Aprile",
+      "description": "Materiale grafico per track day 19 aprile",
+      "status": "attivo",
+      "launchDate": "2026-04-19",
+      "tasks": [
+        {
+          "id": "task_t6_locandina",
+          "title": "Locandina evento + post social",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-01",
+          "estimateHours": 4,
+          "recurrence": null,
+          "note": "Locandina A3 per stampa + versione social (1080x1080 e 1080x1920). Data: 19 aprile, Misano.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "Locandina approvata da Mattia",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "evento"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774483600000,
+          "completedAt": null,
+          "activityLog": []
+        },
+        {
+          "id": "task_t7_badge",
+          "title": "Badge partecipanti + pass paddock",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-10",
+          "estimateHours": 3,
+          "recurrence": null,
+          "note": "Badge nominativo con QR code. Template editabile per stampare in loco.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "Template badge funzionante",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "evento"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774483600000,
+          "completedAt": null,
+          "activityLog": []
         }
       ]
     }
