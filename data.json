@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:42.108Z",
+  "publishedAt": "2026-03-26T21:28:45.216Z",
   "projects": [],
   "team": [
     {
@@ -61,15 +61,6 @@
       "brand": "USR",
       "startDate": "2026-04-12",
       "endDate": "2026-04-16",
-      "projectId": "",
-      "notes": ""
-    },
-    {
-      "id": "ln_s6",
-      "name": "Lancio USR Setup Pack",
-      "brand": "GTF",
-      "startDate": "2026-04-08",
-      "endDate": "2026-04-11",
       "projectId": "",
       "notes": ""
     }
