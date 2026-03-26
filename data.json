@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T08:27:07.013Z",
+  "publishedAt": "2026-03-26T10:12:53.000Z",
   "projects": [
     {
       "id": "id_1774509286071_hsatnk",
@@ -1857,6 +1857,71 @@
       "role": "F1 Esports Coach",
       "hoursPerWeek": 15,
       "color": "#6366F1"
+    }
+  ],
+  "launches": [
+    {
+      "id": "ln_1774516373207_t6gbuy",
+      "name": "Lancio ADT Setup Pack F1-26",
+      "brand": "ADT",
+      "startDate": "2026-03-28",
+      "endDate": "2026-03-31",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774516373207_d6a5te",
+      "name": "Lancio Database Strategia ADT",
+      "brand": "ADT",
+      "startDate": "2026-04-03",
+      "endDate": "2026-04-07",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774516373207_h96870",
+      "name": "Lancio Circolo dei Top Drivers Aprile",
+      "brand": "ADT",
+      "startDate": "2026-04-21",
+      "endDate": "2026-04-28",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774516373207_fhe5fi",
+      "name": "Lancio ADT Kick Off",
+      "brand": "ADT",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774516373207_q9lg5l",
+      "name": "Lancio USR Kick Off",
+      "brand": "USR",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774516373207_xng56a",
+      "name": "Lancio USR Setup Pack",
+      "brand": "USR",
+      "startDate": "2026-04-06",
+      "endDate": "2026-04-09",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774516373207_vpmhs5",
+      "name": "Lancio Gentleman Driver Lead Magnet",
+      "brand": "ADT",
+      "startDate": "2026-03-31",
+      "endDate": "2026-04-05",
+      "projectId": "",
+      "notes": ""
     }
   ]
 }
