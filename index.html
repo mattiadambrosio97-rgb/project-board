@@ -3303,23 +3303,43 @@ function renderCEOHome() {
             }
         });
     });
-    // Ordina: bloccate prima, poi per scadenza
+
+    // Calcola priorità per ordinamento: COO ha risposto > urgenti/scadute > normali > in attesa > completate
+    function _ceoTaskPriority(item) {
+        var t = item.task;
+        var ceoTa = _ca.taskActions[t.id];
+        var lastCeoUpd = (ceoTa && ceoTa.updates && ceoTa.updates.length > 0) ? ceoTa.updates[ceoTa.updates.length - 1] : null;
+        var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+        var cooHasReplied = lastCooResp && lastCeoUpd && new Date(lastCooResp.at) > new Date(lastCeoUpd.at);
+        var awaitingCooReply = lastCeoUpd && lastCeoUpd.type === 'update' && (!lastCooResp || new Date(lastCeoUpd.at) > new Date(lastCooResp.at));
+        if (cooHasReplied) return 0;
+        if (t.status === 'blocked') return 1;
+        if (t.dueDate && t.dueDate < todayStr) return 2;
+        if (t.dueDate && t.dueDate === todayStr) return 3;
+        if (t.status === 'ceo_done') return 8;
+        if (awaitingCooReply) return 7;
+        return 5;
+    }
     allCeoTasks.sort(function(a, b) {
-        if (a.task.status === 'blocked' && b.task.status !== 'blocked') return -1;
-        if (a.task.status !== 'blocked' && b.task.status === 'blocked') return 1;
+        var pa = _ceoTaskPriority(a), pb = _ceoTaskPriority(b);
+        if (pa !== pb) return pa - pb;
         var aDate = a.task.dueDate || '9999';
         var bDate = b.task.dueDate || '9999';
         return aDate.localeCompare(bDate);
     });
 
+    // Separa attive e completate
+    var activeCeoTasks = allCeoTasks.filter(function(item) { return item.task.status !== 'ceo_done'; });
+    var doneCeoTasks = allCeoTasks.filter(function(item) { return item.task.status === 'ceo_done'; });
+
     if (allCeoTasks.length > 0) {
         html += '<div style="margin-bottom:24px">';
         html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
         html += '<div style="font-size:15px;font-weight:800;color:var(--text)">Le tue task</div>';
-        html += '<span style="background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px">' + allCeoTasks.length + '</span>';
+        html += '<span style="background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px">' + activeCeoTasks.length + '</span>';
         html += '</div>';
 
-        allCeoTasks.forEach(function(item) {
+        activeCeoTasks.forEach(function(item) {
             var t = item.task;
             var isBlocked = t.status === 'blocked';
             var isOverdue = t.dueDate && t.dueDate < todayStr;
@@ -3369,6 +3389,29 @@ function renderCEOHome() {
 
             html += '</div>';
         });
+
+        // Sezione completate (ceo_done) — collassabile
+        if (doneCeoTasks.length > 0) {
+            html += '<div style="margin-top:12px;border-top:1px solid var(--border);padding-top:10px">';
+            html += '<div onclick="var p=document.getElementById(\'ceoDonePanel\');var c=document.getElementById(\'ceoDoneChev\');if(p.style.display===\'none\'){p.style.display=\'block\';c.style.transform=\'rotate(90deg)\'}else{p.style.display=\'none\';c.style.transform=\'rotate(0deg)\'}" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+            html += '<span id="ceoDoneChev" style="font-size:12px;color:var(--text-muted);transition:transform 0.2s">&#9654;</span>';
+            html += '<span style="font-size:13px;font-weight:700;color:var(--green)">Completate in attesa di conferma (' + doneCeoTasks.length + ')</span>';
+            html += '</div>';
+            html += '<div id="ceoDonePanel" style="display:none">';
+            doneCeoTasks.forEach(function(item) {
+                var t = item.task;
+                html += '<div onclick="ceoOpenTask(\'' + t.id + '\',\'' + item.projectId + '\')" style="cursor:pointer;background:var(--green-bg, #F0FDF4);border:1px solid var(--green);border-radius:10px;padding:12px 14px;margin-bottom:6px;opacity:0.7;transition:opacity 0.15s" onmouseenter="this.style.opacity=\'1\'" onmouseleave="this.style.opacity=\'0.7\'">';
+                html += '<div style="display:flex;align-items:center;gap:8px">';
+                html += '<span style="background:var(--green);color:#fff;font-size:9px;font-weight:800;border-radius:4px;padding:2px 6px">COMPLETATA</span>';
+                html += '<span style="font-size:13px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.ceoNote && t.ceoNote.trim() ? t.ceoNote : t.title) + '</span>';
+                html += '<span style="font-size:11px;color:var(--text-muted)">' + esc(item.projectName) + '</span>';
+                html += '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+            html += '</div>';
+        }
+
         html += '</div>';
     }
 
@@ -3952,6 +3995,8 @@ function _cooFetchCeoActions() {
                 (p.tasks || []).forEach(function(t) {
                     var ta = ceoActs.taskActions[t.id];
                     if (!ta) return;
+                    // Skip se il COO ha già gestito questa azione (confermata o rifiutata)
+                    if (t.cooAcknowledgedCeoAction) return;
                     // Completate → da_verificare
                     if (ta.status === 'complete' && t.status !== 'done' && t.status !== 'da_verificare') {
                         t.status = 'da_verificare';
@@ -6838,6 +6883,7 @@ function confirmTask(taskId, projectId) {
     if (!t) { _showToast('Task non trovata', true); return; }
     t.status = 'done';
     t.completedAt = new Date().toISOString();
+    t.cooAcknowledgedCeoAction = true;
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Confermata dal COO (completata da Alberto)' });
     saveProjects(projects);
@@ -6853,6 +6899,7 @@ function rejectTask(taskId, projectId) {
     var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
     if (!t) { _showToast('Task non trovata', true); return; }
     t.status = 'in_progress';
+    t.cooAcknowledgedCeoAction = true;
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO (era da verificare)' });
     saveProjects(projects);
