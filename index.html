@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Project Command Center — Mattia D'Ambrosio</title>
-    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js?v=' + Date.now()).catch(function(){});}</script>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()});});}</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -2600,12 +2600,14 @@ function previewCEO() {
     _ceoPreview = true;
     // In preview, use local data directly
     _ceoData = { publishedAt: new Date().toISOString(), projects: _origGetProjects(), team: _origGetTeam(), launches: getLaunches(), ceoLinks: getCeoLinks(), resources: getResources() };
+    _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
     document.getElementById('header').style.display = 'none';
     renderCEOView();
 }
 function exitCEOPreview() {
     _ceoPreview = false;
     _ceoData = null;
+    _ceoActions = null;
     document.getElementById('header').style.display = '';
     render();
 }
@@ -2637,14 +2639,13 @@ function ceoToggleResource(resId) {
 }
 
 function ceoMarkResource(resId, action) {
-    if (!_ceoData || !_ceoData.resources) return;
-    var res = _ceoData.resources.find(function(r) { return r.id === resId; });
-    if (!res) return;
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions.resourceActions[resId]) _ceoActions.resourceActions[resId] = {};
     if (action === 'read') {
-        res.ceoRead = true;
-        res.ceoReadAt = new Date().toISOString();
+        _ceoActions.resourceActions[resId].read = true;
+        _ceoActions.resourceActions[resId].readAt = new Date().toISOString();
     }
-    ceoPushData(_ceoData, function(ok) {
+    ceoPushActions(function(ok) {
         if (ok) renderCEOView();
         else alert('Errore nel salvataggio. Riprova.');
     });
@@ -2653,17 +2654,17 @@ function ceoMarkResource(resId, action) {
 function ceoResourceFeedback(resId) {
     var note = prompt('Scrivi la tua risposta per il COO:');
     if (!note || !note.trim()) return;
-    if (!_ceoData || !_ceoData.resources) return;
-    var res = _ceoData.resources.find(function(r) { return r.id === resId; });
-    if (!res) return;
-    if (!res.ceoFeedback) res.ceoFeedback = [];
-    res.ceoFeedback.push({ note: note.trim(), at: new Date().toISOString() });
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions.resourceActions[resId]) _ceoActions.resourceActions[resId] = {};
+    var ra = _ceoActions.resourceActions[resId];
+    if (!ra.feedback) ra.feedback = [];
+    ra.feedback.push({ note: note.trim(), at: new Date().toISOString() });
     // Segnala anche come letto automaticamente
-    if (!res.ceoRead) {
-        res.ceoRead = true;
-        res.ceoReadAt = new Date().toISOString();
+    if (!ra.read) {
+        ra.read = true;
+        ra.readAt = new Date().toISOString();
     }
-    ceoPushData(_ceoData, function(ok) {
+    ceoPushActions(function(ok) {
         if (ok) renderCEOView();
         else alert('Errore nel salvataggio. Riprova.');
     });
@@ -2756,28 +2757,35 @@ function ceoTaskAction(taskId, projectId, actionType) {
         return;
     }
 
-    // Aggiorna i dati locali
-    if (!_ceoData) return;
-    var p = _ceoData.projects.find(function(pr) { return pr.id === projectId; });
-    if (!p) return;
-    var t = (p.tasks || []).find(function(tk) { return tk.id === taskId; });
-    if (!t) return;
-
-    if (!t.ceoUpdates) t.ceoUpdates = [];
-    t.ceoUpdates.push({
+    // Update _ceoActions
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions.taskActions[taskId]) _ceoActions.taskActions[taskId] = { status: '', updates: [] };
+    var ta = _ceoActions.taskActions[taskId];
+    ta.updates.push({
         type: actionType,
         note: noteText.trim(),
         at: new Date().toISOString()
     });
-
     if (actionType === 'complete') {
-        t.status = 'ceo_done';
+        ta.status = 'complete';
+    } else {
+        ta.status = 'update';
     }
 
-    _ceoData.publishedAt = new Date().toISOString();
+    // Also update local _ceoData for immediate rendering
+    if (_ceoData) {
+        var p = _ceoData.projects.find(function(pr) { return pr.id === projectId; });
+        if (p) {
+            var t = (p.tasks || []).find(function(tk) { return tk.id === taskId; });
+            if (t) {
+                t.ceoUpdates = ta.updates;
+                if (actionType === 'complete') t.status = 'ceo_done';
+            }
+        }
+    }
 
-    // Push to GitHub
-    ceoPushData(_ceoData, function(ok) {
+    // Push only ceo.json
+    ceoPushActions(function(ok) {
         if (ok) {
             closeTaskModal();
             renderCEOView();
@@ -2787,24 +2795,27 @@ function ceoTaskAction(taskId, projectId, actionType) {
     });
 }
 
-function ceoPushData(data, callback) {
+function ceoPushActions(callback) {
     var token = safeGetItem('pb_gh_token_ceo');
     if (!token) {
-        token = prompt('Per salvare le tue azioni serve un token GitHub (solo la prima volta).\nChiedi a Mattia di fornirti il token.');
-        if (!token) { callback(false); return; }
-        safeSetItem('pb_gh_token_ceo', token.trim());
+        _showCeoOnboarding();
+        callback(false);
+        return;
     }
 
-    var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    _ceoActions.lastUpdate = new Date().toISOString();
 
-    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(_ceoActions, null, 2))));
+
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
         headers: { 'Authorization': 'Bearer ' + token }
     }).then(function(r) { return r.ok ? r.json() : null; })
     .then(function(existing) {
-        var body = { message: 'CEO update ' + new Date().toISOString().split('T')[0], content: content };
+        var body = { message: 'CEO actions ' + new Date().toISOString().split('T')[0], content: content };
         if (existing && existing.sha) body.sha = existing.sha;
 
-        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE, {
             method: 'PUT',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
             body: JSON.stringify(body)
@@ -2816,7 +2827,7 @@ function ceoPushData(data, callback) {
             r.json().then(function(err) {
                 if (err.message && err.message.indexOf('Bad credentials') !== -1) {
                     safeSetItem('pb_gh_token_ceo', '');
-                    alert('Token non valido. Riprova.');
+                    _showCeoOnboarding();
                 }
                 callback(false);
             });
@@ -2828,6 +2839,54 @@ function ceoToggleTheme() {
     document.body.classList.toggle('dark');
     safeSetItem('pb_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     renderCEOView();
+}
+
+function _showCeoOnboarding() {
+    var mc = document.getElementById('mainContent');
+    mc.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;padding:20px">' +
+        '<div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 36px;max-width:400px;width:100%;box-shadow:var(--shadow-lg);text-align:center">' +
+        '<div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">Benvenuto, Alberto</div>' +
+        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:28px">Inserisci il codice che ti ha dato Mattia</div>' +
+        '<input id="ceoTokenInput" type="text" placeholder="Incolla qui il codice..." style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.2s;box-sizing:border-box" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+        '<button onclick="_ceoOnboardSubmit()" style="margin-top:16px;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.2s" onmouseenter="this.style.background=\'var(--accent-strong)\'" onmouseleave="this.style.background=\'var(--accent)\'">Continua</button>' +
+        '<div id="ceoOnboardError" style="margin-top:12px;font-size:13px;color:var(--red);display:none"></div>' +
+        '</div></div>';
+    // Allow Enter key
+    setTimeout(function() {
+        var inp = document.getElementById('ceoTokenInput');
+        if (inp) { inp.focus(); inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') _ceoOnboardSubmit(); }); }
+    }, 100);
+}
+
+function _ceoOnboardSubmit() {
+    var inp = document.getElementById('ceoTokenInput');
+    var errEl = document.getElementById('ceoOnboardError');
+    if (!inp) return;
+    var token = inp.value.trim();
+    if (!token) {
+        if (errEl) { errEl.textContent = 'Inserisci il codice per continuare.'; errEl.style.display = 'block'; }
+        return;
+    }
+    // Validate token with a test API call
+    if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; }
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r) {
+        if (r.ok || r.status === 404) {
+            // 404 is fine — file may not exist yet
+            safeSetItem('pb_gh_token_ceo', token);
+            // Reload CEO view
+            _ceoData = null;
+            _ceoActions = null;
+            render();
+        } else if (r.status === 401) {
+            if (errEl) { errEl.textContent = 'Codice non valido. Controlla e riprova.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; }
+        } else {
+            if (errEl) { errEl.textContent = 'Errore di connessione. Riprova.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; }
+        }
+    }).catch(function() {
+        if (errEl) { errEl.textContent = 'Errore di rete. Controlla la connessione.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; }
+    });
 }
 
 function daysUntil(dateStr) {
@@ -2868,7 +2927,8 @@ function renderCEOHome() {
 
     // ========== NOTIFICHE / BACHECA RISORSE — widget in alto ==========
     var resources = getResources();
-    var unreadRes = resources.filter(function(r) { return !r.ceoRead; });
+    var _ca = _ceoActions || { taskActions: {}, resourceActions: {} };
+    var unreadRes = resources.filter(function(r) { var ra = _ca.resourceActions[r.id]; return !(ra && ra.read); });
     if (resources.length > 0) {
         var hasUnread = unreadRes.length > 0;
         html += '<div id="ceoInboxWidget" style="margin-bottom:14px">';
@@ -2890,12 +2950,13 @@ function renderCEOHome() {
         // Pannello espandibile
         html += '<div id="ceoInboxPanel" style="display:none;margin-top:8px;display:none">';
         // Non lette prima
-        var sortedRes = resources.slice().sort(function(a,b) { return (a.ceoRead ? 1 : 0) - (b.ceoRead ? 1 : 0); });
+        var sortedRes = resources.slice().sort(function(a,b) { var aRead = _ca.resourceActions[a.id] && _ca.resourceActions[a.id].read; var bRead = _ca.resourceActions[b.id] && _ca.resourceActions[b.id].read; return (aRead ? 1 : 0) - (bRead ? 1 : 0); });
         sortedRes.forEach(function(res) {
             var typeIcon = res.type === 'link' ? '&#128279;' : res.type === 'html' ? '&#128196;' : '&#128221;';
             var typeLabel = res.type === 'link' ? 'Link' : res.type === 'html' ? 'HTML' : 'Nota';
             var dateStr = res.createdAt ? new Date(res.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short'}) : '';
-            var isRead = res.ceoRead;
+            var resActions = _ca.resourceActions[res.id] || {};
+            var isRead = resActions.read;
 
             html += '<div style="background:' + (isRead ? 'var(--surface)' : 'var(--accent-soft,#FFF1ED)') + ';border:1px solid ' + (isRead ? 'var(--border)' : 'var(--accent)') + ';border-radius:10px;margin-bottom:8px;overflow:hidden;opacity:' + (isRead ? '0.7' : '1') + '">';
 
@@ -2924,7 +2985,7 @@ function renderCEOHome() {
             }
 
             // Feedback precedenti
-            var ceoFeedback = res.ceoFeedback || [];
+            var ceoFeedback = (resActions.feedback) || [];
             if (ceoFeedback.length > 0) {
                 html += '<div style="margin-top:10px">';
                 ceoFeedback.slice().reverse().forEach(function(fb) {
@@ -3251,6 +3312,7 @@ function renderCEOProject(pid) {
 // ========== PUBLISH TO GITHUB (CEO sync) ==========
 var GH_REPO = 'mattiadambrosio97-rgb/project-board';
 var GH_DATA_FILE = 'data.json';
+var GH_CEO_FILE = 'ceo.json';
 
 function getGHToken() { return safeGetItem('pb_gh_token'); }
 function setGHToken(t) { safeSetItem('pb_gh_token', t); }
@@ -3274,7 +3336,7 @@ function publishForCEO() {
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
     // Get current file SHA (needed for update)
-    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
         headers: { 'Authorization': 'Bearer ' + getGHToken() }
     }).then(function(r) { return r.ok ? r.json() : null; })
     .then(function(existing) {
@@ -3308,18 +3370,50 @@ function publishForCEO() {
     }).catch(function(e) { alert('Errore di rete: ' + e.message); });
 }
 
-// CEO mode: load data from remote data.json
+// CEO mode: load data from remote data.json + ceo.json
 var _ceoData = null;
+var _ceoActions = null;
+
+function _applyCeoActionsToData() {
+    if (!_ceoData || !_ceoActions) return;
+    // Apply task actions from ceo.json onto _ceoData for rendering
+    if (_ceoActions.taskActions && _ceoData.projects) {
+        _ceoData.projects.forEach(function(p) {
+            (p.tasks || []).forEach(function(t) {
+                var ta = _ceoActions.taskActions[t.id];
+                if (ta) {
+                    if (ta.status === 'complete') t.status = 'ceo_done';
+                    t.ceoUpdates = ta.updates || [];
+                }
+            });
+        });
+    }
+}
+
 function loadCEOData(callback) {
     if (_ceoData) { callback(_ceoData); return; }
     var loc = window.location;
-    var dataUrl = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/') + 'data.json?t=' + Date.now();
-    fetch(dataUrl, { cache: 'no-store' }).then(function(r) {
+    var base = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/');
+    var dataUrl = base + 'data.json?t=' + Date.now();
+    var ceoUrl = base + 'ceo.json?t=' + Date.now();
+
+    var dataPromise = fetch(dataUrl, { cache: 'no-store' }).then(function(r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
-    }).then(function(d) {
-        _ceoData = d;
-        callback(d);
+    });
+
+    var ceoPromise = fetch(ceoUrl, { cache: 'no-store' }).then(function(r) {
+        if (!r.ok) return { lastUpdate: '', taskActions: {}, resourceActions: {} };
+        return r.json();
+    }).catch(function() {
+        return { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    });
+
+    Promise.all([dataPromise, ceoPromise]).then(function(results) {
+        _ceoData = results[0];
+        _ceoActions = results[1];
+        _applyCeoActionsToData();
+        callback(_ceoData);
     }).catch(function(err) {
         document.getElementById('mainContent').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-size:16px">Nessun dato pubblicato ancora.<br>Il COO deve prima pubblicare i dati.<br><small style="color:var(--red)">' + err.message + '</small></div>';
     });
@@ -3343,6 +3437,11 @@ function render() {
     // CEO mode — dashboard sintetica
     if (CEO_MODE) {
         document.getElementById('header').style.display = 'none';
+        // Check for token first
+        if (!safeGetItem('pb_gh_token_ceo')) {
+            _showCeoOnboarding();
+            return;
+        }
         if (!_ceoData) {
             loadCEOData(function() { render(); });
             return;
@@ -3360,9 +3459,74 @@ function render() {
     renderHeader();
     if (state.currentView === 'global') {
         mc.innerHTML = renderGlobalWrapper();
+        if (state.globalTab === 0) _cooFetchCeoActions();
     } else {
         mc.innerHTML = renderDetail();
     }
+}
+
+// COO: fetch ceo.json from GitHub to display Alberto's responses
+function _cooFetchCeoActions() {
+    var ghToken = getGHToken();
+    if (!ghToken) return;
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + ghToken }
+    }).then(function(r) {
+        if (!r.ok) return null;
+        return r.json();
+    }).then(function(fileData) {
+        if (!fileData || !fileData.content) return;
+        var decoded = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, ''))));
+        var ceoActs = JSON.parse(decoded);
+        // Update resource badges in DOM
+        var ress = getResources();
+        ress.forEach(function(r) {
+            var ra = (ceoActs.resourceActions && ceoActs.resourceActions[r.id]) || {};
+            var badgeEl = document.getElementById('cooResBadge_' + r.id);
+            if (badgeEl) {
+                if (ra.read) {
+                    badgeEl.style.color = 'var(--green)';
+                    badgeEl.style.background = 'var(--green-bg,#F0FDF4)';
+                    badgeEl.textContent = 'LETTO';
+                } else {
+                    badgeEl.style.color = 'var(--orange)';
+                    badgeEl.style.background = 'var(--orange-bg,#FFF7ED)';
+                    badgeEl.textContent = 'NON LETTO';
+                }
+            }
+            var feedEl = document.getElementById('cooResFeedback_' + r.id);
+            var feedback = ra.feedback || [];
+            if (feedEl && feedback.length > 0) {
+                var fHtml = '<div style="padding:4px 10px 8px;border-top:1px solid var(--border-light)">';
+                feedback.slice(-2).forEach(function(fb) {
+                    var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    fHtml += '<div style="font-size:11px;padding:4px 0"><span style="font-weight:700;color:var(--blue)">Alberto:</span> <span style="color:var(--text-secondary)">' + esc(fb.note) + '</span> <span style="color:var(--text-muted);font-size:10px">' + fDate + '</span></div>';
+                });
+                fHtml += '</div>';
+                feedEl.innerHTML = fHtml;
+            }
+            // Also update the badge next to button if there are messages
+            if (badgeEl && feedback.length > 0) {
+                var msgBadge = document.createElement('span');
+                msgBadge.style.cssText = 'font-size:9px;font-weight:800;color:var(--blue);background:var(--blue-bg,#EFF6FF);border-radius:4px;padding:1px 5px;margin-left:4px';
+                msgBadge.textContent = feedback.length + ' msg';
+                badgeEl.parentNode.insertBefore(msgBadge, badgeEl.nextSibling);
+            }
+        });
+        // Also check task actions for ceo_done
+        if (ceoActs.taskActions) {
+            var projects = getProjects();
+            projects.forEach(function(p) {
+                (p.tasks || []).forEach(function(t) {
+                    var ta = ceoActs.taskActions[t.id];
+                    if (ta && ta.status === 'complete' && t.status !== 'done') {
+                        t.status = 'ceo_done';
+                        t.ceoUpdates = ta.updates || [];
+                    }
+                });
+            });
+        }
+    }).catch(function() { /* silent fail — badges stay as '...' */ });
 }
 
 function renderGlobalWrapper() {
@@ -3893,7 +4057,7 @@ function renderGlobal() {
     });
     html += '</div></div>';
 
-    // Resources management
+    // Resources management — badges fetched from ceo.json
     html += '<div>';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
     html += '<span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Bacheca Risorse</span>';
@@ -3903,27 +4067,17 @@ function renderGlobal() {
     if (ress.length === 0) {
         html += '<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nessuna risorsa. Aggiungi note, link o HTML che il CEO potra consultare.</div>';
     } else {
-        html += '<div style="display:flex;flex-direction:column;gap:6px">';
+        html += '<div id="cooResourcesList" style="display:flex;flex-direction:column;gap:6px">';
         ress.forEach(function(r) {
             var typeIcon = r.type === 'link' ? '&#128279;' : r.type === 'html' ? '&#128196;' : '&#128221;';
-            var readBadge = r.ceoRead ? '<span style="font-size:9px;font-weight:800;color:var(--green);background:var(--green-bg,#F0FDF4);border-radius:4px;padding:1px 5px">LETTO</span>' : '<span style="font-size:9px;font-weight:800;color:var(--orange);background:var(--orange-bg,#FFF7ED);border-radius:4px;padding:1px 5px">NON LETTO</span>';
-            var hasFeedback = r.ceoFeedback && r.ceoFeedback.length > 0;
             html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
             html += '<div onclick="openResourceModal(\'' + r.id + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;font-size:12px" title="Clicca per modificare">';
             html += '<span>' + typeIcon + '</span>';
             html += '<span style="font-weight:600;color:var(--text);flex:1">' + esc(r.title) + '</span>';
-            html += readBadge;
-            if (hasFeedback) html += '<span style="font-size:9px;font-weight:800;color:var(--blue);background:var(--blue-bg,#EFF6FF);border-radius:4px;padding:1px 5px">' + r.ceoFeedback.length + ' msg</span>';
+            html += '<span id="cooResBadge_' + r.id + '" style="font-size:9px;font-weight:800;color:var(--text-muted);background:var(--bg);border-radius:4px;padding:1px 5px">...</span>';
             html += '<span style="font-size:10px;color:var(--text-muted)">' + (r.type === 'link' ? 'Link' : r.type === 'html' ? 'HTML' : 'Nota') + '</span>';
             html += '</div>';
-            if (hasFeedback) {
-                html += '<div style="padding:4px 10px 8px;border-top:1px solid var(--border-light)">';
-                r.ceoFeedback.slice(-2).forEach(function(fb) {
-                    var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    html += '<div style="font-size:11px;padding:4px 0"><span style="font-weight:700;color:var(--blue)">Alberto:</span> <span style="color:var(--text-secondary)">' + esc(fb.note) + '</span> <span style="color:var(--text-muted);font-size:10px">' + fDate + '</span></div>';
-                });
-                html += '</div>';
-            }
+            html += '<div id="cooResFeedback_' + r.id + '"></div>';
             html += '</div>';
         });
         html += '</div>';
