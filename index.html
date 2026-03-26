@@ -1063,77 +1063,113 @@
 
         /* ===== RESPONSIVE — TABLET & MOBILE ===== */
         @media (max-width: 768px) {
-            body { overflow-x: hidden; }
+            body { overflow-x: hidden; -webkit-text-size-adjust: 100%; }
 
             /* Header */
             .header {
                 flex-wrap: wrap; padding: 12px 16px; gap: 8px;
             }
             .header-left { min-width: 0; flex: 1 1 100%; }
-            .header-title { font-size: 18px; max-width: 100%; white-space: normal; }
-            .header-desc { max-width: 100%; }
+            .header-title { font-size: 20px; max-width: 100%; white-space: normal; }
+            .header-desc { max-width: 100%; font-size: 13px; }
             .header-right { flex-wrap: wrap; gap: 6px; justify-content: flex-start; flex: 1 1 100%; }
-            .header-right .add-btn { padding: 6px 14px; font-size: 12px; }
-            .header-right .icon-btn { width: 30px; height: 30px; font-size: 13px; }
-            .copy-data-btn { font-size: 11px !important; padding: 6px 10px !important; }
+            .header-right .add-btn { padding: 8px 16px; font-size: 13px; min-height: 40px; }
+            .header-right .icon-btn { width: 36px; height: 36px; font-size: 15px; }
+            .copy-data-btn { font-size: 12px !important; padding: 8px 12px !important; }
 
             /* Global dashboard */
             .global-view { padding: 16px; gap: 18px; }
             .global-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .global-stat-value { font-size: 26px; }
+            .global-stat-value { font-size: 28px; }
+            .global-stat-label { font-size: 13px; }
 
             /* Action bar */
-            .action-bar { gap: 8px; }
-            .action-card { min-width: 130px; padding: 10px 14px; flex: 1 1 calc(50% - 4px); }
-            .action-card-num { font-size: 18px; }
-            .action-card-icon { font-size: 18px; }
+            .action-bar { gap: 8px; flex-direction: column; }
+            .action-card { min-width: 0; padding: 12px 16px; flex: 1 1 100%; }
+            .action-card-num { font-size: 20px; }
+            .action-card-label { font-size: 13px; }
+            .action-card-icon { font-size: 20px; }
 
             /* Stats line */
-            .stats-line { font-size: 12px; gap: 4px 10px; }
+            .stats-line { font-size: 13px; gap: 4px 10px; }
 
             /* Projects grid */
             .projects-grid { grid-template-columns: 1fr; }
 
-            /* Tabs bar */
+            /* Tabs bar — STICKY + compact */
             .tabs-bar {
-                padding: 0 16px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+                padding: 0 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;
                 scrollbar-width: none; -ms-overflow-style: none;
+                position: sticky; top: 0; z-index: 50; background: var(--surface);
+                border-bottom: 1px solid var(--border);
             }
             .tabs-bar::-webkit-scrollbar { display: none; }
-            .tab-btn { padding: 10px 14px; font-size: 12px; white-space: nowrap; }
+            .tab-btn { padding: 10px 10px; font-size: 13px; white-space: nowrap; }
 
             /* Filters bar */
             .filters-bar { padding: 10px 16px; gap: 8px; flex-wrap: wrap; }
-            .filter-input { min-width: 0; width: 100%; flex: 1 1 100%; }
-            .filter-select { min-width: 0; flex: 1 1 calc(50% - 4px); }
+            .filter-input { min-width: 0; width: 100%; flex: 1 1 100%; font-size: 14px; }
+            .filter-select { min-width: 0; flex: 1 1 calc(50% - 4px); font-size: 14px; }
 
             /* View content */
             .view-content { padding: 12px 16px; }
 
-            /* Kanban board */
-            .kanban-board { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 12px; }
-            .kanban-column { min-width: 260px; max-width: 280px; }
+            /* ====== KANBAN BOARD — VERTICAL STACK on mobile ====== */
+            .kanban-board {
+                flex-direction: column; overflow-x: visible; gap: 12px;
+            }
+            .kanban-column {
+                min-width: 100% !important; max-width: 100% !important; flex-shrink: 1;
+            }
+            .kanban-col-body { max-height: none; }
+            .kanban-empty { display: none; }
+            .kanban-add-btn { font-size: 14px; padding: 10px; min-height: 40px; }
 
-            /* List table — horizontal scroll */
-            .list-table { font-size: 12px; display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
-            .list-table th { font-size: 10px; padding: 6px 8px; white-space: nowrap; }
-            .list-table td { padding: 8px; font-size: 12px; white-space: nowrap; }
+            /* ====== LIST TABLE — CARD LAYOUT on mobile ====== */
+            .list-table { display: block; border: none; }
+            .list-table thead { display: none; }
+            .list-table tbody { display: flex; flex-direction: column; gap: 8px; }
+            .list-table tr {
+                display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto auto;
+                gap: 4px 10px; align-items: center;
+                padding: 14px 16px; border: 1px solid var(--border);
+                border-radius: 10px; background: var(--surface);
+                cursor: pointer;
+            }
+            .list-table tr:hover { background: var(--surface-hover); }
+            .list-table td { padding: 0; border: none; white-space: normal; font-size: 14px; }
+            .list-table td.td-check { grid-row: 1 / 3; grid-column: 1; align-self: center; }
+            .list-table td.td-title { grid-row: 1; grid-column: 2; font-size: 15px; font-weight: 700; }
+            .list-table td.td-assignee { display: none; }
+            .list-table td.td-status { grid-row: 2; grid-column: 2; justify-self: start; }
+            .list-table td.td-due { grid-row: 2; grid-column: 2; justify-self: end; }
+            .list-table .status-chip { font-size: 12px; }
+            .list-add-row { font-size: 15px; padding: 12px; min-height: 44px; }
 
-            /* Calendar nav — wrap for mobile */
+            /* ====== TASK CARDS — bigger text, comfy tap ====== */
+            .task-card { padding: 14px 16px; gap: 10px; }
+            .task-card-title { font-size: 15px; }
+            .task-card-status-dot { width: 14px; height: 14px; }
+            .task-card-meta { font-size: 13px; }
+            .task-card-due { font-size: 12px; }
+            .task-card-assignee { font-size: 12px; }
+            .task-card-tags .tag-chip { font-size: 11px; }
+
+            /* Calendar nav */
             .calendar-nav {
                 flex-wrap: wrap; gap: 8px;
             }
-            .calendar-month-label { font-size: 15px; flex: 1 1 auto; min-width: 0; }
-            .calendar-nav-btn { width: 32px; height: 32px; flex-shrink: 0; }
+            .calendar-month-label { font-size: 17px; flex: 1 1 auto; min-width: 0; }
+            .calendar-nav-btn { width: 36px; height: 36px; flex-shrink: 0; font-size: 16px; }
             .cal-mode-toggle { gap: 3px; flex-wrap: nowrap; }
-            .cal-mode-btn { font-size: 11px; padding: 4px 8px; white-space: nowrap; }
+            .cal-mode-btn { font-size: 12px; padding: 6px 10px; white-space: nowrap; min-height: 34px; }
 
             /* Calendar month grid */
             .calendar-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
             .calendar-day { min-height: 50px; padding: 3px; }
-            .calendar-day-num { font-size: 10px; }
-            .calendar-day-header { font-size: 9px; padding: 4px 2px; }
-            .calendar-task-pill { font-size: 8px; padding: 1px 3px; }
+            .calendar-day-num { font-size: 11px; }
+            .calendar-day-header { font-size: 10px; padding: 4px 2px; }
+            .calendar-task-pill { font-size: 9px; padding: 2px 4px; }
 
             /* Calendar week grid — vertical stack on mobile */
             .cal-week-grid {
@@ -1141,24 +1177,29 @@
                 gap: 0;
             }
             .cal-week-day {
-                min-height: auto; padding: 10px 12px;
+                min-height: auto; padding: 12px 14px;
                 border-bottom: 1px solid var(--border-light);
             }
             .cal-week-day-header {
-                padding-bottom: 6px; margin-bottom: 6px;
+                padding-bottom: 8px; margin-bottom: 8px;
             }
-            .cal-week-day-name { font-size: 12px; }
-            .cal-week-day-num { font-size: 16px; width: 28px; height: 28px; }
-            .cal-week-task-card { padding: 6px 8px; }
-            .cal-week-task-title { font-size: 13px; white-space: normal; }
+            .cal-week-day-name { font-size: 13px; }
+            .cal-week-day-num { font-size: 18px; width: 32px; height: 32px; }
+            .cal-week-task-card { padding: 8px 10px; }
+            .cal-week-task-title { font-size: 14px; white-space: normal; }
+            .cal-week-task-meta { font-size: 12px; }
 
             /* Calendar year grid — 2 columns on tablet */
             .cal-year-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
-            .cal-year-month { padding: 10px; }
-            .cal-year-month-name { font-size: 12px; }
+            .cal-year-month { padding: 12px; }
+            .cal-year-month-name { font-size: 13px; }
+            .cal-year-mini-day { font-size: 11px; }
 
             /* People grid */
             .people-grid { grid-template-columns: 1fr; }
+            .person-name { font-size: 16px; }
+            .person-role { font-size: 13px; }
+            .person-task-item { font-size: 14px; padding: 8px 0; min-height: 36px; }
 
             /* Summary grid */
             .summary-grid { grid-template-columns: 1fr; }
@@ -1166,33 +1207,35 @@
             /* Dashboard stats */
             .dash-stats { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .dash-stat-value { font-size: 28px; }
+            .dash-stat-label { font-size: 12px; }
 
             /* Modal */
             .modal { width: 95%; max-height: 90vh; padding: 20px; }
             .modal-title-input { font-size: 18px; }
 
             /* Chips — wrap nicely */
-            .chip-row { gap: 4px; }
-            .chip-option { font-size: 11px; padding: 4px 10px; }
-            .assignee-chip { font-size: 11px; padding: 5px 10px; }
+            .chip-row { gap: 6px; }
+            .chip-option { font-size: 13px; padding: 6px 12px; min-height: 34px; }
+            .assignee-chip { font-size: 13px; padding: 6px 12px; min-height: 34px; }
 
             /* Inbox */
-            .inbox-item { flex-wrap: wrap; gap: 6px; }
-            .inbox-project { min-width: 100%; order: -1; }
-            .inbox-task-title { flex: 1 1 100%; }
+            .inbox-item { flex-wrap: wrap; gap: 8px; font-size: 14px; }
+            .inbox-project { min-width: 100%; order: -1; font-size: 12px; }
+            .inbox-task-title { flex: 1 1 100%; font-size: 15px; }
 
             /* My tasks global */
-            .my-global-task { flex-wrap: wrap; gap: 6px; }
+            .my-global-task { flex-wrap: wrap; gap: 8px; font-size: 14px; }
 
             /* Launch items */
-            .launch-item { flex-wrap: wrap; gap: 10px; padding: 12px 16px; }
+            .launch-item { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
             .launch-countdown { min-width: 60px; }
-            .launch-countdown-num { font-size: 22px; }
+            .launch-countdown-num { font-size: 24px; }
+            .launch-project-name { font-size: 15px; }
 
             /* Radar & Analysis */
             .radar-section { padding: 14px; }
             .analysis-section { padding: 14px 16px; }
-            .radar-item { font-size: 13px; flex-wrap: wrap; }
+            .radar-item { font-size: 14px; flex-wrap: wrap; }
 
             /* Mini timeline */
             .mini-timeline { height: 22px; }
@@ -1204,19 +1247,21 @@
             .main-content { overflow-y: auto; overflow-x: hidden; }
 
             /* Touch-friendly: bigger tap targets */
-            .task-card { padding: 12px 14px; }
-            .task-card-status-dot { width: 14px; height: 14px; }
-            .quick-done-btn { padding: 6px 14px; font-size: 13px; min-height: 36px; }
-            .status-chip { padding: 6px 12px; font-size: 12px; }
-            .btn-save, .btn-cancel, .btn-delete { padding: 10px 18px; font-size: 14px; min-height: 40px; }
+            .quick-done-btn { padding: 8px 16px; font-size: 14px; min-height: 40px; }
+            .status-chip { padding: 7px 14px; font-size: 13px; min-height: 34px; }
+            .btn-save, .btn-cancel, .btn-delete { padding: 12px 20px; font-size: 15px; min-height: 44px; }
+
+            /* Breadcrumb */
+            .breadcrumb { font-size: 13px; }
         }
 
-        /* ===== RESPONSIVE — VERY SMALL SCREENS ===== */
+        /* ===== RESPONSIVE — SMALL PHONES (iPhone SE, etc.) ===== */
         @media (max-width: 480px) {
             .global-stats-row { grid-template-columns: 1fr; }
             .modal-row { flex-direction: column; }
             .header-right .add-btn span.btn-label { display: none; }
-            .header-right .add-btn { padding: 6px 10px; font-size: 12px; }
+            .header-right .add-btn { padding: 8px 12px; font-size: 13px; }
+            .header-title { font-size: 18px; }
             .dash-stats { grid-template-columns: 1fr; }
             .donut-chart { flex-direction: column; align-items: center; gap: 12px; }
             .launch-progress-bar { max-width: 100%; }
@@ -1227,23 +1272,19 @@
             /* Calendar year — single column on small phones */
             .cal-year-grid { grid-template-columns: 1fr; }
 
-            /* Action cards — stack vertically */
-            .action-bar { flex-direction: column; }
-            .action-card { flex: 1 1 100%; min-width: 0; }
-
             /* Hide copy-data button text, show icon only */
-            .copy-data-btn { font-size: 0 !important; padding: 6px 8px !important; }
+            .copy-data-btn { font-size: 0 !important; padding: 8px !important; }
             .copy-data-btn::before { content: '\1F4CB'; font-size: 14px; }
 
             /* Calendar nav — tighter */
             .calendar-nav { gap: 6px; }
-            .calendar-month-label { font-size: 14px; }
-            .cal-mode-btn { font-size: 10px; padding: 3px 6px; }
+            .calendar-month-label { font-size: 15px; }
+            .cal-mode-btn { font-size: 11px; padding: 5px 8px; }
 
             /* Week view task cards — full width, comfy */
-            .cal-week-task-card { padding: 8px 10px; }
-            .cal-week-task-title { font-size: 14px; }
-            .cal-week-task-meta { font-size: 11px; }
+            .cal-week-task-card { padding: 10px 12px; }
+            .cal-week-task-title { font-size: 15px; }
+            .cal-week-task-meta { font-size: 12px; }
 
             /* People grid */
             .people-grid { grid-template-columns: 1fr; }
@@ -1252,6 +1293,9 @@
             /* My task items */
             .my-task-item { flex-wrap: wrap; gap: 6px; padding: 10px 14px; }
             .my-task-project { min-width: 100%; }
+
+            /* Tab btn — even more compact */
+            .tab-btn { padding: 9px 8px; font-size: 12px; }
         }
 
         /* ===== NEXT CHECK ALERT ===== */
@@ -1425,7 +1469,10 @@ let state = {
 };
 
 const GLOBAL_TABS = ['Panoramica', 'Board', 'Lista', 'Calendario', 'Persone', 'Review'];
+const GLOBAL_TABS_MOBILE = ['Home', 'Board', 'Lista', 'Cal', 'Team', 'Review'];
 const TABS = ['Dashboard', 'Board', 'Lista', 'Calendario', 'Persone', 'Le mie task', 'Riepilogo'];
+const TABS_MOBILE = ['Dash', 'Board', 'Lista', 'Cal', 'Team', 'Mie task', 'Recap'];
+function isMobile() { return window.innerWidth <= 768; }
 const STATUS_LIST = ['todo', 'in_progress', 'blocked', 'done'];
 const STATUS_LABELS = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccata', done: 'Completata' };
 const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--blue)', blocked: 'var(--red)', done: 'var(--green)' };
@@ -1859,7 +1906,8 @@ function renderGlobalWrapper() {
     let html = '';
     // Global tabs bar
     html += '<div class="tabs-bar">';
-    GLOBAL_TABS.forEach((t,i) => {
+    var _gtabs = isMobile() ? GLOBAL_TABS_MOBILE : GLOBAL_TABS;
+    _gtabs.forEach((t,i) => {
         html += `<button class="tab-btn ${state.globalTab===i?'active':''}" onclick="setGlobalTab(${i})">${t}</button>`;
     });
     html += '</div>';
@@ -3107,7 +3155,8 @@ function renderDetail() {
     let html = '<div class="detail-view">';
     // Tabs
     html += '<div class="tabs-bar">';
-    TABS.forEach((t,i) => {
+    var _dtabs = isMobile() ? TABS_MOBILE : TABS;
+    _dtabs.forEach((t,i) => {
         html += `<button class="tab-btn ${state.currentTab===i?'active':''}" onclick="setTab(${i})">${t}</button>`;
     });
     html += '</div>';
@@ -3399,11 +3448,11 @@ function renderList(p) {
         const m = getTeamMember(t.assignee);
         const dc = dateClass(t.dueDate, t.status);
         html += `<tr onclick="openTaskModal('${t.id}','${p.id}')">`;
-        html += `<td><input type="checkbox" onclick="event.stopPropagation()"></td>`;
-        html += `<td style="font-weight:600">${esc(t.title)}</td>`;
-        html += `<td>${t.assignee?`<span style="display:flex;align-items:center;gap:4px"><span class="avatar-xs" style="background:${m?m.color:'var(--slate)'}">${initials(t.assignee)}</span>${esc(t.assignee)}</span>`:''}</td>`;
-        html += `<td><button class="status-chip status-chip-${t.status}" onclick="event.stopPropagation();cycleTaskStatus('${t.id}','${p.id}')">${STATUS_LABELS[t.status]}</button></td>`;
-        html += `<td><span class="task-card-due ${dc}">${smartDate(t.dueDate)}</span></td>`;
+        html += `<td class="td-check"><input type="checkbox" onclick="event.stopPropagation()"></td>`;
+        html += `<td data-label="Titolo" class="td-title" style="font-weight:600">${esc(t.title)}</td>`;
+        html += `<td data-label="Assegnato" class="td-assignee">${t.assignee?`<span style="display:flex;align-items:center;gap:4px"><span class="avatar-xs" style="background:${m?m.color:'var(--slate)'}">${initials(t.assignee)}</span>${esc(t.assignee)}</span>`:''}</td>`;
+        html += `<td data-label="Stato" class="td-status"><button class="status-chip status-chip-${t.status}" onclick="event.stopPropagation();cycleTaskStatus('${t.id}','${p.id}')">${STATUS_LABELS[t.status]}</button></td>`;
+        html += `<td data-label="Scadenza" class="td-due"><span class="task-card-due ${dc}">${smartDate(t.dueDate)}</span></td>`;
         html += '</tr>';
     });
 
