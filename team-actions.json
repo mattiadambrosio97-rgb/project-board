@@ -33,7 +33,7 @@
       },
       "task_t5_stories": {
         "updates": [],
-        "status": "done"
+        "status": "blocked"
       },
       "task_t1_logo": {
         "updates": [],
@@ -65,5 +65,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-26T23:12:05.092Z"
+  "lastUpdate": "2026-03-26T23:14:20.330Z"
 }
