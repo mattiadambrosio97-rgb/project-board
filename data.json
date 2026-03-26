@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T22:46:23.488Z",
+  "publishedAt": "2026-03-26T22:46:36.920Z",
   "projects": [
     {
       "id": "id_1774561315044_2num0g",
@@ -100,6 +100,10 @@
           "createdAt": 1774564818803,
           "completedAt": 1774565158364,
           "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
+            },
             {
               "date": "2026-03-26",
               "text": "Stato cambiato in: Completata"
