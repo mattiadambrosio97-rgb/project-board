@@ -7428,21 +7428,10 @@ if (!CEO_MODE) setTimeout(checkAutoBackup, 2000); // check dopo caricamento (ski
             }, true); // forceRefresh=true
         }, POLL_CEO);
     } else if (window.location.hostname.indexOf('github.io') !== -1) {
-        // COO su GitHub Pages: ricarica dati da API + feedback CEO
+        // COO su GitHub Pages: fetch solo feedback CEO (il COO e' la fonte dati, non rilegge data.json)
         setInterval(function() {
             var cooToken = getGHToken();
             if (!cooToken) return;
-            // Sync dati principali
-            _ghFetchJSON(GH_DATA_FILE, cooToken).then(function(data) {
-                if (!data) return;
-                var changed = false;
-                if (data.launches) { saveLaunches(data.launches); changed = true; }
-                if (data.projects && data.projects.length > 0) { saveProjects(data.projects); changed = true; }
-                if (data.team && data.team.length > 0) { safeSetItem('pb_team', JSON.stringify(data.team)); changed = true; }
-                if (data.resources) { safeSetItem('pb_resources', JSON.stringify(data.resources)); changed = true; }
-                if (changed) { window._lastCooSync = Date.now(); render(); }
-            }).catch(function() {});
-            // Fetch feedback CEO
             _cooFetchCeoActions();
             _cooFetchCeoActionsForBacheca();
             _updateSyncIndicator();
