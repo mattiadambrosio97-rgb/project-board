@@ -1918,7 +1918,21 @@ function getDefaultCeoLinks() {
 
 // ========== RISORSE CEO (Bacheca) ==========
 function getResources() {
-    try { return JSON.parse(safeGetItem('pb_resources') || '[]'); } catch(e) { return []; }
+    try {
+        var res = JSON.parse(safeGetItem('pb_resources') || '[]');
+        // Seed risorse iniziali se vuoto
+        if (res.length === 0 && !safeGetItem('pb_resources_seeded')) {
+            res = [
+                { id: 'res_demo_001', title: 'Analisi competitor SimRacing Academy (Q1 2026)', type: 'note', content: "Ho analizzato i 5 competitor principali nel mercato SimRacing coaching EU.\n\n**Pure Driving School** \u2014 pricing aggressivo, 49\u20ac/mese membership. Puntano tutto su volumi.\n\n**Coach Dave Academy** \u2014 setup-focused, vendono pacchetti setup singoli (15-25\u20ac). No coaching 1-to-1.\n\n**SimGrid** \u2014 community-first, monetizzano con eventi e sponsor. Modello diverso dal nostro.\n\n**Driver61** \u2014 YouTube-first, funnel da contenuti gratuiti a corsi premium (297-497\u20ac). Molto forte su SEO.\n\n**Nessuno** ha un percorso strutturato pilota come il nostro. Questo \u00e8 il vantaggio competitivo da comunicare nelle prossime campagne.\n\nLeggi tutto e dimmi se vuoi che approfondiamo qualcuno di questi.", createdAt: '2026-03-25T14:00:00.000Z' },
+                { id: 'res_demo_002', title: 'Video reference: come Coach Dave presenta i setup', type: 'link', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', content: '', createdAt: '2026-03-26T09:30:00.000Z' },
+                { id: 'res_demo_003', title: 'Scaletta webinar aprile \u2014 bozza da approvare', type: 'note', content: "Webinar gratuito previsto per met\u00e0 aprile. Obiettivo: lead generation per Setup Pack.\n\n**Titolo proposto:** \"I 3 errori di setup che ti costano 1 secondo al giro (e come correggerli in 15 minuti)\"\n\n**Scaletta:**\n1. Intro + chi siamo (5 min) \u2014 Alberto presenta\n2. Errore #1: bilanciamento freni (10 min) \u2014 Max spiega con telemetria live\n3. Errore #2: rapporti cambio sbagliati (10 min) \u2014 Max\n4. Errore #3: pressioni gomme a caso (10 min) \u2014 Max\n5. Q&A (10 min)\n6. Pitch Setup Pack + offerta webinar-only (5 min) \u2014 Alberto\n\n**Da confermare:** data esatta, piattaforma (Zoom o YouTube Live), se Daniele partecipa.\n\nApprovami la scaletta cos\u00ec procediamo con la landing page.", createdAt: '2026-03-26T10:00:00.000Z' },
+                { id: 'res_commercialisti_001', title: 'Lista commercialisti Palermo \u2014 leggila e dimmi quale preferisci', type: 'link', url: 'commercialisti-palermo.html', content: '', createdAt: '2026-03-26T12:30:00.000Z' }
+            ];
+            safeSetItem('pb_resources', JSON.stringify(res));
+            safeSetItem('pb_resources_seeded', '1');
+        }
+        return res;
+    } catch(e) { return []; }
 }
 function saveResources(arr) { safeSetItem('pb_resources', JSON.stringify(arr)); }
 
@@ -4033,11 +4047,38 @@ function renderGlobal() {
         html += '</div>';
     }
 
-    // ========== CEO TOOLS (Quick Links + Risorse) — gestione COO ==========
+    // ========== CEO TOOLS (Risorse + Quick Links) — gestione COO ==========
     html += '<div style="border-top:2px solid var(--border);padding-top:20px;margin-top:8px">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
     html += '<div style="font-size:15px;font-weight:800;color:var(--text)">Pannello CEO</div>';
-    html += '<div style="font-size:11px;color:var(--text-muted)">Configurazioni visibili al CEO</div>';
+    html += '<div style="font-size:11px;color:var(--text-muted)">Visibile al CEO dopo la pubblicazione</div>';
+    html += '</div>';
+
+    // Resources management PRIMA — badges fetched from ceo.json
+    html += '<div style="margin-bottom:18px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html += '<span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Bacheca Risorse</span>';
+    html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
+    html += '</div>';
+    var ress = getResources();
+    if (ress.length === 0) {
+        html += '<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nessuna risorsa. Clicca "+ Nuova" per aggiungere link, note o HTML per Alberto.</div>';
+    } else {
+        html += '<div id="cooResourcesList" style="display:flex;flex-direction:column;gap:6px">';
+        ress.forEach(function(r) {
+            var typeIcon = r.type === 'link' ? '&#128279;' : r.type === 'html' ? '&#128196;' : '&#128221;';
+            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
+            html += '<div onclick="openResourceModal(\'' + r.id + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;font-size:12px" title="Clicca per modificare">';
+            html += '<span>' + typeIcon + '</span>';
+            html += '<span style="font-weight:600;color:var(--text);flex:1">' + esc(r.title) + '</span>';
+            html += '<span id="cooResBadge_' + r.id + '" style="font-size:9px;font-weight:800;color:var(--text-muted);background:var(--bg);border-radius:4px;padding:1px 5px">...</span>';
+            html += '<span style="font-size:10px;color:var(--text-muted)">' + (r.type === 'link' ? 'Link' : r.type === 'html' ? 'HTML' : 'Nota') + '</span>';
+            html += '</div>';
+            html += '<div id="cooResFeedback_' + r.id + '"></div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
     html += '</div>';
 
     // Quick Links management
@@ -4057,32 +4098,6 @@ function renderGlobal() {
     });
     html += '</div></div>';
 
-    // Resources management — badges fetched from ceo.json
-    html += '<div>';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-    html += '<span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Bacheca Risorse</span>';
-    html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
-    html += '</div>';
-    var ress = getResources();
-    if (ress.length === 0) {
-        html += '<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nessuna risorsa. Aggiungi note, link o HTML che il CEO potra consultare.</div>';
-    } else {
-        html += '<div id="cooResourcesList" style="display:flex;flex-direction:column;gap:6px">';
-        ress.forEach(function(r) {
-            var typeIcon = r.type === 'link' ? '&#128279;' : r.type === 'html' ? '&#128196;' : '&#128221;';
-            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
-            html += '<div onclick="openResourceModal(\'' + r.id + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;font-size:12px" title="Clicca per modificare">';
-            html += '<span>' + typeIcon + '</span>';
-            html += '<span style="font-weight:600;color:var(--text);flex:1">' + esc(r.title) + '</span>';
-            html += '<span id="cooResBadge_' + r.id + '" style="font-size:9px;font-weight:800;color:var(--text-muted);background:var(--bg);border-radius:4px;padding:1px 5px">...</span>';
-            html += '<span style="font-size:10px;color:var(--text-muted)">' + (r.type === 'link' ? 'Link' : r.type === 'html' ? 'HTML' : 'Nota') + '</span>';
-            html += '</div>';
-            html += '<div id="cooResFeedback_' + r.id + '"></div>';
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-    html += '</div>';
     html += '</div>'; // close CEO tools section
 
     html += '</div>';
