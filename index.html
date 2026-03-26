@@ -3947,12 +3947,29 @@ function renderTeamTaskDetail() {
     if (task.note) {
         html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.5;margin-top:8px;white-space:pre-wrap">' + esc(task.note) + '</div>';
     }
+
+    // Dropdown stato
+    var currentStatus = (ta && ta.status) || task.status || 'todo';
+    html += '<div style="margin-top:12px;display:flex;align-items:center;gap:10px">';
+    html += '<span style="font-size:13px;font-weight:700;color:var(--text-muted)">Stato:</span>';
+    html += '<select id="teamStatusSelect" onchange="teamChangeStatus(\'' + task.id + '\')" style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-weight:700;font-family:var(--font);background:var(--bg);color:var(--text);cursor:pointer">';
+    var teamStatuses = [
+        { key: 'todo', label: 'Da fare' },
+        { key: 'in_progress', label: 'In corso' },
+        { key: 'blocked', label: 'Bloccata' },
+        { key: 'done', label: 'Completata' }
+    ];
+    teamStatuses.forEach(function(s) {
+        html += '<option value="' + s.key + '"' + (currentStatus === s.key ? ' selected' : '') + '>' + s.label + '</option>';
+    });
+    html += '</select></div>';
+
     html += '</div>';
 
-    // Conversazione (COO responses + team updates)
+    // Conversazione (solo messaggi con testo)
     var allMsgs = [];
-    (ta.updates || []).forEach(function(u) { allMsgs.push({ from: 'team', note: u.note, at: u.at, status: u.status }); });
-    (task.cooResponses || []).forEach(function(r) { allMsgs.push({ from: 'coo', note: r.note, at: r.at }); });
+    (ta.updates || []).forEach(function(u) { if (u.note && u.note.trim()) allMsgs.push({ from: 'team', note: u.note, at: u.at }); });
+    (task.cooResponses || []).forEach(function(r) { if (r.note && r.note.trim()) allMsgs.push({ from: 'coo', note: r.note, at: r.at }); });
     allMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
 
     if (allMsgs.length > 0) {
@@ -3968,10 +3985,6 @@ function renderTeamTaskDetail() {
             html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%">';
             html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
             if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + esc(m.note) + '</div>';
-            if (m.status) {
-                var sl = m.status === 'in_progress' ? 'Messo in corso' : m.status === 'done' ? 'Segnato completato' : m.status === 'blocked' ? 'Segnato bloccato' : m.status;
-                html += '<div style="font-size:12px;font-weight:700;color:var(--accent);margin-top:4px">' + sl + '</div>';
-            }
             html += '</div></div>';
         });
     }
@@ -3979,16 +3992,8 @@ function renderTeamTaskDetail() {
     // Input commento
     html += '<textarea id="teamTaskNote" rows="3" placeholder="Scrivi un commento o aggiornamento..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:12px;margin-top:12px"></textarea>';
 
-    // Bottoni azione
-    html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-    if (task.status !== 'done') {
-        html += '<button onclick="teamTaskAction(\'' + task.id + '\',\'in_progress\')" style="flex:1;padding:14px;background:var(--blue,#2563EB);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:48px">In corso</button>';
-        html += '<button onclick="teamTaskAction(\'' + task.id + '\',\'done\')" style="flex:1;padding:14px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:48px">Completata</button>';
-        html += '<button onclick="teamTaskAction(\'' + task.id + '\',\'blocked\')" style="flex:1;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:48px">Bloccata</button>';
-    }
-    html += '</div>';
-    // Bottone solo commento
-    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="width:100%;padding:12px;background:var(--surface);color:var(--accent);border:1px solid var(--accent);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:8px">Invia commento</button>';
+    // Bottone commento
+    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia commento</button>';
 
     html += '</div>';
     return html;
@@ -4006,18 +4011,30 @@ function teamGoHome() {
     window.scrollTo(0, 0);
 }
 
+function teamChangeStatus(taskId) {
+    var sel = document.getElementById('teamStatusSelect');
+    if (!sel) return;
+    var newStatus = sel.value;
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    myActions.taskActions[taskId].status = newStatus;
+    teamPushActions(function(ok) {
+        if (!ok) alert('Errore nel salvataggio. Riprova.');
+    });
+}
+
 function teamTaskAction(taskId, newStatus) {
     var noteEl = document.getElementById('teamTaskNote');
     var note = noteEl ? noteEl.value.trim() : '';
-    if (!note && !newStatus) { alert('Scrivi un commento prima di inviare.'); return; }
+    if (!note) { alert('Scrivi un commento prima di inviare.'); return; }
 
     var myActions = _getTeamMemberActions();
     if (!myActions.taskActions) myActions.taskActions = {};
     if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
     var ta = myActions.taskActions[taskId];
-    if (newStatus) ta.status = newStatus;
     if (!ta.updates) ta.updates = [];
-    ta.updates.push({ note: note || '', status: newStatus, at: new Date().toISOString() });
+    ta.updates.push({ note: note, at: new Date().toISOString() });
 
     teamPushActions(function(ok) {
         if (ok) {
