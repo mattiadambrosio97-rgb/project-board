@@ -2718,39 +2718,34 @@ function renderCEOHome() {
             var isDueToday = t.dueDate && t.dueDate === todayStr;
             var borderColor = isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
             var bgColor = isBlocked ? 'var(--red-bg, #FEF2F2)' : isOverdue ? 'var(--red-bg, #FEF2F2)' : isDueToday ? 'var(--orange-bg, #FFF7ED)' : 'var(--surface)';
+            var hasCeoNote = t.ceoNote && t.ceoNote.trim();
 
-            html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:8px">';
+            html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:16px 18px;margin-bottom:10px">';
 
-            // Riga 1: titolo + badge status
-            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
-            if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px;flex-shrink:0">BLOCCATA</span>';
-            html += '<div style="font-size:15px;font-weight:700;color:var(--text);flex:1;min-width:0">' + esc(t.title) + '</div>';
-            html += '</div>';
-
-            // Riga 2: progetto + scadenza
-            html += '<div style="display:flex;align-items:center;gap:12px;font-size:12px;margin-bottom:4px">';
-            html += '<span style="color:var(--text-muted)">' + esc(item.projectName) + '</span>';
+            // Top: badge urgenza + progetto + scadenza
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
+            if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
+            else if (isOverdue) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
+            else if (isDueToday) html += '<span style="background:var(--orange);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">OGGI</span>';
+            html += '<span style="font-size:11px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</span>';
             if (t.dueDate) {
                 var dLeft = daysUntil(t.dueDate);
                 var dateFormatted = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
                 var dateColor = isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--text-muted)';
-                var dateLabel = isOverdue ? dateFormatted + ' (scaduta da ' + Math.abs(dLeft) + 'g)' : isDueToday ? 'OGGI' : dateFormatted + ' (' + dLeft + 'g)';
-                html += '<span style="font-weight:700;color:' + dateColor + '">&#128197; ' + dateLabel + '</span>';
+                var dateLabel = isOverdue ? 'scaduta da ' + Math.abs(dLeft) + 'g' : isDueToday ? 'oggi' : dateFormatted + ' (' + dLeft + 'g)';
+                html += '<span style="font-size:11px;font-weight:700;color:' + dateColor + ';margin-left:auto">&#128197; ' + dateLabel + '</span>';
             }
             html += '</div>';
 
-            // Riga 3: nota/descrizione (se presente)
-            if (t.note) {
-                html += '<div style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.5;color:var(--text-secondary)">' + esc(t.note) + '</div>';
-            }
-
-            // Ultimo commento (se presente) — utile per contesto
-            var lastComment = (t.comments || []).slice(-1)[0];
-            if (lastComment && lastComment.text) {
-                html += '<div style="margin-top:6px;font-size:12px;color:var(--text-muted);display:flex;align-items:start;gap:6px">';
-                html += '<span style="flex-shrink:0">&#128172;</span>';
-                html += '<span>' + (lastComment.author ? '<strong>' + esc(lastComment.author) + ':</strong> ' : '') + esc(lastComment.text) + '</span>';
-                html += '</div>';
+            // Messaggio CEO (protagonista) oppure titolo task
+            if (hasCeoNote) {
+                html += '<div style="font-size:15px;font-weight:600;color:var(--text);line-height:1.5;margin-bottom:6px">' + esc(t.ceoNote) + '</div>';
+                html += '<div style="font-size:11px;color:var(--text-muted);font-style:italic">Rif: ' + esc(t.title) + '</div>';
+            } else {
+                html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
+                if (t.note) {
+                    html += '<div style="font-size:13px;color:var(--text-secondary);line-height:1.5;margin-top:4px">' + esc(t.note) + '</div>';
+                }
             }
 
             html += '</div>';
@@ -5423,6 +5418,12 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
         <textarea class="modal-textarea" id="tmNote" rows="2" placeholder="Appunti, contesto, blocchi...">${esc(task.note||'')}</textarea>
     </div>`;
 
+    // Messaggio per il CEO (visibile solo se assegnato ad Alberto)
+    html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label" style="color:var(--orange);font-weight:700">Messaggio per il CEO</span>
+        <textarea class="modal-textarea" id="tmCeoNote" rows="3" placeholder="Cosa deve fare Alberto concretamente? Scrivi in modo diretto e chiaro...">${esc(task.ceoNote||'')}</textarea>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Questo testo appare nella dashboard di Alberto come istruzione principale.</div>
+    </div>`;
+
     // === SEZIONE AVANZATA (collapsibile) ===
     const hasExtra = (task.tags||[]).length > 0 || (task.dependsOn||[]).length > 0 || task.recurrence;
     html += `<button class="modal-section-toggle" onclick="toggleModalExtra()">
@@ -5537,6 +5538,7 @@ function saveTask(taskId, projectId, isNew) {
         estimateHours: parseFloat(document.getElementById('tmHours').value) || 0,
         recurrence: document.getElementById('tmRecurrence').value || null,
         note: document.getElementById('tmNote').value,
+        ceoNote: document.getElementById('tmCeoNote').value || '',
         nextCheck: document.getElementById('tmNextCheck').value || '',
         doneWhen: document.getElementById('tmDoneWhen').value || '',
         dependsLabel: document.getElementById('tmDependsLabel').value || '',

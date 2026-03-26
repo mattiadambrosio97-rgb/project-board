@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:49:24.640Z",
+  "publishedAt": "2026-03-26T10:50:52.935Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -190,7 +190,8 @@
           "createdAt": 1774090152440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Blocco: aspettiamo video finale"
+          "note": "Blocco: aspettiamo video finale",
+          "ceoNote": "Serve la tua approvazione finale sul Lancio Setup Pack F1-26. Siamo in attesa del video di Kevin — appena arriva, dacci il via libera per partire."
         },
         {
           "id": "id_1774522152441_uq52js",
@@ -461,7 +462,8 @@
           "createdAt": 1774090152440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse."
+          "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse.",
+          "ceoNote": "Devi confermare il budget di 3.000 EUR/mese per le campagne Meta Q2. Mattia ha preparato il report con i risultati Q1 (ROAS 2.8x). Leggi il report e comunicagli il tuo ok."
         }
       ]
     },
@@ -645,31 +647,6 @@
           "completedAt": null,
           "recurrence": null,
           "note": ""
-        },
-        {
-          "id": "id_1774522152441_0asxck",
-          "title": "Decidere pricing nuovo funnel USR",
-          "assignee": "Alberto",
-          "status": "todo",
-          "priority": "p0",
-          "dependsOn": [],
-          "dueDate": "2026-03-26",
-          "estimateHours": 1,
-          "tags": [
-            "pricing",
-            "decisione"
-          ],
-          "comments": [
-            {
-              "text": "Proposte: 297 EUR (base), 497 EUR (premium), 997 EUR (VIP)",
-              "author": "Mattia",
-              "createdAt": 1774349352440
-            }
-          ],
-          "createdAt": 1774003752440,
-          "completedAt": null,
-          "recurrence": null,
-          "note": "Mattia ha preparato 3 opzioni di prezzo con margini e proiezioni. Scegli quale struttura adottare per il nuovo funnel USR. Vedi doc condiviso su Drive."
         }
       ]
     },
@@ -919,7 +896,8 @@
           "createdAt": 1773830952440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi."
+          "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi.",
+          "ceoNote": "Registra il video introduttivo del Videocorso F1 Esports (3-5 minuti). Lo script e gia pronto nella cartella Drive condivisa. Kevin lo montera appena glielo mandi. Serve entro venerdi."
         },
         {
           "id": "id_1774522152441_cnriu6",
@@ -938,7 +916,8 @@
           "createdAt": 1774090152440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Daniele ha completato i moduli 1-3. Guardali e conferma che il livello tecnico sia ok per il target. Segnala correzioni su Drive."
+          "note": "Daniele ha completato i moduli 1-3. Guardali e conferma che il livello tecnico sia ok per il target. Segnala correzioni su Drive.",
+          "ceoNote": "Daniele ha completato i primi 3 moduli del videocorso. Guardali e conferma che il livello tecnico sia adeguato al nostro target. Segnala eventuali correzioni nel documento su Drive."
         }
       ]
     },
@@ -1107,7 +1086,8 @@
           "createdAt": 1774176552440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Parlare con Luigi della possibilita che promuova il programma referral ai suoi contatti. Manlio ha gia sondato la disponibilita. Fissa la call e allineati con lui."
+          "note": "Parlare con Luigi della possibilita che promuova il programma referral ai suoi contatti. Manlio ha gia sondato la disponibilita. Fissa la call e allineati con lui.",
+          "ceoNote": "Organizza una chiamata con Luigi Mazzola per proporgli di promuovere il programma referral ai suoi contatti. Manlio ha gia sondato — Luigi e disponibile giovedi o venerdi pomeriggio. Fissa la call."
         }
       ]
     },
