@@ -3798,8 +3798,15 @@ function renderTeamHome() {
     html += '<button onclick="setTeamTab(1)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 1 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 1 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Board</button>';
     html += '</div>';
 
-    // Tutte le task (attive + completate) per la board
-    var allMyTasks = myTasks.concat(completedTasks.map(function(c) { return { task: c.task, projectName: c.projectName, projectId: '', cooHasReplied: false }; }));
+    // Tutte le task (attive + completate) per la board — usa stato locale se presente
+    var allMyTasks = myTasks.map(function(item) {
+        var effectiveStatus = item.memberStatus || item.task.status || 'todo';
+        return { task: Object.assign({}, item.task, { _effectiveStatus: effectiveStatus }), projectName: item.projectName, projectId: item.projectId || '', cooHasReplied: item.cooHasReplied };
+    }).concat(completedTasks.map(function(c) {
+        var ta2 = (myActions.taskActions || {})[c.task.id];
+        var es = (ta2 && ta2.status) || c.task.status || 'done';
+        return { task: Object.assign({}, c.task, { _effectiveStatus: es }), projectName: c.projectName, projectId: '', cooHasReplied: false };
+    }));
 
     if (_teamViewTab === 0) {
         // ===== VISTA LISTA — raggruppata per stato =====
@@ -3813,7 +3820,7 @@ function renderTeamHome() {
                 { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal)', items: [] }
             ];
             myTasks.forEach(function(item) {
-                var st = item.task.status || 'todo';
+                var st = item.memberStatus || item.task.status || 'todo';
                 var grp = listGroups.find(function(g) { return g.key === st; });
                 if (grp) grp.items.push(item);
                 else listGroups[1].items.push(item); // fallback to "Da fare"
@@ -3848,7 +3855,7 @@ function renderTeamHome() {
         ];
         html += '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch">';
         columns.forEach(function(col) {
-            var colTasks = allMyTasks.filter(function(i) { return (i.task.status || 'todo') === col.key; });
+            var colTasks = allMyTasks.filter(function(i) { return (i.task._effectiveStatus || i.task.status || 'todo') === col.key; });
             html += '<div data-team-col="' + col.key + '" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')" style="min-width:220px;flex:1;background:' + col.bg + ';border:2px dashed transparent;border-radius:12px;padding:10px;min-height:120px;transition:border-color 0.15s,background 0.15s">';
             html += '<div onclick="teamBoardColumnPopup(\'' + col.key + '\')" style="cursor:pointer;font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
             html += col.label;
@@ -4226,21 +4233,6 @@ function initTeamTouchDrag() {
         _touchDragTaskId = null;
         _touchMoved = false;
     });
-}
-
-function teamBoardColumnPopup(statusKey) {
-    _teamViewTab = 1; // vai a Board
-    renderTeamView();
-    // Scroll alla colonna corrispondente
-    setTimeout(function() {
-        var col = document.querySelector('[data-team-col="' + statusKey + '"]');
-        if (col) {
-            col.style.outline = '2px solid var(--accent)';
-            col.style.outlineOffset = '2px';
-            col.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
-            setTimeout(function() { col.style.outline = ''; col.style.outlineOffset = ''; }, 1500);
-        }
-    }, 100);
 }
 
 function teamBoardColumnPopup(statusKey) {
