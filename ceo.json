@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T14:36:05.092Z",
+  "lastUpdate": "2026-03-26T14:38:20.515Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -45,6 +45,10 @@
     "res_competitor": {
       "read": true,
       "readAt": "2026-03-26T14:36:05.092Z"
+    },
+    "res_scaletta": {
+      "read": true,
+      "readAt": "2026-03-26T14:38:20.515Z"
     }
   }
 }
