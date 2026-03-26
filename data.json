@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:54:26.078Z",
+  "publishedAt": "2026-03-26T11:21:23.179Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -54,7 +54,7 @@
         {
           "id": "id_1774522152441_uko36d",
           "title": "Creare landing page",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "in_progress",
           "priority": "p0",
           "dependsOn": [],
@@ -117,7 +117,7 @@
         {
           "id": "id_1774522152441_swhgpy",
           "title": "Video presentazione pack",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -135,7 +135,7 @@
         {
           "id": "id_1774522152441_86hw5m",
           "title": "Configurare checkout WooCommerce",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -190,8 +190,7 @@
           "createdAt": 1774090152440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Blocco: aspettiamo video finale",
-          "ceoNote": "Serve la tua approvazione finale sul Lancio Setup Pack F1-26. Siamo in attesa del video di Kevin — appena arriva, dacci il via libera per partire."
+          "note": "Blocco: aspettiamo video finale"
         },
         {
           "id": "id_1774522152441_uq52js",
@@ -342,7 +341,7 @@
         {
           "id": "id_1774522152441_47j0wx",
           "title": "Creare 3 video ads",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "blocked",
           "priority": "p0",
           "dependsOn": [],
@@ -462,8 +461,7 @@
           "createdAt": 1774090152440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse.",
-          "ceoNote": "Devi confermare il budget di 3.000 EUR/mese per le campagne Meta Q2. Mattia ha preparato il report con i risultati Q1 (ROAS 2.8x). Leggi il report e comunicagli il tuo ok."
+          "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse."
         }
       ]
     },
@@ -539,7 +537,7 @@
         {
           "id": "id_1774522152441_pxbfe8",
           "title": "Sviluppo nuova sales page",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p0",
           "dependsOn": [],
@@ -576,7 +574,7 @@
         {
           "id": "id_1774522152441_k4gpco",
           "title": "Redesign checkout",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -633,7 +631,7 @@
         {
           "id": "id_1774522152441_jhkat2",
           "title": "Go-live e redirect old URLs",
-          "assignee": "Mattia",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p0",
           "dependsOn": [],
@@ -647,6 +645,31 @@
           "completedAt": null,
           "recurrence": null,
           "note": ""
+        },
+        {
+          "id": "id_1774522152441_0asxck",
+          "title": "Decidere pricing nuovo funnel USR",
+          "assignee": "Alberto",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 1,
+          "tags": [
+            "pricing",
+            "decisione"
+          ],
+          "comments": [
+            {
+              "text": "Proposte: 297 EUR (base), 497 EUR (premium), 997 EUR (VIP)",
+              "author": "Mattia",
+              "createdAt": 1774349352440
+            }
+          ],
+          "createdAt": 1774003752440,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Mattia ha preparato 3 opzioni di prezzo con margini e proiezioni. Scegli quale struttura adottare per il nuovo funnel USR. Vedi doc condiviso su Drive."
         }
       ]
     },
@@ -764,7 +787,7 @@
         {
           "id": "id_1774522152441_qo8cxf",
           "title": "Editing video moduli 1-5",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -801,7 +824,7 @@
         {
           "id": "id_1774522152441_555afz",
           "title": "Setup area membri su WordPress",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -896,8 +919,7 @@
           "createdAt": 1773830952440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi.",
-          "ceoNote": "Registra il video introduttivo del Videocorso F1 Esports (3-5 minuti). Lo script e gia pronto nella cartella Drive condivisa. Kevin lo montera appena glielo mandi. Serve entro venerdi."
+          "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi."
         },
         {
           "id": "id_1774522152441_cnriu6",
@@ -916,8 +938,7 @@
           "createdAt": 1774090152440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Daniele ha completato i moduli 1-3. Guardali e conferma che il livello tecnico sia ok per il target. Segnala correzioni su Drive.",
-          "ceoNote": "Daniele ha completato i primi 3 moduli del videocorso. Guardali e conferma che il livello tecnico sia adeguato al nostro target. Segnala eventuali correzioni nel documento su Drive."
+          "note": "Daniele ha completato i moduli 1-3. Guardali e conferma che il livello tecnico sia ok per il target. Segnala correzioni su Drive."
         }
       ]
     },
@@ -991,7 +1012,7 @@
         {
           "id": "id_1774522152441_7mku87",
           "title": "Setup codici sconto WooCommerce",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1047,7 +1068,7 @@
         {
           "id": "id_1774522152441_crrzbj",
           "title": "Dashboard tracking referral",
-          "assignee": "Mattia",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -1086,8 +1107,7 @@
           "createdAt": 1774176552440,
           "completedAt": null,
           "recurrence": null,
-          "note": "Parlare con Luigi della possibilita che promuova il programma referral ai suoi contatti. Manlio ha gia sondato la disponibilita. Fissa la call e allineati con lui.",
-          "ceoNote": "Organizza una chiamata con Luigi Mazzola per proporgli di promuovere il programma referral ai suoi contatti. Manlio ha gia sondato — Luigi e disponibile giovedi o venerdi pomeriggio. Fissa la call."
+          "note": "Parlare con Luigi della possibilita che promuova il programma referral ai suoi contatti. Manlio ha gia sondato la disponibilita. Fissa la call e allineati con lui."
         }
       ]
     },
@@ -1183,7 +1203,7 @@
         {
           "id": "id_1774522152441_0d9c8r",
           "title": "Migrazione altri 6 siti",
-          "assignee": "Mattia",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1348,7 +1368,7 @@
         {
           "id": "id_1774522152441_q2z2js",
           "title": "Creare coupon automatico WooCommerce",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1473,7 +1493,7 @@
         {
           "id": "id_1774522152441_tbuuse",
           "title": "Creare canale Discord VIP",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "in_progress",
           "priority": "p1",
           "dependsOn": [],
@@ -1548,7 +1568,7 @@
         {
           "id": "id_1774522152441_77192d",
           "title": "Video presentazione Circolo (Alberto)",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -1657,7 +1677,7 @@
         {
           "id": "id_1774522152441_vosq4y",
           "title": "Fix OPcache configurazione",
-          "assignee": "Mattia",
+          "assignee": "Mattia FS",
           "status": "in_progress",
           "priority": "p1",
           "dependsOn": [],
@@ -1676,7 +1696,7 @@
         {
           "id": "id_1774522152441_gy970e",
           "title": "Pulizia database WP (transients, revisioni)",
-          "assignee": "Mattia",
+          "assignee": "Mattia FS",
           "status": "blocked",
           "priority": "p1",
           "dependsOn": [],
@@ -1738,7 +1758,7 @@
         {
           "id": "id_1774522152441_xvelf6",
           "title": "Implementare backup automatico giornaliero",
-          "assignee": "Mattia",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1877,7 +1897,7 @@
         {
           "id": "id_1774522152441_yonfnv",
           "title": "Post-produzione highlights",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -2074,28 +2094,5 @@
       "color": "#10A37F"
     }
   ],
-  "resources": [
-    {
-      "id": "res_demo_001",
-      "title": "Analisi competitor SimRacing Academy (Q1 2026)",
-      "type": "note",
-      "content": "Ho analizzato i 5 competitor principali nel mercato SimRacing coaching EU.\n\n**Pure Driving School** — pricing aggressivo, 49€/mese membership. Puntano tutto su volumi.\n\n**Coach Dave Academy** — setup-focused, vendono pacchetti setup singoli (15-25€). No coaching 1-to-1.\n\n**SimGrid** — community-first, monetizzano con eventi e sponsor. Modello diverso dal nostro.\n\n**Driver61** — YouTube-first, funnel da contenuti gratuiti a corsi premium (297-497€). Molto forte su SEO.\n\n**Nessuno** ha un percorso strutturato pilota come il nostro. Questo è il vantaggio competitivo da comunicare nelle prossime campagne.\n\nLeggi tutto e dimmi se vuoi che approfondiamo qualcuno di questi.",
-      "createdAt": "2026-03-25T14:00:00.000Z"
-    },
-    {
-      "id": "res_demo_002",
-      "title": "Video reference: come Coach Dave presenta i setup",
-      "type": "link",
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "content": "",
-      "createdAt": "2026-03-26T09:30:00.000Z"
-    },
-    {
-      "id": "res_demo_003",
-      "title": "Scaletta webinar aprile — bozza da approvare",
-      "type": "note",
-      "content": "Webinar gratuito previsto per metà aprile. Obiettivo: lead generation per Setup Pack.\n\n**Titolo proposto:** \"I 3 errori di setup che ti costano 1 secondo al giro (e come correggerli in 15 minuti)\"\n\n**Scaletta:**\n1. Intro + chi siamo (5 min) — Alberto presenta\n2. Errore #1: bilanciamento freni (10 min) — Max spiega con telemetria live\n3. Errore #2: rapporti cambio sbagliati (10 min) — Max\n4. Errore #3: pressioni gomme a caso (10 min) — Max\n5. Q&A (10 min)\n6. Pitch Setup Pack + offerta webinar-only (5 min) — Alberto\n\n**Da confermare:** data esatta, piattaforma (Zoom o YouTube Live), se Daniele partecipa.\n\nApprovami la scaletta così procediamo con la landing page.",
-      "createdAt": "2026-03-26T10:00:00.000Z"
-    }
-  ]
+  "resources": []
 }
