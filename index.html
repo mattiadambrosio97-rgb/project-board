@@ -3440,6 +3440,10 @@ function _ceoOnboardSubmit() {
         if (errEl) { errEl.textContent = 'Inserisci il codice per continuare.'; errEl.style.display = 'block'; }
         return;
     }
+    // Chiudi tastiera iOS — Safari mantiene lo scroll offset della tastiera
+    inp.blur();
+    document.activeElement && document.activeElement.blur();
+    window.scrollTo(0, 0);
     // Validate token with a test API call
     if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; }
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
@@ -3448,6 +3452,7 @@ function _ceoOnboardSubmit() {
         if (r.ok || r.status === 404) {
             // 404 is fine — file may not exist yet
             safeSetItem('pb_gh_token_ceo', token);
+            window.scrollTo(0, 0);
             // Reload CEO view
             _ceoData = null;
             _ceoActions = null;
