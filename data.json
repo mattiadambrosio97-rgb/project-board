@@ -1,1 +1,189 @@
-{"publishedAt":"2026-03-26T21:12:02.000Z","projects":[],"team":[],"launches":[],"ceoLinks":[],"resources":[]}
+{
+  "publishedAt": "2026-03-26T21:28:17.025Z",
+  "projects": [],
+  "team": [
+    {
+      "name": "Mattia",
+      "role": "COO / Marketing",
+      "hoursPerWeek": 40,
+      "color": "#0D9488"
+    },
+    {
+      "name": "Kevin",
+      "role": "Grafica & Video",
+      "hoursPerWeek": 30,
+      "color": "#3B7DD8"
+    },
+    {
+      "name": "Mattia FS",
+      "role": "Tech & Sviluppo",
+      "hoursPerWeek": 25,
+      "color": "#8B5CF6"
+    },
+    {
+      "name": "Alberto",
+      "role": "Fondatore",
+      "hoursPerWeek": 15,
+      "color": "#E87B35"
+    },
+    {
+      "name": "Manlio",
+      "role": "Direttore Piloti",
+      "hoursPerWeek": 20,
+      "color": "#DB2777"
+    },
+    {
+      "name": "Max",
+      "role": "Setup & Telemetria",
+      "hoursPerWeek": 15,
+      "color": "#3D9A50"
+    },
+    {
+      "name": "Daniele",
+      "role": "F1 Esports Coach",
+      "hoursPerWeek": 15,
+      "color": "#6366F1"
+    }
+  ],
+  "launches": [
+    {
+      "id": "ln_s1",
+      "name": "Lancio ADT Setup Pack F1-26",
+      "brand": "ADT",
+      "startDate": "2026-03-28",
+      "endDate": "2026-03-31",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s2",
+      "name": "Lancio Database Strategia ADT",
+      "brand": "ADT",
+      "startDate": "2026-04-03",
+      "endDate": "2026-04-07",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s3",
+      "name": "Lancio ADT Kick Off",
+      "brand": "ADT",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s4",
+      "name": "Lancio Circolo dei Top Drivers Aprile",
+      "brand": "ADT",
+      "startDate": "2026-04-21",
+      "endDate": "2026-04-28",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s5",
+      "name": "Lancio USR Kick Off",
+      "brand": "USR",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s6",
+      "name": "Lancio USR Setup Pack",
+      "brand": "GTF",
+      "startDate": "2026-04-08",
+      "endDate": "2026-04-11",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s7",
+      "name": "Lancio Gentleman Driver Lead Magnet",
+      "brand": "USR",
+      "startDate": "2026-03-31",
+      "endDate": "2026-04-05",
+      "projectId": "",
+      "notes": ""
+    }
+  ],
+  "ceoLinks": [
+    {
+      "id": "lk_keap",
+      "label": "Keap CRM",
+      "url": "https://qh917.infusionsoft.com/",
+      "icon": "📇",
+      "color": "#16A34A"
+    },
+    {
+      "id": "lk_drive",
+      "label": "Google Drive",
+      "url": "https://drive.google.com/",
+      "icon": "📁",
+      "color": "#2563EB"
+    },
+    {
+      "id": "lk_gmail",
+      "label": "Gmail",
+      "url": "https://mail.google.com",
+      "icon": "✉️",
+      "color": "#DC2626"
+    },
+    {
+      "id": "lk_coaches",
+      "label": "Programmi Coach e Piloti",
+      "url": "https://docs.google.com/spreadsheets/d/1gxNtqoWbNV2KgfqydifrT60hJ2quR4AfPyll4FNSpG4/edit?gid=563466402#gid=563466402",
+      "icon": "🎯",
+      "color": "#7C3AED"
+    },
+    {
+      "id": "lk_vendite",
+      "label": "Report Vendite Manlio",
+      "url": "https://docs.google.com/spreadsheets/d/1crrpOv5hw9P68FIKktFPmvqoTmLoVziCC40j-VmkS74/edit?gid=1369235724#gid=1369235724",
+      "icon": "💰",
+      "color": "#CA8A04"
+    },
+    {
+      "id": "lk_notebook",
+      "label": "NotebookLM",
+      "url": "https://notebooklm.google.com/",
+      "icon": "📓",
+      "color": "#4285F4"
+    },
+    {
+      "id": "lk_chatgpt",
+      "label": "ChatGPT",
+      "url": "https://chat.openai.com",
+      "icon": "🤖",
+      "color": "#10A37F"
+    }
+  ],
+  "resources": [
+    {
+      "id": "res_demo_002",
+      "title": "Video reference: come Coach Dave presenta i setup",
+      "type": "link",
+      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "content": "",
+      "createdAt": "2026-03-26T09:30:00.000Z"
+    },
+    {
+      "id": "res_demo_003",
+      "title": "Scaletta webinar aprile — bozza da approvare",
+      "type": "note",
+      "content": "Webinar gratuito previsto per metà aprile. Obiettivo: lead generation per Setup Pack.\n\n**Titolo proposto:** \"I 3 errori di setup che ti costano 1 secondo al giro (e come correggerli in 15 minuti)\"\n\n**Scaletta:**\n1. Intro + chi siamo (5 min) — Alberto presenta\n2. Errore #1: bilanciamento freni (10 min) — Max spiega con telemetria live\n3. Errore #2: rapporti cambio sbagliati (10 min) — Max\n4. Errore #3: pressioni gomme a caso (10 min) — Max\n5. Q&A (10 min)\n6. Pitch Setup Pack + offerta webinar-only (5 min) — Alberto\n\n**Da confermare:** data esatta, piattaforma (Zoom o YouTube Live), se Daniele partecipa.\n\nApprovami la scaletta così procediamo con la landing page.",
+      "createdAt": "2026-03-26T10:00:00.000Z"
+    },
+    {
+      "id": "res_commercialisti_001",
+      "title": "Lista commercialisti Palermo — leggila e dimmi quale preferisci",
+      "type": "link",
+      "url": "commercialisti-palermo.html",
+      "content": "",
+      "createdAt": "2026-03-26T12:30:00.000Z"
+    }
+  ]
+}
