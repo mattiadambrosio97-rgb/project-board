@@ -1975,9 +1975,10 @@ function renderLaunchCalendar(allLaunches, editable) {
 
     var startD = new Date(allDates[0] + 'T00:00:00');
     var endD = new Date(allDates[allDates.length - 1] + 'T00:00:00');
-    // Pad: start from Monday before, end Sunday after
+    // Pad: start from Monday before, end at least 2 weeks after last date (+ to Sunday)
     var dayOff = startD.getDay() === 0 ? 6 : startD.getDay() - 1;
     startD.setDate(startD.getDate() - dayOff);
+    endD.setDate(endD.getDate() + 14); // +2 settimane di visibilità extra
     var dayEnd = endD.getDay() === 0 ? 0 : 7 - endD.getDay();
     endD.setDate(endD.getDate() + dayEnd);
 
@@ -2296,21 +2297,26 @@ function renderLaunchesSection() {
 function init() {
     if (!CEO_MODE) {
         seedData();
-        // Su GitHub Pages COO: se localStorage è vuoto, carica da data.json
-        if (window.location.hostname.indexOf('github.io') !== -1 && getLaunches().length === 0) {
+        // Su GitHub Pages COO: sincronizza da data.json (lanci, progetti, team)
+        if (window.location.hostname.indexOf('github.io') !== -1) {
             var loc = window.location;
             var dataUrl = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/') + 'data.json?t=' + Date.now();
             fetch(dataUrl).then(function(r) { return r.json(); }).then(function(data) {
-                if (data.launches && data.launches.length > 0 && getLaunches().length === 0) {
+                var changed = false;
+                // Lanci: se data.json ne ha di più, usa quelli
+                if (data.launches && data.launches.length > getLaunches().length) {
                     saveLaunches(data.launches);
+                    changed = true;
                 }
+                // Progetti: se localStorage è vuoto, carica
                 if (data.projects && data.projects.length > 0 && getProjects().length === 0) {
                     saveProjects(data.projects);
+                    changed = true;
                 }
                 if (data.team && data.team.length > 0) {
                     safeSetItem('pb_team', JSON.stringify(data.team));
                 }
-                render();
+                if (changed) render();
             }).catch(function() {});
         }
         // Migrate review -> todo (colonna rimossa)
