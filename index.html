@@ -1390,7 +1390,7 @@
         .ceo-container { padding: 32px 40px; max-width: 900px; margin: 0 auto; }
         .ceo-projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
         @media (max-width: 768px) {
-            .ceo-container { padding: 20px 16px 100px 16px; max-width: 100%; }
+            .ceo-container { padding: 20px 16px 30px 16px; max-width: 100%; }
             .ceo-projects-grid { grid-template-columns: 1fr; }
             .ceo-stats-bar { flex-wrap: wrap; }
             .ceo-quick-links { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
@@ -3015,7 +3015,7 @@ function _renderCeoTaskInline(taskId, projectId) {
     }
 
     // Spacer bottom per iOS Safari — i pulsanti non devono finire sotto la barra browser
-    html += '<div style="height:120px" aria-hidden="true"></div>';
+    html += '<div style="height:30px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -3101,7 +3101,7 @@ function _renderCeoResInline(resId) {
     html += '</div>';
 
     // Spacer bottom per iOS Safari — i pulsanti non devono finire sotto la barra browser
-    html += '<div style="height:120px" aria-hidden="true"></div>';
+    html += '<div style="height:30px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -3972,7 +3972,7 @@ function renderCEOHome() {
     // Bacheca Risorse rimossa dal fondo — ora è il widget notifica in alto
 
     // Spacer bottom per iOS Safari
-    html += '<div style="height:120px" aria-hidden="true"></div>';
+    html += '<div style="height:30px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -4105,7 +4105,7 @@ function renderCEOProject(pid) {
     }
 
     // Spacer bottom per iOS Safari
-    html += '<div style="height:120px" aria-hidden="true"></div>';
+    html += '<div style="height:30px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
