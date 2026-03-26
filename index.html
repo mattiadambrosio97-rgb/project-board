@@ -1230,17 +1230,22 @@
             .dash-stat-label { font-size: 12px; }
 
             /* Modal — full screen on mobile */
-            .modal { width: 100%; max-width: 100%; max-height: 100vh; height: 100vh;
-                padding: 16px 16px 24px; border-radius: 0; margin: 0;
-                overflow-y: auto; -webkit-overflow-scrolling: touch; }
+            .modal-overlay { padding: 0; }
             .modal-overlay.open { align-items: flex-start; }
+            .modal { width: 100%; max-width: 100%; height: 100vh; max-height: 100vh;
+                padding: 16px 16px 24px; border-radius: 0; margin: 0;
+                overflow-y: scroll; overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain; }
             .modal-title-input { font-size: 18px; }
-            .modal-close-bar { position: sticky; top: 0; z-index: 10;
-                background: var(--surface); padding: 4px 0 8px; margin: -4px 0 8px; }
+            .modal-close-bar { position: sticky; top: -16px; z-index: 10;
+                background: var(--surface); padding: 12px 0 8px; margin: -16px 0 8px; }
             .modal-close-x { width: 44px; height: 44px; font-size: 26px;
                 background: var(--bg); border: 1px solid var(--border); }
-            .modal-actions { position: sticky; bottom: 0; background: var(--surface);
-                padding: 12px 0 4px; border-top: 1px solid var(--border-light); margin-top: 16px; }
+            .modal-actions { position: sticky; bottom: -24px; background: var(--surface);
+                padding: 12px 0 env(safe-area-inset-bottom, 16px);
+                border-top: 1px solid var(--border-light); margin: 16px 0 -24px;
+                z-index: 10; }
             .modal-label { font-size: 12px; }
             .modal-select, .modal-input { font-size: 15px; padding: 10px 14px; min-height: 44px; }
             .modal-textarea { font-size: 16px; padding: 10px 14px; }
@@ -2875,6 +2880,9 @@ function ceoOpenResource(resId) {
     var modal = document.getElementById('backupModalInner');
     var html = '';
 
+    // Close bar (sticky su mobile)
+    html += '<div class="modal-close-bar"><button class="modal-close-x" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')" aria-label="Chiudi">&times;</button></div>';
+
     // Header
     html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">';
     html += '<span style="font-size:24px">' + typeIcon + '</span>';
@@ -2934,15 +2942,14 @@ function ceoOpenResource(resId) {
     html += '<textarea id="ceoResNote_' + resId + '" rows="3" placeholder="Scrivi una nota, un commento, o una domanda per Mattia..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical"></textarea>';
     html += '</div>';
 
-    // Bottoni azione
-    html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    // Bottoni azione — sticky su mobile
+    html += '<div class="modal-actions" style="display:flex;gap:8px;flex-wrap:wrap">';
     if (!isRead) {
-        html += '<button onclick="ceoMarkResourceWithNote(\'' + resId + '\')" style="flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Segna come letto</button>';
+        html += '<button onclick="ceoMarkResourceWithNote(\'' + resId + '\')" style="flex:1;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:100px;min-height:48px">Segna come letto</button>';
     }
-    html += '<button onclick="ceoSendResourceFeedbackModal(\'' + resId + '\')" style="flex:1;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Invia risposta</button>';
+    html += '<button onclick="ceoSendResourceFeedbackModal(\'' + resId + '\')" style="flex:1;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:100px;min-height:48px">Invia risposta</button>';
+    html += '<button onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')" style="flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text);min-height:48px">Chiudi</button>';
     html += '</div>';
-
-    html += '<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')">Chiudi</button></div>';
 
     modal.innerHTML = html;
     document.getElementById('backupModal').classList.add('open');
@@ -3080,15 +3087,16 @@ function ceoOpenTask(taskId, projectId) {
     html += '<textarea id="ceoTaskNote" class="modal-textarea" rows="3" placeholder="Scrivi una nota, un aggiornamento, o il motivo per cui non hai potuto completarla..." style="font-size:16px"></textarea>';
     html += '</div>';
 
-    // Bottoni azione
+    // Bottoni azione — classe modal-actions per sticky su mobile
+    html += '<div class="modal-actions" style="display:flex;gap:8px;flex-wrap:wrap">';
     if (t.status !== 'ceo_done' && t.status !== 'done') {
-        html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'complete\')" style="flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Completa</button>';
-        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'update\')" style="flex:1;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Aggiorna il COO</button>';
-        html += '</div>';
+        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'complete\')" style="flex:1;padding:14px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px;min-height:48px">Completa</button>';
+        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'update\')" style="flex:1;padding:14px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px;min-height:48px">Aggiorna il COO</button>';
     } else if (t.status === 'ceo_done') {
-        html += '<div style="padding:12px;background:var(--green-bg);border:1px solid var(--green);border-radius:10px;text-align:center;font-size:14px;font-weight:600;color:var(--green)">In attesa di conferma dal COO</div>';
+        html += '<div style="flex:1;padding:14px;background:var(--green-bg);border:1px solid var(--green);border-radius:10px;text-align:center;font-size:14px;font-weight:600;color:var(--green)">In attesa di conferma dal COO</div>';
     }
+    html += '<button onclick="closeTaskModal()" style="flex:1;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text);min-height:48px">Chiudi</button>';
+    html += '</div>';
 
     modal.innerHTML = html;
     document.getElementById('taskModal').classList.add('open');
