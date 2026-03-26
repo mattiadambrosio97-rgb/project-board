@@ -1921,59 +1921,62 @@ function renderCEOView() {
     document.getElementById('mainContent').innerHTML = _ceoOpenProject ? renderCEOProject(_ceoOpenProject) : renderCEOHome();
 }
 
+function ceoToggleTheme() {
+    document.body.classList.toggle('dark');
+    safeSetItem('pb_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    renderCEOView();
+}
+
+function daysUntil(dateStr) {
+    if (!dateStr) return null;
+    var diff = Math.ceil((new Date(dateStr) - new Date(today())) / 86400000);
+    return diff;
+}
+
 function renderCEOHome() {
     var projects = getProjects().filter(function(p) { return p.status !== 'completato'; });
     var allTasks = projects.flatMap(function(p) { return (p.tasks||[]).map(function(t) { return Object.assign({}, t, {projectName: p.name}); }); });
     var todayStr = today();
-    var weekAhead = new Date(); weekAhead.setDate(weekAhead.getDate() + 7);
-    var weekStr = weekAhead.toISOString().split('T')[0];
 
     var totalTasks = allTasks.length;
     var doneTasks = allTasks.filter(function(t) { return t.status === 'done'; }).length;
-    var blockedTasks = allTasks.filter(function(t) { return t.status === 'blocked'; });
-    var overdueTasks = allTasks.filter(function(t) { return t.dueDate && t.dueDate < todayStr && t.status !== 'done'; });
-    var upcomingTasks = allTasks.filter(function(t) { return t.dueDate && t.dueDate >= todayStr && t.dueDate <= weekStr && t.status !== 'done'; });
+    var blockedCount = allTasks.filter(function(t) { return t.status === 'blocked'; }).length;
+    var overdueCount = allTasks.filter(function(t) { return t.dueDate && t.dueDate < todayStr && t.status !== 'done'; }).length;
     var pct = totalTasks > 0 ? Math.round(doneTasks / totalTasks * 100) : 0;
+    var isDark = document.body.classList.contains('dark');
 
     var html = '<div style="padding:20px 16px;max-width:600px;margin:0 auto">';
 
-    // Header
-    html += '<div style="margin-bottom:20px">';
-    html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">CEO Dashboard</div>';
-    html += '<div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px">ADT Esports</div>';
-    html += '<div style="font-size:12px;color:var(--text-muted);margin-top:4px">' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + '</div>';
+    // Header con theme toggle
+    html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px">';
+    html += '<div>';
+    html += '<div style="font-size:22px;font-weight:800;color:var(--text)">ADT Esports</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);margin-top:2px">' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + '</div>';
     if (_ceoData && _ceoData.publishedAt) {
         var pubDate = new Date(_ceoData.publishedAt);
         html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Aggiornato: ' + pubDate.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) + '</div>';
     }
     html += '</div>';
-
-    // Stats
-    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">';
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--accent)">' + pct + '%</div><div style="font-size:12px;color:var(--text-muted);font-weight:600">Completamento</div></div>';
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:28px;font-weight:800;color:' + (blockedTasks.length > 0 ? 'var(--red)' : 'var(--green)') + '">' + blockedTasks.length + '</div><div style="font-size:12px;color:var(--text-muted);font-weight:600">Bloccate</div></div>';
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:28px;font-weight:800;color:' + (overdueTasks.length > 0 ? 'var(--red)' : 'var(--green)') + '">' + overdueTasks.length + '</div><div style="font-size:12px;color:var(--text-muted);font-weight:600">Scadute</div></div>';
+    html += '<button onclick="ceoToggleTheme()" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;width:42px;height:42px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
     html += '</div>';
 
-    // Upcoming deadlines timeline (prossimi 7 giorni)
-    if (upcomingTasks.length > 0) {
-        html += '<div style="margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Scadenze prossimi 7 giorni</div>';
-        upcomingTasks.sort(function(a,b) { return (a.dueDate||'').localeCompare(b.dueDate||''); });
-        upcomingTasks.forEach(function(t) {
-            var dc = dateClass(t.dueDate, t.status);
-            html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-light)">';
-            html += '<span class="task-card-due ' + dc + '" style="font-size:12px;min-width:60px;flex-shrink:0">' + smartDate(t.dueDate) + '</span>';
-            html += '<span style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.title) + '</span>';
-            html += '<span style="font-size:11px;color:var(--text-muted);flex-shrink:0">' + esc(t.projectName).split(' ').slice(0,2).join(' ') + '</span>';
-            html += '</div>';
-        });
-        html += '</div>';
-    }
+    // Quick stats bar
+    html += '<div style="display:flex;gap:8px;margin-bottom:24px">';
+    html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--accent)">' + pct + '%</div><div style="font-size:11px;color:var(--text-muted);font-weight:600">Globale</div></div>';
+    html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--text)">' + projects.length + '</div><div style="font-size:11px;color:var(--text-muted);font-weight:600">Progetti</div></div>';
+    if (blockedCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Bloccate</div></div>';
+    if (overdueCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Scadute</div></div>';
+    html += '</div>';
 
-    // Project cards (clickable)
-    html += '<div style="margin-bottom:20px">';
-    html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Progetti</div>';
+    // ========== PROJECT CARDS — protagonisti ==========
+    // Ordina: prima quelli con lancio vicino, poi senza data
+    projects.sort(function(a, b) {
+        if (a.launchDate && b.launchDate) return a.launchDate.localeCompare(b.launchDate);
+        if (a.launchDate) return -1;
+        if (b.launchDate) return 1;
+        return 0;
+    });
+
     projects.forEach(function(p) {
         var tasks = p.tasks || [];
         var total = tasks.length;
@@ -1982,66 +1985,74 @@ function renderCEOHome() {
         var blocked = tasks.filter(function(t) { return t.status === 'blocked'; }).length;
         var overdue = tasks.filter(function(t) { return t.dueDate && t.dueDate < todayStr && t.status !== 'done'; }).length;
         var ppct = total > 0 ? Math.round(done / total * 100) : 0;
+        var remaining = total - done;
 
-        var light = 'var(--green)';
-        if (blocked > 0 || overdue > 2) light = 'var(--red)';
-        else if (overdue > 0) light = 'var(--yellow, #EAB308)';
+        var light = '#22C55E'; // green
+        if (blocked > 0 || overdue > 2) light = '#EF4444'; // red
+        else if (overdue > 0) light = '#EAB308'; // yellow
 
-        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;cursor:pointer" onclick="ceoOpenProject(\'' + p.id + '\')">';
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">';
-        html += '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">';
-        html += '<span style="width:12px;height:12px;border-radius:50%;background:' + light + ';flex-shrink:0"></span>';
-        html += '<span style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.name) + '</span>';
+        var dLeft = daysUntil(p.launchDate);
+        var launchUrgent = dLeft !== null && dLeft <= 14 && dLeft >= 0;
+        var launchOverdue = dLeft !== null && dLeft < 0;
+
+        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:0;margin-bottom:12px;overflow:hidden;cursor:pointer" onclick="ceoOpenProject(\'' + p.id + '\')">';
+
+        // Top colored bar
+        html += '<div style="height:4px;background:' + light + '"></div>';
+
+        html += '<div style="padding:16px 16px 14px">';
+
+        // Row 1: name + arrow
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+        html += '<div style="font-size:17px;font-weight:800;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(p.name) + '</div>';
+        html += '<span style="font-size:22px;color:var(--text-muted);flex-shrink:0">&#8250;</span>';
         html += '</div>';
-        html += '<span style="font-size:20px;color:var(--text-muted)">&#8250;</span>';
+
+        // Row 2: Launch date — PROMINENTE
+        if (p.launchDate) {
+            var launchColor = launchOverdue ? 'var(--red)' : (launchUrgent ? 'var(--yellow, #EAB308)' : 'var(--text)');
+            var launchDateFormatted = new Date(p.launchDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'});
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px 12px;background:var(--bg);border-radius:10px;border:1px solid var(--border-light)">';
+            html += '<span style="font-size:20px">&#127937;</span>'; // bandiera a scacchi
+            html += '<div style="flex:1">';
+            html += '<div style="font-size:16px;font-weight:800;color:' + launchColor + '">' + launchDateFormatted + '</div>';
+            if (dLeft !== null) {
+                if (launchOverdue) {
+                    html += '<div style="font-size:12px;color:var(--red);font-weight:700">Scaduto da ' + Math.abs(dLeft) + ' giorni</div>';
+                } else if (dLeft === 0) {
+                    html += '<div style="font-size:12px;color:var(--accent);font-weight:700">OGGI</div>';
+                } else {
+                    html += '<div style="font-size:12px;color:var(--text-muted);font-weight:600">' + dLeft + ' giorni rimanenti</div>';
+                }
+            }
+            html += '</div>';
+            html += '</div>';
+        } else {
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px;padding:8px 12px;background:var(--bg);border-radius:10px;border:1px dashed var(--border)">';
+            html += '<span style="font-size:16px">&#127937;</span>';
+            html += '<span style="font-size:13px;color:var(--text-muted);font-style:italic">Nessuna data di lancio</span>';
+            html += '</div>';
+        }
+
+        // Row 3: Progress bar + percentage
+        html += '<div style="margin-top:12px;display:flex;align-items:center;gap:10px">';
+        html += '<div style="flex:1;height:8px;background:var(--border);border-radius:4px;overflow:hidden">';
+        html += '<div style="height:100%;width:' + ppct + '%;background:' + light + ';border-radius:4px;transition:width 0.3s"></div>';
         html += '</div>';
-        // Progress bar
-        html += '<div style="margin-top:8px;height:6px;background:var(--border);border-radius:3px;overflow:hidden">';
-        html += '<div style="height:100%;width:' + ppct + '%;background:' + light + ';border-radius:3px;transition:width 0.3s"></div>';
+        html += '<span style="font-size:15px;font-weight:800;color:var(--text);min-width:42px;text-align:right">' + ppct + '%</span>';
         html += '</div>';
-        // Stats row
-        html += '<div style="margin-top:8px;display:flex;gap:12px;font-size:12px;color:var(--text-muted)">';
-        html += '<span style="font-weight:700">' + ppct + '%</span>';
-        if (inProgress > 0) html += '<span style="color:var(--blue)">' + inProgress + ' in corso</span>';
+
+        // Row 4: Mini stats
+        html += '<div style="margin-top:8px;display:flex;gap:10px;font-size:12px;flex-wrap:wrap">';
+        html += '<span style="color:var(--text-muted)">' + done + '/' + total + ' task</span>';
+        if (remaining > 0) html += '<span style="color:var(--text-muted)">' + remaining + ' rimaste</span>';
+        if (inProgress > 0) html += '<span style="color:var(--blue);font-weight:600">' + inProgress + ' in corso</span>';
         if (blocked > 0) html += '<span style="color:var(--red);font-weight:700">' + blocked + ' bloccate</span>';
         if (overdue > 0) html += '<span style="color:var(--red)">' + overdue + ' scadute</span>';
-        html += '<span>' + done + '/' + total + '</span>';
-        if (p.launchDate) html += '<span>Lancio: ' + smartDate(p.launchDate) + '</span>';
         html += '</div>';
-        html += '</div>';
+
+        html += '</div></div>';
     });
-    html += '</div>';
-
-    // Blocked tasks (global)
-    if (blockedTasks.length > 0) {
-        html += '<div style="margin-bottom:20px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:10px">Task Bloccate</div>';
-        blockedTasks.forEach(function(t) {
-            html += '<div style="background:var(--red-bg, #FEF2F2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px">';
-            html += '<div style="font-size:14px;font-weight:600;color:var(--text)">' + esc(t.title) + '</div>';
-            html += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">' + esc(t.projectName);
-            if (t.assignee) html += ' &middot; ' + esc(t.assignee);
-            html += '</div></div>';
-        });
-        html += '</div>';
-    }
-
-    // Overdue
-    if (overdueTasks.length > 0) {
-        html += '<div style="margin-bottom:20px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:10px">Task Scadute</div>';
-        overdueTasks.sort(function(a,b) { return (a.dueDate||'').localeCompare(b.dueDate||''); });
-        overdueTasks.forEach(function(t) {
-            html += '<div style="background:var(--red-bg, #FEF2F2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">';
-            html += '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:600;color:var(--text)">' + esc(t.title) + '</div>';
-            html += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">' + esc(t.projectName);
-            if (t.assignee) html += ' &middot; ' + esc(t.assignee);
-            html += '</div></div>';
-            html += '<span class="task-card-due overdue" style="font-size:13px;flex-shrink:0;margin-left:8px">' + smartDate(t.dueDate) + '</span>';
-            html += '</div>';
-        });
-        html += '</div>';
-    }
 
     if (projects.length === 0) {
         html += '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:15px">Nessun progetto attivo</div>';
