@@ -13,29 +13,10 @@
     window.scrollTo(0,0);
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
-    // Rileva CEO/COO mode PRIMA del rendering — evita flash
+    // CEO mode: solo se ?ceo=1 nell'URL. Nessun redirect, nessun localStorage.
     (function(){
-        var params = new URLSearchParams(window.location.search);
-        var forceCoo = params.get('coo') === '1';
-        var fromUrl = params.get('ceo') === '1';
-        var fromHash = window.location.hash === '#ceo';
-        // ?coo=1 forza COO: pulisci stato CEO da localStorage/cookie
-        if (forceCoo) {
-            try { localStorage.removeItem('pb_is_ceo'); } catch(e){}
-            document.cookie='pb_is_ceo=;path=/;max-age=0';
-            return; // NON aggiungere is-ceo
-        }
-        var isCeo = fromUrl || fromHash;
-        try {
-            if (isCeo) { localStorage.setItem('pb_is_ceo','1'); document.cookie='pb_is_ceo=1;path=/;max-age=31536000;SameSite=Lax'; }
-            else { isCeo = localStorage.getItem('pb_is_ceo')==='1'; }
-        } catch(e){}
-        if (!isCeo) { isCeo = document.cookie.indexOf('pb_is_ceo=1') !== -1; }
-        if (isCeo) document.documentElement.classList.add('is-ceo');
-        if (isCeo && !fromUrl) {
-            var u = new URL(window.location.href);
-            u.searchParams.set('ceo', '1');
-            history.replaceState(null, '', u.toString());
+        if (new URLSearchParams(window.location.search).get('ceo') === '1') {
+            document.documentElement.classList.add('is-ceo');
         }
     })();
     </script>
@@ -1550,14 +1531,7 @@
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
 
 <script>
-// ========== GITHUB PAGES PROTECTION ==========
-// Su GitHub Pages: senza parametri → redirect a CEO. Con ?coo=1 → accesso COO.
-(function() {
-    if (window.location.hostname.indexOf('github.io') === -1) return;
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('ceo') === '1' || params.get('coo') === '1') return;
-    window.location.replace(window.location.href.split('?')[0] + '?ceo=1');
-})();
+// Nessun redirect: ?ceo=1 = CEO, tutto il resto = COO
 
 // ========== STORAGE SAFETY (WhatsApp in-app browser) ==========
 var _storageAvailable = (function() {
@@ -2869,21 +2843,8 @@ function handleAdd() {
 }
 
 // ========== CEO MODE ==========
-// Rileva CEO da URL (?ceo=1), hash (#ceo), localStorage, o cookie
-// ?coo=1 forza COO mode — ignora localStorage/cookie CEO
-var CEO_MODE = (function() {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get('coo') === '1') return false;
-    var fromUrl = params.get('ceo') === '1';
-    var fromHash = window.location.hash === '#ceo';
-    if (fromUrl || fromHash) {
-        try { localStorage.setItem('pb_is_ceo', '1'); } catch(e) {}
-        try { document.cookie='pb_is_ceo=1;path=/;max-age=31536000;SameSite=Lax'; } catch(e) {}
-        return true;
-    }
-    try { if (localStorage.getItem('pb_is_ceo') === '1') return true; } catch(e) {}
-    return document.cookie.indexOf('pb_is_ceo=1') !== -1;
-})();
+// ?ceo=1 = CEO, tutto il resto = COO. Nessuna persistenza.
+var CEO_MODE = new URLSearchParams(window.location.search).get('ceo') === '1';
 
 var _ceoPreview = false; // preview mode from COO
 function previewCEO() {
