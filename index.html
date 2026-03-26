@@ -872,7 +872,7 @@
             60% { transform: scale(1); opacity: 1; }
             100% { transform: scale(0.8); opacity: 0; }
         }
-        .dash-section { margin-bottom: 24px; }
+        .dash-section { margin-bottom: 14px; }
         .dash-section-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; letter-spacing: -0.2px; }
         .dash-list { display: flex; flex-direction: column; gap: 6px; }
         .dash-list-item {
@@ -2585,7 +2585,7 @@ function deleteLaunch(id) {
 
 function renderLaunchesSection() {
     var launches = getLaunches();
-    var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px">';
+    var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">';
     html += '<div style="font-size:15px;font-weight:800;color:var(--text)">&#128640; Lanci Marketing</div>';
     html += '<button class="add-btn" style="font-size:12px;padding:5px 12px" onclick="openLaunchModal(null)">+ Lancio</button>';
@@ -4000,14 +4000,12 @@ function renderGlobal() {
     // ===== BACHECA RISORSE — rettangolo unico cliccabile =====
     var topRes = getResources();
     var resCount = topRes.length;
-    html += '<div onclick="openBachecaModal()" style="cursor:pointer;display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:20px;transition:all 0.15s" onmouseenter="this.style.borderColor=\'var(--accent)\';this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.borderColor=\'\';this.style.transform=\'\'">';
-    html += '<span style="font-size:22px">&#128218;</span>';
-    html += '<div style="flex:1">';
-    html += '<div style="font-size:14px;font-weight:700;color:var(--text)">Bacheca per Alberto</div>';
-    html += '<div style="font-size:12px;color:var(--text-muted)">' + (resCount > 0 ? resCount + ' element' + (resCount === 1 ? 'o' : 'i') : 'Nessun elemento — clicca per aggiungere') + '</div>';
-    html += '</div>';
-    html += '<span id="cooResBadgeSummary" style="font-size:11px;color:var(--text-muted)"></span>';
-    html += '<span style="font-size:16px;color:var(--text-muted)">&#9654;</span>';
+    html += '<div onclick="openBachecaModal()" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;margin-bottom:10px;transition:all 0.15s;font-size:12px" onmouseenter="this.style.borderColor=\'var(--accent)\'" onmouseleave="this.style.borderColor=\'\'">';
+    html += '<span style="font-size:14px">&#128218;</span>';
+    html += '<span style="font-weight:700;color:var(--text)">Bacheca Alberto</span>';
+    html += '<span style="color:var(--text-muted)">' + resCount + '</span>';
+    html += '<span id="cooResBadgeSummary" style="color:var(--text-muted)"></span>';
+    html += '<span style="color:var(--text-muted)">&#9654;</span>';
     html += '</div>';
 
     // ===== LANCI MARKETING =====
