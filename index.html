@@ -1323,6 +1323,19 @@
         }
 
         /* ===== NEXT CHECK ALERT ===== */
+        /* ===== CEO DASHBOARD STYLES ===== */
+        .ceo-container { padding: 32px 40px; max-width: 900px; margin: 0 auto; }
+        .ceo-projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+        @media (max-width: 768px) {
+            .ceo-container { padding: 20px 16px; max-width: 100%; }
+            .ceo-projects-grid { grid-template-columns: 1fr; }
+            .ceo-stats-bar { flex-wrap: wrap; }
+        }
+        @media (min-width: 1200px) {
+            .ceo-container { max-width: 1100px; }
+            .ceo-projects-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+
         .next-check-badge { font-size: 11px; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 6px; }
         .next-check-badge.overdue-check { color: var(--red); background: var(--red-bg); }
         .next-check-badge.normal-check { color: var(--text-muted); }
@@ -1945,7 +1958,7 @@ function renderCEOHome() {
     var pct = totalTasks > 0 ? Math.round(doneTasks / totalTasks * 100) : 0;
     var isDark = document.body.classList.contains('dark');
 
-    var html = '<div style="padding:20px 16px;max-width:600px;margin:0 auto">';
+    var html = '<div class="ceo-container">';
 
     // Header con theme toggle
     html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px">';
@@ -1969,6 +1982,7 @@ function renderCEOHome() {
     html += '</div>';
 
     // ========== PROJECT CARDS — protagonisti ==========
+    html += '<div class="ceo-projects-grid">';
     // Ordina: prima quelli con lancio vicino, poi senza data
     projects.sort(function(a, b) {
         if (a.launchDate && b.launchDate) return a.launchDate.localeCompare(b.launchDate);
@@ -2053,6 +2067,7 @@ function renderCEOHome() {
 
         html += '</div></div>';
     });
+    html += '</div>'; // close ceo-projects-grid
 
     if (projects.length === 0) {
         html += '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:15px">Nessun progetto attivo</div>';
@@ -2062,7 +2077,7 @@ function renderCEOHome() {
     return html;
 }
 
-// CEO project detail view
+// CEO project detail view — sintetico, no nomi assegnati
 function renderCEOProject(pid) {
     var p = getProjects().find(function(pr) { return pr.id === pid; });
     if (!p) return renderCEOHome();
@@ -2070,41 +2085,56 @@ function renderCEOProject(pid) {
     var todayStr = today();
     var total = tasks.length;
     var done = tasks.filter(function(t) { return t.status === 'done'; }).length;
+    var inProgress = tasks.filter(function(t) { return t.status === 'in_progress'; }).length;
+    var blocked = tasks.filter(function(t) { return t.status === 'blocked'; }).length;
+    var todo = tasks.filter(function(t) { return t.status === 'todo'; }).length;
     var ppct = total > 0 ? Math.round(done / total * 100) : 0;
 
-    var html = '<div style="padding:20px 16px;max-width:600px;margin:0 auto">';
+    var html = '<div class="ceo-container">';
 
     // Back + title
-    html += '<div style="margin-bottom:16px">';
+    html += '<div style="margin-bottom:20px">';
     html += '<button onclick="ceoGoHome()" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;padding:0;font-family:var(--font);margin-bottom:8px">&#8592; Tutti i progetti</button>';
-    html += '<div style="font-size:20px;font-weight:800;color:var(--text)">' + esc(p.name) + '</div>';
-    if (p.description) html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">' + esc(p.description) + '</div>';
+    html += '<div style="font-size:22px;font-weight:800;color:var(--text)">' + esc(p.name) + '</div>';
+    if (p.description) html += '<div style="font-size:14px;color:var(--text-muted);margin-top:4px">' + esc(p.description) + '</div>';
     html += '</div>';
 
-    // Stats row
-    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--accent)">' + ppct + '%</div><div style="font-size:11px;color:var(--text-muted)">Completo</div></div>';
-    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--text)">' + done + '/' + total + '</div><div style="font-size:11px;color:var(--text-muted)">Task</div></div>';
+    // Launch date prominent
     if (p.launchDate) {
-        var dc = dateClass(p.launchDate, p.status === 'completato' ? 'done' : 'todo');
-        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div class="task-card-due ' + dc + '" style="font-size:16px;font-weight:800">' + smartDate(p.launchDate) + '</div><div style="font-size:11px;color:var(--text-muted)">Lancio</div></div>';
-    } else {
-        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:16px;color:var(--text-muted)">—</div><div style="font-size:11px;color:var(--text-muted)">Lancio</div></div>';
+        var dLeft = daysUntil(p.launchDate);
+        var launchColor = (dLeft !== null && dLeft < 0) ? 'var(--red)' : (dLeft !== null && dLeft <= 14 ? 'var(--yellow, #EAB308)' : 'var(--text)');
+        var launchDateF = new Date(p.launchDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'long', year:'numeric'});
+        html += '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:20px">';
+        html += '<span style="font-size:24px">&#127937;</span>';
+        html += '<div><div style="font-size:18px;font-weight:800;color:' + launchColor + '">' + launchDateF + '</div>';
+        if (dLeft !== null) {
+            html += '<div style="font-size:13px;color:' + (dLeft < 0 ? 'var(--red)' : 'var(--text-muted)') + ';font-weight:600">' + (dLeft < 0 ? 'Scaduto da ' + Math.abs(dLeft) + ' giorni' : dLeft === 0 ? 'OGGI' : dLeft + ' giorni al lancio') + '</div>';
+        }
+        html += '</div></div>';
     }
+
+    // Stats: visual breakdown
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px">';
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--accent)">' + ppct + '%</div><div style="font-size:11px;color:var(--text-muted)">Completo</div></div>';
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--blue)">' + inProgress + '</div><div style="font-size:11px;color:var(--text-muted)">In corso</div></div>';
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:var(--slate)">' + todo + '</div><div style="font-size:11px;color:var(--text-muted)">Da fare</div></div>';
+    html += '<div style="background:' + (blocked > 0 ? 'var(--red-bg, #FEF2F2)' : 'var(--surface)') + ';border:1px solid ' + (blocked > 0 ? 'var(--red)' : 'var(--border)') + ';border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:800;color:' + (blocked > 0 ? 'var(--red)' : 'var(--green)') + '">' + blocked + '</div><div style="font-size:11px;color:var(--text-muted)">Bloccate</div></div>';
     html += '</div>';
 
     // Progress bar
-    html += '<div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:20px">';
-    html += '<div style="height:100%;width:' + ppct + '%;background:var(--accent);border-radius:4px"></div>';
+    html += '<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:24px;display:flex">';
+    if (done > 0) html += '<div style="width:' + (done/total*100) + '%;background:var(--green);transition:width 0.3s"></div>';
+    if (inProgress > 0) html += '<div style="width:' + (inProgress/total*100) + '%;background:var(--blue);transition:width 0.3s"></div>';
+    if (blocked > 0) html += '<div style="width:' + (blocked/total*100) + '%;background:var(--red);transition:width 0.3s"></div>';
+    if (todo > 0) html += '<div style="width:' + (todo/total*100) + '%;background:var(--border);transition:width 0.3s"></div>';
     html += '</div>';
 
-    // Tasks grouped by status
-    var statusOrder = ['blocked', 'in_progress', 'todo', 'done'];
+    // Cosa manca — solo task non completate, raggruppate per status, SENZA nomi
+    var statusOrder = ['blocked', 'in_progress', 'todo'];
     var statusStyles = {
         blocked: {label:'Bloccate', color:'var(--red)', bg:'var(--red-bg, #FEF2F2)'},
         in_progress: {label:'In Corso', color:'var(--blue)', bg:'var(--blue-bg, #EFF6FF)'},
-        todo: {label:'Da Fare', color:'var(--slate)', bg:'var(--bg)'},
-        done: {label:'Completate', color:'var(--green)', bg:'var(--green-bg, #F0FDF4)'}
+        todo: {label:'Da Fare', color:'var(--slate)', bg:'var(--bg)'}
     };
 
     statusOrder.forEach(function(status) {
@@ -2115,24 +2145,15 @@ function renderCEOProject(pid) {
         html += '<div style="margin-bottom:16px">';
         html += '<div style="font-size:13px;font-weight:700;color:' + style.color + ';margin-bottom:8px;display:flex;align-items:center;gap:6px">';
         html += '<span style="width:8px;height:8px;border-radius:50%;background:' + style.color + '"></span>';
-        html += style.label + ' <span style="font-weight:400;color:var(--text-muted)">(' + sTasks.length + ')</span>';
+        html += style.label + ' (' + sTasks.length + ')';
         html += '</div>';
 
         sTasks.forEach(function(t) {
-            html += '<div style="background:' + style.bg + ';border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px">';
-            html += '<div style="font-size:14px;font-weight:600;color:var(--text)">' + esc(t.title) + '</div>';
-            var meta = [];
-            if (t.assignee) meta.push(esc(t.assignee));
+            html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + style.bg + ';border:1px solid var(--border);border-radius:8px;margin-bottom:5px">';
+            html += '<span style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0">' + esc(t.title) + '</span>';
             if (t.dueDate) {
                 var dc = dateClass(t.dueDate, t.status);
-                meta.push('<span class="task-card-due ' + dc + '">' + smartDate(t.dueDate) + '</span>');
-            }
-            if (t.estimateHours) meta.push(t.estimateHours + 'h');
-            if (meta.length > 0) {
-                html += '<div style="font-size:12px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' + meta.join(' &middot; ') + '</div>';
-            }
-            if (t.note) {
-                html += '<div style="font-size:12px;color:var(--text-muted);margin-top:4px;font-style:italic">' + esc(t.note.slice(0, 80)) + (t.note.length > 80 ? '...' : '') + '</div>';
+                html += '<span class="task-card-due ' + dc + '" style="font-size:12px;flex-shrink:0">' + smartDate(t.dueDate) + '</span>';
             }
             html += '</div>';
         });
