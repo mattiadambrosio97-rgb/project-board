@@ -8004,6 +8004,10 @@ function openBackupModal() {
         <button class="backup-btn" onclick="document.getElementById('importFile').click()">Importa JSON</button>
         <div class="backup-info">Carica un file JSON per ripristinare i dati. Sovrascrive i dati esistenti.</div>
     </div>`;
+    html += `<div class="backup-section" style="border-top:2px solid var(--red);padding-top:16px;margin-top:16px">
+        <button class="backup-btn" style="background:var(--red);color:#fff" onclick="if(confirm('ATTENZIONE: Cancellare TUTTI i dati? Progetti, task, team, risorse, tutto. Non recuperabile.')){localStorage.clear();location.reload();}">Reset completo</button>
+        <div class="backup-info" style="color:var(--red)">Cancella tutti i dati locali e riparte da zero.</div>
+    </div>`;
     html += `<div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--text-secondary)">
         <div><strong>Progetti:</strong> ${projects.length}</div>
         <div><strong>Task totali:</strong> ${totalTasks}</div>
