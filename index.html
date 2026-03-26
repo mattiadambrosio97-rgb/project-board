@@ -3148,7 +3148,8 @@ function ceoPushActions(callback, retryCount) {
     }
     retryCount = retryCount || 0;
 
-    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {}, projectActions: {} };
+    if (!_ceoActions.projectActions) _ceoActions.projectActions = {};
     _ceoActions.lastUpdate = new Date().toISOString();
 
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(_ceoActions, null, 2))));
@@ -3424,10 +3425,18 @@ function renderCEOHome() {
         html += '</div>';
     }
 
-    // === SEZIONE 3: Le tue task ===
+    // === SEZIONE 3: Le tue task — accordion ===
     if (secActive.length > 0) {
-        html += _ceoSectionHeader('Le tue task', secActive.length, 'var(--text)', '&#9745;');
+        html += '<div style="margin-top:20px">';
+        html += '<div onclick="var p=document.getElementById(\'ceoTasksPanel\');var c=document.getElementById(\'ceoTasksChev\');if(p.style.display===\'none\'){p.style.display=\'block\';c.style.transform=\'rotate(90deg)\'}else{p.style.display=\'none\';c.style.transform=\'rotate(0deg)\'}" style="cursor:pointer;display:flex;align-items:center;gap:8px;margin-bottom:10px">';
+        html += '<span id="ceoTasksChev" style="font-size:12px;color:var(--blue);transition:transform 0.2s;transform:rotate(90deg)">&#9654;</span>';
+        html += '<span style="font-size:15px;font-weight:800;color:var(--blue)">&#9745; Le tue task</span>';
+        html += '<span style="background:var(--blue);color:#fff;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px">' + secActive.length + '</span>';
+        html += '</div>';
+        html += '<div id="ceoTasksPanel">';
         secActive.forEach(function(item) { html += _renderCeoTaskCard(item); });
+        html += '</div>';
+        html += '</div>';
     }
 
     // === SEZIONE 4: In attesa (feedback inviato + completate da confermare) ===
@@ -3479,7 +3488,8 @@ function renderCEOHome() {
         html += '</div>';
     }
 
-    // Quick stats bar — tra lanci e project cards
+    // Titolo sezione + Quick stats bar
+    html += '<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:12px;margin-top:8px">Panoramica Progetti</div>';
     html += '<div style="display:flex;gap:6px;margin-bottom:18px">';
     html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--accent)">' + pct + '%</div><div style="font-size:10px;color:var(--text-muted);font-weight:600">Globale</div></div>';
     html += '<div style="flex:1;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 6px;text-align:center"><div style="font-size:18px;font-weight:800;color:var(--text)">' + projects.length + '</div><div style="font-size:10px;color:var(--text-muted);font-weight:600">Progetti</div></div>';
@@ -3677,8 +3687,73 @@ function renderCEOProject(pid) {
         html += '</div>';
     }
 
+    // ========== CONVERSAZIONE PROGETTO (CEO ↔ COO) ==========
+    var _pca = (_ceoActions && _ceoActions.projectActions && _ceoActions.projectActions[pid]) ? _ceoActions.projectActions[pid] : null;
+    var pNotes = (_pca && _pca.notes) ? _pca.notes : [];
+    var pCooResps = p.cooProjectResponses || [];
+    // Unisci e ordina per data
+    var pConvo = [];
+    pNotes.forEach(function(n) { pConvo.push({ from: 'ceo', note: n.note, at: n.at }); });
+    pCooResps.forEach(function(r) { pConvo.push({ from: 'coo', note: r.note, at: r.at }); });
+    pConvo.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+
+    html += '<div style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px">';
+    html += '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px">&#128172; Note sul progetto</div>';
+
+    if (pConvo.length > 0) {
+        html += '<div style="max-height:300px;overflow-y:auto;margin-bottom:12px">';
+        pConvo.forEach(function(msg) {
+            var isCeo = msg.from === 'ceo';
+            var msgDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            var align = isCeo ? 'flex-end' : 'flex-start';
+            var bg = isCeo ? 'var(--accent-soft,#FFF1ED)' : 'var(--blue-bg,#EFF6FF)';
+            var border = isCeo ? 'var(--accent)' : 'var(--blue)';
+            var label = isCeo ? 'Alberto' : 'Mattia';
+            var labelColor = isCeo ? 'var(--accent)' : 'var(--blue)';
+            html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:8px">';
+            html += '<div style="max-width:80%;background:' + bg + ';border:1px solid ' + border + '33;border-radius:12px;padding:10px 14px">';
+            html += '<div style="font-size:11px;font-weight:700;color:' + labelColor + ';margin-bottom:4px">' + label + ' &middot; ' + msgDate + '</div>';
+            html += '<div style="font-size:14px;color:var(--text);line-height:1.5;white-space:pre-wrap">' + esc(msg.note) + '</div>';
+            html += '</div></div>';
+        });
+        html += '</div>';
+    } else {
+        html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px;font-style:italic">Nessuna nota ancora. Scrivi al COO per discutere di questo progetto.</div>';
+    }
+
+    // Campo input per CEO
+    html += '<div style="display:flex;gap:8px">';
+    html += '<input id="ceoProjectNote_' + pid + '" type="text" placeholder="Scrivi una nota per Mattia..." style="flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')ceoSendProjectNote(\'' + pid + '\')">';
+    html += '<button onclick="ceoSendProjectNote(\'' + pid + '\')" style="padding:12px 20px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+    html += '</div>';
+    html += '</div>';
+
     html += '</div>';
     return html;
+}
+
+// CEO invia nota su progetto
+function ceoSendProjectNote(pid) {
+    var input = document.getElementById('ceoProjectNote_' + pid);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions.projectActions) _ceoActions.projectActions = {};
+    if (!_ceoActions.projectActions[pid]) _ceoActions.projectActions[pid] = { notes: [] };
+    _ceoActions.projectActions[pid].notes.push({ note: note, at: new Date().toISOString() });
+    input.value = '';
+    var btn = input.nextElementSibling;
+    if (btn) { btn.textContent = 'Invio...'; btn.disabled = true; }
+    ceoPushActions(function(ok) {
+        if (ok) {
+            _showToast('Nota inviata a Mattia!');
+            renderCEOView();
+        } else {
+            _showToast('Errore invio nota', true);
+            if (btn) { btn.textContent = 'Invia'; btn.disabled = false; }
+        }
+    });
 }
 
 // ========== PUBLISH TO GITHUB (CEO sync) ==========
@@ -4092,6 +4167,25 @@ function _cooFetchCeoActions() {
             });
             if (needSave) { saveProjects(projects); render(); }
         }
+
+        // Note progetto da CEO → flag ceoHasProjectNote
+        if (ceoActs.projectActions) {
+            var projects2 = getProjects();
+            var needSave2 = false;
+            projects2.forEach(function(p) {
+                var pa = ceoActs.projectActions[p.id];
+                if (!pa || !pa.notes || pa.notes.length === 0) return;
+                var lastCeoNote = pa.notes[pa.notes.length - 1];
+                var lastCooResp = (p.cooProjectResponses && p.cooProjectResponses.length > 0) ? p.cooProjectResponses[p.cooProjectResponses.length - 1] : null;
+                var ceoIsNewer = !lastCooResp || new Date(lastCeoNote.at) > new Date(lastCooResp.at);
+                if (ceoIsNewer && !p.ceoHasProjectNote) {
+                    p.ceoHasProjectNote = true;
+                    p.ceoProjectNotes = pa.notes;
+                    needSave2 = true;
+                }
+            });
+            if (needSave2) { saveProjects(projects2); render(); }
+        }
     }).catch(function() { /* silent fail — badges stay as '...' */ });
 }
 
@@ -4451,10 +4545,14 @@ function renderGlobal() {
     // Task con aggiornamenti da Alberto
     const ceoUpdatedTasks = allTasks.filter(t => t.ceoHasUpdate);
 
+    // Progetti con note da Alberto
+    const ceoProjectNotes = projects.filter(p => p.ceoHasProjectNote);
+
     // Riga 1: ACTION CARDS — urgenti, visivamente distinte
-    const hasActions = actions.length > 0 || daVerificare.length > 0 || ceoUpdatedTasks.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
+    const hasActions = actions.length > 0 || daVerificare.length > 0 || ceoUpdatedTasks.length > 0 || ceoProjectNotes.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
     if (hasActions) {
         html += '<div class="action-bar">';
+        if (ceoProjectNotes.length > 0) html += `<div class="action-card" style="border-color:var(--purple,#8B5CF6)" onclick="showCeoProjectNotes()"><span class="action-card-icon" style="color:var(--purple,#8B5CF6)">&#128172;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--purple,#8B5CF6)">${ceoProjectNotes.length}</span><span class="action-card-label" style="color:var(--purple,#8B5CF6)">Note progetto</span></div></div>`;
         if (ceoUpdatedTasks.length > 0) html += `<div class="action-card" style="border-color:var(--blue)" onclick="showCeoUpdatedTasks()"><span class="action-card-icon" style="color:var(--blue)">&#128172;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--blue)">${ceoUpdatedTasks.length}</span><span class="action-card-label" style="color:var(--blue)">Risposte Alberto</span></div></div>`;
         if (daVerificare.length > 0) html += `<div class="action-card" style="border-color:var(--teal)" onclick="showDaVerificareTasks()"><span class="action-card-icon" style="color:var(--teal)">&#9745;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--teal)">${daVerificare.length}</span><span class="action-card-label" style="color:var(--teal)">Da verificare</span></div></div>`;
         if (actions.length > 0) html += `<div class="action-card danger" onclick="showUnblockPopup()"><span class="action-card-icon">&#9888;</span><div class="action-card-body"><span class="action-card-num">${actions.length}</span><span class="action-card-label">Da sbloccare</span></div></div>`;
@@ -6967,6 +7065,89 @@ function markDoneFromCeoPopup(taskId, projectId) {
     saveProjects(projects);
     _autoPublishForCEO();
     _showToast('Task completata!');
+    document.getElementById('backupModal').classList.remove('open');
+    render();
+}
+
+// ========== NOTE PROGETTO CEO → COO ==========
+function showCeoProjectNotes() {
+    var projects = getProjects();
+    var items = projects.filter(function(p) { return p.ceoHasProjectNote; });
+    if (!items.length) {
+        document.getElementById('backupModal').classList.remove('open');
+        return;
+    }
+    var modal = document.getElementById('backupModalInner');
+    var html = '<div style="font-size:18px;font-weight:700;margin-bottom:6px;color:var(--purple,#8B5CF6)">Note di Alberto sui progetti (' + items.length + ')</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Alberto ha scritto delle note su questi progetti. Rispondi o segna come letto.</div>';
+    items.forEach(function(p) {
+        var notes = p.ceoProjectNotes || [];
+        var cooResps = p.cooProjectResponses || [];
+        // Mostra ultimi messaggi come conversazione
+        var convo = [];
+        notes.forEach(function(n) { convo.push({ from: 'ceo', note: n.note, at: n.at }); });
+        cooResps.forEach(function(r) { convo.push({ from: 'coo', note: r.note, at: r.at }); });
+        convo.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+        var lastFew = convo.slice(-4);
+
+        html += '<div style="padding:14px 16px;background:var(--purple-bg,#F5F3FF);border:1px solid var(--purple,#8B5CF6)33;border-radius:10px;margin-bottom:12px">';
+        html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">' + esc(p.name) + '</div>';
+
+        // Conversazione
+        if (lastFew.length > 0) {
+            html += '<div style="margin-bottom:10px;max-height:200px;overflow-y:auto">';
+            lastFew.forEach(function(msg) {
+                var isCeo = msg.from === 'ceo';
+                var msgDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                var label = isCeo ? 'Alberto' : 'Mattia';
+                var color = isCeo ? 'var(--purple,#8B5CF6)' : 'var(--blue)';
+                var bg = isCeo ? 'var(--surface)' : 'var(--blue-bg,#EFF6FF)';
+                html += '<div style="padding:8px 12px;background:' + bg + ';border-radius:8px;margin-bottom:4px;border-left:3px solid ' + color + '">';
+                html += '<span style="font-size:11px;font-weight:700;color:' + color + '">' + label + '</span> <span style="font-size:10px;color:var(--text-muted)">' + msgDate + '</span>';
+                html += '<div style="font-size:13px;color:var(--text);margin-top:2px">' + esc(msg.note) + '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+        }
+
+        // Input risposta
+        html += '<div style="display:flex;gap:6px">';
+        html += '<input id="cooProjectReply_' + p.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToProjectNote(\'' + p.id + '\')">';
+        html += '<button onclick="cooRespondToProjectNote(\'' + p.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+        html += '</div>';
+        html += '<button onclick="cooAckProjectNote(\'' + p.id + '\')" style="width:100%;margin-top:6px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text-muted)">Segna come letto</button>';
+        html += '</div>';
+    });
+    html += '<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')">Chiudi</button></div>';
+    modal.innerHTML = html;
+    document.getElementById('backupModal').classList.add('open');
+}
+
+function cooRespondToProjectNote(pid) {
+    var input = document.getElementById('cooProjectReply_' + pid);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === pid; });
+    if (!p) { _showToast('Progetto non trovato', true); return; }
+    if (!p.cooProjectResponses) p.cooProjectResponses = [];
+    p.cooProjectResponses.push({ note: note, at: new Date().toISOString() });
+    p.ceoHasProjectNote = false;
+    saveProjects(projects);
+    _autoPublishForCEO();
+    _showToast('Risposta inviata!');
+    document.getElementById('backupModal').classList.remove('open');
+    render();
+}
+
+function cooAckProjectNote(pid) {
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === pid; });
+    if (!p) return;
+    p.ceoHasProjectNote = false;
+    saveProjects(projects);
+    _showToast('Nota letta');
     document.getElementById('backupModal').classList.remove('open');
     render();
 }
