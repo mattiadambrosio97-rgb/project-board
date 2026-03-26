@@ -2819,7 +2819,12 @@ function handleAdd() {
 }
 
 // ========== CEO MODE ==========
-var CEO_MODE = new URLSearchParams(window.location.search).get('ceo') === '1';
+// Rileva CEO da URL (?ceo=1) e salva la preferenza, oppure recupera da localStorage
+var CEO_MODE = (function() {
+    var fromUrl = new URLSearchParams(window.location.search).get('ceo') === '1';
+    if (fromUrl) { try { localStorage.setItem('pb_is_ceo', '1'); } catch(e) {} return true; }
+    try { return localStorage.getItem('pb_is_ceo') === '1'; } catch(e) { return false; }
+})();
 
 var _ceoPreview = false; // preview mode from COO
 function previewCEO() {
