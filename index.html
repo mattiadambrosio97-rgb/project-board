@@ -2012,9 +2012,11 @@ function renderLaunchCalendar(allLaunches, editable) {
         if (!grouped[b]) grouped[b] = [];
         grouped[b].push(l);
     });
-    var brandKeys = brandOrder.filter(function(b) { return grouped[b]; });
+    // Mostra TUTTI i brand sempre, anche se vuoti
+    var brandKeys = brandOrder.slice();
     Object.keys(grouped).forEach(function(b) { if (brandKeys.indexOf(b) === -1) brandKeys.push(b); });
     brandKeys.forEach(function(b) {
+        if (!grouped[b]) grouped[b] = [];
         grouped[b].sort(function(a, c) { return (a.startDate || '').localeCompare(c.startDate || ''); });
     });
 
@@ -2088,12 +2090,15 @@ function renderLaunchCalendar(allLaunches, editable) {
             if (!placed) rows.push([l]);
         });
 
+        // Se il brand non ha lanci, mostra una riga vuota
+        if (rows.length === 0) rows.push([]);
+
         rows.forEach(function(rowLaunches, ri) {
             html += '<div class="gantt-row" data-brand="' + esc(brand) + '" style="display:flex;height:' + rowH + 'px;align-items:center;position:relative">';
 
             // Brand label solo sulla prima riga
             if (ri === 0) {
-                html += '<div style="width:' + labelW + 'px;flex-shrink:0;font-size:11px;font-weight:800;color:' + bColor + ';padding:0 6px;text-align:right;white-space:nowrap">' + esc(brand) + '</div>';
+                html += '<div style="width:' + labelW + 'px;flex-shrink:0;font-size:11px;font-weight:800;color:' + bColor + ';padding:0 6px;text-align:right;white-space:nowrap;opacity:' + (rowLaunches.length === 0 ? '0.4' : '1') + '">' + esc(brand) + '</div>';
             } else {
                 html += '<div style="width:' + labelW + 'px;flex-shrink:0"></div>';
             }
