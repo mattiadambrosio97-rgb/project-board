@@ -4301,6 +4301,16 @@ function render() {
     // CEO mode — dashboard sintetica
     if (CEO_MODE) {
         document.getElementById('header').style.display = 'none';
+        // Auto-login da URL: ?token=xxx
+        var _urlToken = new URLSearchParams(window.location.search).get('token');
+        if (_urlToken) {
+            safeSetItem('pb_gh_token_ceo', _urlToken);
+            // Pulisci il token dall'URL per sicurezza
+            if (history.replaceState) {
+                var cleanUrl = window.location.pathname + '?ceo=1';
+                history.replaceState(null, '', cleanUrl);
+            }
+        }
         // Check for token first
         if (!safeGetItem('pb_gh_token_ceo')) {
             _showCeoOnboarding();
