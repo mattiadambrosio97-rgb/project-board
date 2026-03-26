@@ -186,7 +186,8 @@
         .main-content { flex: 1; overflow: auto; position: relative; }
 
         /* ===== GLOBAL DASHBOARD ===== */
-        .global-view { padding: 24px 32px; display: flex; flex-direction: column; gap: 24px; }
+        .global-view { padding: 24px 32px; display: flex; flex-direction: column; gap: 16px; }
+        .top-controls-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
         .global-stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; }
         .global-stat-card {
             background: var(--surface); border: 1px solid var(--border);
@@ -200,21 +201,21 @@
         .global-stat-sub { font-size: 13px; color: var(--text-secondary); font-weight: 600; }
 
         /* ===== ACTION CARDS (riga 1 — urgenti, cliccabili) ===== */
-        .action-bar { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-bottom: 12px; }
+        .action-bar { display: flex; justify-content: flex-start; flex-wrap: wrap; gap: 10px; }
         .action-card {
-            display: flex; align-items: center; gap: 10px;
-            padding: 12px 20px; border-radius: var(--radius); cursor: pointer;
+            display: flex; align-items: center; gap: 8px;
+            padding: 10px 16px; border-radius: var(--radius); cursor: pointer;
             background: var(--surface); border: 1px solid var(--border);
             box-shadow: var(--shadow-card); transition: all 0.2s;
-            min-width: 160px; position: relative; overflow: hidden;
+            min-width: 140px; position: relative; overflow: hidden;
         }
         .action-card::before {
             content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
         }
         .action-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
-        .action-card-icon { font-size: 22px; line-height: 1; flex-shrink: 0; }
+        .action-card-icon { font-size: 18px; line-height: 1; flex-shrink: 0; }
         .action-card-body { display: flex; flex-direction: column; gap: 1px; }
-        .action-card-num { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+        .action-card-num { font-size: 18px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
         .action-card-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.3px; opacity: 0.8; }
 
         .action-card.danger { border-color: var(--red); }
@@ -556,6 +557,8 @@
         .status-chip-done::before { background: var(--green); }
         .status-chip-blocked { background: var(--red-bg); color: var(--red); }
         .status-chip-blocked::before { background: var(--red); }
+        .status-chip-da_verificare { background: var(--teal-bg); color: var(--teal); }
+        .status-chip-da_verificare::before { background: var(--teal); }
         .list-add-row {
             padding: 10px 12px; border: none; background: none;
             color: var(--text-muted); font-size: 13px; font-weight: 500;
@@ -1094,7 +1097,8 @@
             .copy-data-btn { font-size: 12px !important; padding: 8px 12px !important; }
 
             /* Global dashboard */
-            .global-view { padding: 16px; gap: 18px; }
+            .global-view { padding: 16px; gap: 12px; }
+            .top-controls-row { flex-direction: column; gap: 8px; }
             .global-stats-row { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .global-stat-value { font-size: 28px; }
             .global-stat-label { font-size: 13px; }
@@ -1448,6 +1452,8 @@
             <button class="copy-data-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
             <button class="icon-btn" title="Anteprima CEO" onclick="previewCEO()">&#128065;</button>
             <button class="copy-data-btn" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
+            <span id="syncIndicator" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>
+            <button class="icon-btn" title="Refresh dati" onclick="_manualRefresh()" style="font-size:14px">&#8635;</button>
             <button class="theme-toggle" onclick="toggleTheme()"></button>
         </div>
     </div>
@@ -1531,9 +1537,9 @@ const GLOBAL_TABS_MOBILE = ['Home', 'Board', 'Lista', 'Cal', 'Team', 'Review'];
 const TABS = ['Dashboard', 'Board', 'Lista', 'Calendario', 'Persone', 'Le mie task', 'Riepilogo'];
 const TABS_MOBILE = ['Dash', 'Board', 'Lista', 'Cal', 'Team', 'Mie task', 'Recap'];
 function isMobile() { return window.innerWidth <= 768; }
-const STATUS_LIST = ['todo', 'in_progress', 'blocked', 'done'];
-const STATUS_LABELS = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccata', done: 'Completata' };
-const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--blue)', blocked: 'var(--red)', done: 'var(--green)' };
+const STATUS_LIST = ['todo', 'in_progress', 'blocked', 'da_verificare', 'done'];
+const STATUS_LABELS = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccata', da_verificare: 'Da verificare', done: 'Completata' };
+const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--blue)', blocked: 'var(--red)', da_verificare: 'var(--teal)', done: 'var(--green)' };
 const XP_PER_TASK = 20;
 const PROJECT_STATUSES = ['attivo', 'in-pausa', 'completato'];
 
@@ -1994,7 +2000,7 @@ function _cooFetchCeoActionsForBacheca() {
     var ghToken = getGHToken();
     if (!ghToken) return;
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
-        headers: { 'Authorization': 'Bearer ' + ghToken }
+        headers: { 'Authorization': 'Bearer ' + ghToken }, cache: 'no-store'
     }).then(function(r) { return r.ok ? r.json() : null; })
     .then(function(fileData) {
         if (!fileData || !fileData.content) return;
@@ -2585,27 +2591,36 @@ function deleteLaunch(id) {
 
 function renderLaunchesSection() {
     var launches = getLaunches();
-    var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">';
-    html += '<div style="font-size:15px;font-weight:800;color:var(--text)">&#128640; Lanci Marketing</div>';
-    html += '<button class="add-btn" style="font-size:12px;padding:5px 12px" onclick="openLaunchModal(null)">+ Lancio</button>';
+    var active = launches.filter(function(l) { var s = getLaunchStatus(l); return s === 'live' || s === 'planned'; });
+    var liveCount = launches.filter(function(l) { return getLaunchStatus(l) === 'live'; }).length;
+    var isOpen = safeGetItem('pb_launches_open') === '1';
+
+    var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:8px 14px">';
+    // Header — sempre visibile, cliccabile per aprire/chiudere
+    html += '<div onclick="toggleLaunchesSection()" style="cursor:pointer;display:flex;align-items:center;gap:8px">';
+    html += '<span id="launchChevron" style="font-size:10px;color:var(--text-muted);transition:transform 0.2s;transform:rotate(' + (isOpen ? '90' : '0') + 'deg)">&#9654;</span>';
+    html += '<span style="font-size:13px;font-weight:800;color:var(--text)">&#128640; Lanci Marketing</span>';
+    html += '<span style="font-size:11px;color:var(--text-muted)">' + active.length + ' attiv' + (active.length === 1 ? 'o' : 'i');
+    if (liveCount > 0) html += ' &middot; <span style="color:var(--green);font-weight:700">' + liveCount + ' live</span>';
+    html += '</span>';
+    html += '<div style="margin-left:auto"><button class="add-btn" style="font-size:11px;padding:4px 10px" onclick="event.stopPropagation();openLaunchModal(null)">+</button></div>';
     html += '</div>';
 
+    // Contenuto collassabile
+    html += '<div id="launchesContent" style="display:' + (isOpen ? 'block' : 'none') + ';margin-top:8px">';
+
     if (launches.length === 0) {
-        html += '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Nessun lancio programmato</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);padding:4px 0">Nessun lancio programmato</div>';
     } else {
-        // Filtra solo attivi (live + planned) per il calendario
-        var active = launches.filter(function(l) { var s = getLaunchStatus(l); return s === 'live' || s === 'planned'; });
         if (active.length > 0) {
             html += renderLaunchCalendar(active, true);
         }
-        // Conclusi sotto in piccolo
         var completed = launches.filter(function(l) { return getLaunchStatus(l) === 'completed'; });
         if (completed.length > 0) {
-            html += '<div style="margin-top:10px;padding-top:8px;border-top:1px solid var(--border-light)">';
+            html += '<div style="margin-top:8px;padding-top:6px;border-top:1px solid var(--border-light)">';
             html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:4px">Conclusi</div>';
             completed.forEach(function(l) {
-                html += '<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:12px;color:var(--text-muted);cursor:pointer" onclick="openLaunchModal(\'' + l.id + '\')">';
+                html += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px;color:var(--text-muted);cursor:pointer" onclick="openLaunchModal(\'' + l.id + '\')">';
                 html += '<span style="text-decoration:line-through">' + esc(l.name) + '</span>';
                 if (l.brand) html += '<span style="font-size:10px;font-weight:700;opacity:0.6">' + esc(l.brand) + '</span>';
                 html += '</div>';
@@ -2613,35 +2628,44 @@ function renderLaunchesSection() {
             html += '</div>';
         }
     }
+    html += '</div>'; // close collapsible
 
     html += '</div>';
     return html;
 }
 
+function toggleLaunchesSection() {
+    var content = document.getElementById('launchesContent');
+    var chevron = document.getElementById('launchChevron');
+    if (!content) return;
+    var isOpen = content.style.display !== 'none';
+    content.style.display = isOpen ? 'none' : 'block';
+    if (chevron) chevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(90deg)';
+    safeSetItem('pb_launches_open', isOpen ? '0' : '1');
+}
+
 function init() {
     if (!CEO_MODE) {
         seedData();
-        // Su GitHub Pages COO: sincronizza da data.json (lanci, progetti, team)
+        // Su GitHub Pages COO: SEMPRE carica dati freschi da API GitHub
         if (window.location.hostname.indexOf('github.io') !== -1) {
-            var loc = window.location;
-            var dataUrl = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/') + 'data.json?t=' + Date.now();
-            fetch(dataUrl).then(function(r) { return r.json(); }).then(function(data) {
-                var changed = false;
-                // Lanci: se data.json ne ha di più, usa quelli
-                if (data.launches && data.launches.length > getLaunches().length) {
-                    saveLaunches(data.launches);
-                    changed = true;
-                }
-                // Progetti: se localStorage è vuoto, carica
-                if (data.projects && data.projects.length > 0 && getProjects().length === 0) {
-                    saveProjects(data.projects);
-                    changed = true;
-                }
-                if (data.team && data.team.length > 0) {
-                    safeSetItem('pb_team', JSON.stringify(data.team));
-                }
-                if (changed) render();
-            }).catch(function() {});
+            var cooToken = getGHToken();
+            if (!cooToken) {
+                _showCooOnboarding(function() { init(); });
+                return;
+            }
+            if (cooToken) {
+                _ghFetchJSON(GH_DATA_FILE, cooToken).then(function(data) {
+                    if (!data) return;
+                    var changed = false;
+                    if (data.launches) { saveLaunches(data.launches); changed = true; }
+                    if (data.projects && data.projects.length > 0) { saveProjects(data.projects); changed = true; }
+                    if (data.team && data.team.length > 0) { safeSetItem('pb_team', JSON.stringify(data.team)); changed = true; }
+                    if (data.resources) { safeSetItem('pb_resources', JSON.stringify(data.resources)); changed = true; }
+                    if (data.ceoLinks) { safeSetItem('pb_ceoLinks', JSON.stringify(data.ceoLinks)); changed = true; }
+                    if (changed) { window._lastCooSync = Date.now(); render(); }
+                }).catch(function() {});
+            }
         }
         // Migrate review -> todo (colonna rimossa)
         const ps = getProjects();
@@ -2916,7 +2940,7 @@ function ceoPushActions(callback) {
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(_ceoActions, null, 2))));
 
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
-        headers: { 'Authorization': 'Bearer ' + token }
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
     }).then(function(r) { return r.ok ? r.json() : null; })
     .then(function(existing) {
         var body = { message: 'CEO actions ' + new Date().toISOString().split('T')[0], content: content };
@@ -2977,7 +3001,7 @@ function _ceoOnboardSubmit() {
     // Validate token with a test API call
     if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; }
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
-        headers: { 'Authorization': 'Bearer ' + token }
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
     }).then(function(r) {
         if (r.ok || r.status === 404) {
             // 404 is fine — file may not exist yet
@@ -3029,7 +3053,11 @@ function renderCEOHome() {
         html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Aggiornato: ' + pubDate.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) + '</div>';
     }
     html += '</div>';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    html += '<span id="syncIndicatorCeo" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>';
+    html += '<button onclick="_manualRefresh()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:42px;height:42px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna dati">&#8635;</button>';
     html += '<button onclick="ceoToggleTheme()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:42px;height:42px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
+    html += '</div>';
     html += '</div>';
 
     // ========== NOTIFICHE / BACHECA RISORSE — widget in alto ==========
@@ -3434,12 +3462,54 @@ var GH_CEO_FILE = 'ceo.json';
 function getGHToken() { return safeGetItem('pb_gh_token'); }
 function setGHToken(t) { safeSetItem('pb_gh_token', t); }
 
+function _showCooOnboarding(onSuccess) {
+    var mc = document.getElementById('mainContent');
+    if (!mc) return;
+    var existing = document.getElementById('cooOnboardOverlay');
+    if (existing) existing.remove();
+    var overlay = document.createElement('div');
+    overlay.id = 'cooOnboardOverlay';
+    overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:var(--modal-backdrop);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+    overlay.innerHTML =
+        '<div style="background:var(--surface);border-radius:16px;padding:32px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)">' +
+        '<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px">Connessione GitHub</div>' +
+        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5">Serve una sola volta. Incolla il Personal Access Token di GitHub.<br><span style="font-size:12px">Crealo su github.com/settings/tokens &rarr; Fine-grained &rarr; repo "project-board" &rarr; Contents: Read and write</span></div>' +
+        '<input id="cooTokenInput" type="text" placeholder="ghp_..." style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;box-sizing:border-box" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+        '<div id="cooTokenErr" style="display:none;font-size:13px;margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--red-bg);color:var(--red);font-weight:600"></div>' +
+        '<button id="cooTokenBtn" onclick="_cooOnboardSubmit()" style="margin-top:16px;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Connetti</button>' +
+        '</div>';
+    document.body.appendChild(overlay);
+    window._cooOnboardCallback = onSuccess || null;
+    setTimeout(function() { var inp = document.getElementById('cooTokenInput'); if (inp) inp.focus(); }, 100);
+}
+function _cooOnboardSubmit() {
+    var inp = document.getElementById('cooTokenInput');
+    var errEl = document.getElementById('cooTokenErr');
+    var token = (inp ? inp.value : '').trim();
+    if (!token) { if (errEl) { errEl.textContent = 'Incolla il token.'; errEl.style.display = 'block'; } return; }
+    if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; errEl.style.background = 'var(--bg)'; }
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
+    }).then(function(r) {
+        if (r.ok || r.status === 404) {
+            setGHToken(token);
+            var overlay = document.getElementById('cooOnboardOverlay');
+            if (overlay) overlay.remove();
+            if (window._cooOnboardCallback) window._cooOnboardCallback();
+            else render();
+        } else {
+            if (errEl) { errEl.textContent = 'Token non valido. Controlla e riprova.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; errEl.style.background = 'var(--red-bg)'; }
+        }
+    }).catch(function() {
+        if (errEl) { errEl.textContent = 'Errore di rete. Riprova.'; errEl.style.display = 'block'; errEl.style.color = 'var(--red)'; errEl.style.background = 'var(--red-bg)'; }
+    });
+}
+
 function publishForCEO() {
     var token = getGHToken();
     if (!token) {
-        token = prompt('Incolla il tuo GitHub Personal Access Token (serve solo la prima volta).\nCrealo su github.com/settings/tokens con permesso "Contents: Read and write" per il repo project-board.');
-        if (!token) return;
-        setGHToken(token.trim());
+        _showCooOnboarding(function() { publishForCEO(); });
+        return;
     }
 
     var data = {
@@ -3454,7 +3524,7 @@ function publishForCEO() {
 
     // Get current file SHA (needed for update)
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
-        headers: { 'Authorization': 'Bearer ' + getGHToken() }
+        headers: { 'Authorization': 'Bearer ' + getGHToken() }, cache: 'no-store'
     }).then(function(r) { return r.ok ? r.json() : null; })
     .then(function(existing) {
         var body = {
@@ -3473,19 +3543,80 @@ function publishForCEO() {
         });
     }).then(function(r) {
         if (r.ok) {
-            alert('Pubblicato per il CEO!');
+            window._lastCooPublish = Date.now();
+            _updateSyncIndicator();
+            _showToast('Pubblicato per il CEO!');
         } else {
             r.json().then(function(err) {
                 if (err.message && err.message.indexOf('Bad credentials') !== -1) {
                     setGHToken('');
-                    alert('Token non valido. Riprova.');
+                    _showCooOnboarding(function() { publishForCEO(); });
                 } else {
-                    alert('Errore: ' + (err.message || 'sconosciuto'));
+                    _showToast('Errore: ' + (err.message || 'sconosciuto'), true);
                 }
             });
         }
-    }).catch(function(e) { alert('Errore di rete: ' + e.message); });
+    }).catch(function(e) { _showToast('Errore di rete: ' + e.message, true); });
 }
+
+// ========== TOAST & SYNC INDICATOR ==========
+function _showToast(msg, isError) {
+    var existing = document.getElementById('pbToast');
+    if (existing) existing.remove();
+    var el = document.createElement('div');
+    el.id = 'pbToast';
+    el.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);padding:12px 24px;border-radius:12px;font-size:14px;font-weight:600;font-family:var(--font);z-index:99999;box-shadow:var(--shadow-lg);transition:opacity 0.3s;' +
+        (isError ? 'background:var(--red);color:#fff' : 'background:var(--surface);color:var(--text);border:1px solid var(--border)');
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 300); }, 3000);
+}
+
+function _updateSyncIndicator() {
+    var ids = CEO_MODE ? ['syncIndicatorCeo', 'syncIndicator'] : ['syncIndicator'];
+    var lastSync = CEO_MODE ? window._lastCeoSync : window._lastCooSync;
+    ids.forEach(function(id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        if (!lastSync) { el.textContent = ''; return; }
+        var secsAgo = Math.round((Date.now() - lastSync) / 1000);
+        var label = secsAgo < 10 ? 'ora' : secsAgo < 60 ? secsAgo + 's fa' : Math.round(secsAgo / 60) + 'm fa';
+        el.innerHTML = '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);margin-right:4px"></span>Sync: ' + label;
+    });
+}
+
+function _manualRefresh() {
+    _showToast('Aggiornamento in corso...');
+    if (CEO_MODE) {
+        loadCEOData(function() {
+            renderCEOView();
+            _updateSyncIndicator();
+            _showToast('Dati aggiornati');
+        }, true);
+    } else if (window.location.hostname.indexOf('github.io') !== -1) {
+        var cooToken = getGHToken();
+        if (!cooToken) return;
+        _ghFetchJSON(GH_DATA_FILE, cooToken).then(function(data) {
+            if (!data) { _showToast('Nessun dato trovato', true); return; }
+            if (data.launches) saveLaunches(data.launches);
+            if (data.projects && data.projects.length > 0) saveProjects(data.projects);
+            if (data.team && data.team.length > 0) safeSetItem('pb_team', JSON.stringify(data.team));
+            if (data.resources) safeSetItem('pb_resources', JSON.stringify(data.resources));
+            if (data.ceoLinks) safeSetItem('pb_ceoLinks', JSON.stringify(data.ceoLinks));
+            window._lastCooSync = Date.now();
+            render();
+            _updateSyncIndicator();
+            _showToast('Dati aggiornati');
+        }).catch(function() { _showToast('Errore nel refresh', true); });
+        _cooFetchCeoActions();
+    } else {
+        render();
+        _showToast('Dati locali aggiornati');
+    }
+}
+
+// Aggiorna indicatore ogni 10s
+setInterval(_updateSyncIndicator, 10000);
 
 // CEO mode: load data from remote data.json + ceo.json
 var _ceoData = null;
@@ -3507,29 +3638,36 @@ function _applyCeoActionsToData() {
     }
 }
 
-function loadCEOData(callback) {
-    if (_ceoData) { callback(_ceoData); return; }
-    var loc = window.location;
-    var base = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/');
-    var dataUrl = base + 'data.json?t=' + Date.now();
-    var ceoUrl = base + 'ceo.json?t=' + Date.now();
-
-    var dataPromise = fetch(dataUrl, { cache: 'no-store' }).then(function(r) {
-        if (!r.ok) throw new Error('HTTP ' + r.status);
+function _ghFetchJSON(file, token) {
+    var url = 'https://api.github.com/repos/' + GH_REPO + '/contents/' + file + '?t=' + Date.now();
+    var opts = { cache: 'no-store', headers: {} };
+    if (token) opts.headers['Authorization'] = 'Bearer ' + token;
+    return fetch(url, opts).then(function(r) {
+        if (!r.ok) return null;
         return r.json();
+    }).then(function(fileData) {
+        if (!fileData || !fileData.content) return null;
+        return JSON.parse(decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, '')))));
     });
+}
 
-    var ceoPromise = fetch(ceoUrl, { cache: 'no-store' }).then(function(r) {
-        if (!r.ok) return { lastUpdate: '', taskActions: {}, resourceActions: {} };
-        return r.json();
-    }).catch(function() {
-        return { lastUpdate: '', taskActions: {}, resourceActions: {} };
+function loadCEOData(callback, forceRefresh) {
+    if (_ceoData && !forceRefresh) { callback(_ceoData); return; }
+    var token = safeGetItem('pb_gh_token_ceo') || '';
+
+    var dataPromise = _ghFetchJSON(GH_DATA_FILE, token).then(function(d) {
+        if (!d) throw new Error('Nessun dato pubblicato');
+        return d;
+    });
+    var ceoPromise = _ghFetchJSON(GH_CEO_FILE, token).then(function(d) {
+        return d || { lastUpdate: '', taskActions: {}, resourceActions: {} };
     });
 
     Promise.all([dataPromise, ceoPromise]).then(function(results) {
         _ceoData = results[0];
         _ceoActions = results[1];
         _applyCeoActionsToData();
+        window._lastCeoSync = Date.now();
         callback(_ceoData);
     }).catch(function(err) {
         document.getElementById('mainContent').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-size:16px">Nessun dato pubblicato ancora.<br>Il COO deve prima pubblicare i dati.<br><small style="color:var(--red)">' + err.message + '</small></div>';
@@ -3587,7 +3725,7 @@ function _cooFetchCeoActions() {
     var ghToken = getGHToken();
     if (!ghToken) return;
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
-        headers: { 'Authorization': 'Bearer ' + ghToken }
+        headers: { 'Authorization': 'Bearer ' + ghToken }, cache: 'no-store'
     }).then(function(r) {
         if (!r.ok) return null;
         return r.json();
@@ -3676,18 +3814,22 @@ function _cooFetchCeoActions() {
             }
         }
 
-        // Also check task actions for ceo_done
+        // Task completate da CEO → status 'da_verificare' (COO conferma poi)
         if (ceoActs.taskActions) {
             var projects = getProjects();
+            var needSave = false;
             projects.forEach(function(p) {
                 (p.tasks || []).forEach(function(t) {
                     var ta = ceoActs.taskActions[t.id];
-                    if (ta && ta.status === 'complete' && t.status !== 'done') {
-                        t.status = 'ceo_done';
+                    if (ta && ta.status === 'complete' && t.status !== 'done' && t.status !== 'da_verificare') {
+                        t.status = 'da_verificare';
                         t.ceoUpdates = ta.updates || [];
+                        t.ceoCompletedAt = (ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1].at : new Date().toISOString();
+                        needSave = true;
                     }
                 });
             });
+            if (needSave) { saveProjects(projects); render(); }
         }
     }).catch(function() { /* silent fail — badges stay as '...' */ });
 }
@@ -3997,10 +4139,13 @@ function renderGlobal() {
 
     const todayStr = today();
 
-    // ===== BACHECA RISORSE — rettangolo unico cliccabile =====
+    // ===== TOP ROW: BACHECA + LANCI =====
+    html += '<div class="top-controls-row">';
+
+    // BACHECA RISORSE — rettangolo unico cliccabile
     var topRes = getResources();
     var resCount = topRes.length;
-    html += '<div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:10px">';
+    html += '<div style="display:inline-flex;align-items:center;gap:6px">';
     html += '<div onclick="openBachecaModal()" style="cursor:pointer;display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;transition:all 0.15s;font-size:12px" onmouseenter="this.style.borderColor=\'var(--accent)\'" onmouseleave="this.style.borderColor=\'\'">';
     html += '<span style="font-size:14px">&#128218;</span>';
     html += '<span style="font-weight:700;color:var(--text)">Bacheca Alberto</span>';
@@ -4011,8 +4156,10 @@ function renderGlobal() {
     html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 10px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);line-height:1">+</button>';
     html += '</div>';
 
-    // ===== LANCI MARKETING =====
-    html += renderLaunchesSection();
+    // LANCI MARKETING — affiancato
+    html += '<div style="flex:1;min-width:200px">' + renderLaunchesSection() + '</div>';
+
+    html += '</div>'; // close top-controls-row
 
     // ===== SBLOCCA (solo se serve) =====
     const pmData = generatePMAnalysis();
@@ -4034,15 +4181,17 @@ function renderGlobal() {
 
     // Scadenze per giorno
     const noDueTasks = allTasks.filter(t => t.status !== 'done' && !t.dueDate);
-    const dueTodayAll = allTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate === todayStr);
+    const daVerificare = allTasks.filter(t => t.status === 'da_verificare');
+    const dueTodayAll = allTasks.filter(t => t.status !== 'done' && t.status !== 'da_verificare' && t.dueDate && t.dueDate === todayStr);
     const tomorrowStr = (()=>{ const d=new Date(); d.setDate(d.getDate()+1); return d.toISOString().split('T')[0]; })();
-    const dueTomorrowAll = allTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate === tomorrowStr);
-    const overdueAll = allTasks.filter(t => t.status !== 'done' && t.dueDate && t.dueDate < todayStr);
+    const dueTomorrowAll = allTasks.filter(t => t.status !== 'done' && t.status !== 'da_verificare' && t.dueDate && t.dueDate === tomorrowStr);
+    const overdueAll = allTasks.filter(t => t.status !== 'done' && t.status !== 'da_verificare' && t.dueDate && t.dueDate < todayStr);
 
     // Riga 1: ACTION CARDS — urgenti, visivamente distinte
-    const hasActions = actions.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
+    const hasActions = actions.length > 0 || daVerificare.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
     if (hasActions) {
         html += '<div class="action-bar">';
+        if (daVerificare.length > 0) html += `<div class="action-card" style="border-color:var(--teal)" onclick="showDaVerificareTasks()"><span class="action-card-icon" style="color:var(--teal)">&#9745;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--teal)">${daVerificare.length}</span><span class="action-card-label" style="color:var(--teal)">Da verificare</span></div></div>`;
         if (actions.length > 0) html += `<div class="action-card danger" onclick="showUnblockPopup()"><span class="action-card-icon">&#9888;</span><div class="action-card-body"><span class="action-card-num">${actions.length}</span><span class="action-card-label">Da sbloccare</span></div></div>`;
         if (overdueAll.length > 0) html += `<div class="action-card danger" onclick="showOverdueTasks()"><span class="action-card-icon">&#128680;</span><div class="action-card-body"><span class="action-card-num">${overdueAll.length}</span><span class="action-card-label">In ritardo</span></div></div>`;
         if (dueTodayAll.length > 0) html += `<div class="action-card warning" onclick="showDueTodayTasks()"><span class="action-card-icon">&#9203;</span><div class="action-card-body"><span class="action-card-num">${dueTodayAll.length}</span><span class="action-card-label">Scade oggi</span></div></div>`;
@@ -6409,6 +6558,65 @@ function showUnblockPopup() {
     document.getElementById('backupModal').classList.add('open');
 }
 
+function showDaVerificareTasks() {
+    const projects = getProjects();
+    let items = [];
+    projects.forEach(p => {
+        (p.tasks||[]).forEach(t => {
+            if (t.status === 'da_verificare') items.push({ ...t, projectName: p.name, projectId: p.id });
+        });
+    });
+    if (!items.length) return;
+    const modal = document.getElementById('backupModalInner');
+    let html = `<div style="font-size:18px;font-weight:700;margin-bottom:6px;color:var(--teal)">Da verificare (${items.length})</div>`;
+    html += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Alberto ha segnato queste task come completate. Conferma o rimetti in lavorazione.</div>`;
+    items.forEach(t => {
+        const ceoNote = t.ceoUpdates && t.ceoUpdates.length > 0 ? t.ceoUpdates[t.ceoUpdates.length - 1].note : '';
+        const ceoDate = t.ceoCompletedAt ? new Date(t.ceoCompletedAt).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+        html += `<div style="padding:14px 16px;background:var(--teal-bg);border:1px solid var(--teal)22;border-radius:10px;margin-bottom:10px">
+            <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">${esc(t.title)}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${esc(t.projectName)}${ceoDate ? ' &middot; Completata: ' + ceoDate : ''}</div>
+            ${ceoNote ? '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--teal)"><strong>Alberto:</strong> ' + esc(ceoNote) + '</div>' : ''}
+            <div style="display:flex;gap:8px">
+                <button onclick="confirmTask('${t.id}','${t.projectId}')" style="flex:1;padding:10px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Conferma completata</button>
+                <button onclick="rejectTask('${t.id}','${t.projectId}')" style="flex:1;padding:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Rimetti in lavorazione</button>
+            </div>
+        </div>`;
+    });
+    html += `<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById('backupModal').classList.remove('open')">Chiudi</button></div>`;
+    modal.innerHTML = html;
+    document.getElementById('backupModal').classList.add('open');
+}
+
+function confirmTask(taskId, projectId) {
+    const projects = getProjects();
+    const p = projects.find(pr => pr.id === projectId);
+    if (!p) return;
+    const t = (p.tasks||[]).find(tk => tk.id === taskId);
+    if (!t) return;
+    t.status = 'done';
+    t.completedAt = new Date().toISOString();
+    if (!t.activityLog) t.activityLog = [];
+    t.activityLog.push({ date: today(), text: 'Confermata dal COO (completata da Alberto)' });
+    saveProjects(projects);
+    render();
+    showDaVerificareTasks(); // refresh popup
+}
+
+function rejectTask(taskId, projectId) {
+    const projects = getProjects();
+    const p = projects.find(pr => pr.id === projectId);
+    if (!p) return;
+    const t = (p.tasks||[]).find(tk => tk.id === taskId);
+    if (!t) return;
+    t.status = 'in_progress';
+    if (!t.activityLog) t.activityLog = [];
+    t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO (era da verificare)' });
+    saveProjects(projects);
+    render();
+    showDaVerificareTasks(); // refresh popup
+}
+
 function showCheckPopup() {
     const checks = window._pmChecks || [];
     if (!checks.length) return;
@@ -6851,6 +7059,43 @@ function checkAutoBackup() {
 // ========== START ==========
 init();
 if (!CEO_MODE) setTimeout(checkAutoBackup, 2000); // check dopo caricamento (skip in CEO mode)
+
+// ========== AUTO-SYNC ==========
+(function() {
+    var POLL_CEO = 45000;  // CEO: refresh ogni 45s
+    var POLL_COO = 60000;  // COO: fetch feedback ogni 60s
+
+    if (CEO_MODE) {
+        // CEO: ricarica dati da API periodicamente
+        setInterval(function() {
+            if (!safeGetItem('pb_gh_token_ceo')) return;
+            loadCEOData(function() {
+                renderCEOView();
+                _updateSyncIndicator();
+            }, true); // forceRefresh=true
+        }, POLL_CEO);
+    } else if (window.location.hostname.indexOf('github.io') !== -1) {
+        // COO su GitHub Pages: ricarica dati da API + feedback CEO
+        setInterval(function() {
+            var cooToken = getGHToken();
+            if (!cooToken) return;
+            // Sync dati principali
+            _ghFetchJSON(GH_DATA_FILE, cooToken).then(function(data) {
+                if (!data) return;
+                var changed = false;
+                if (data.launches) { saveLaunches(data.launches); changed = true; }
+                if (data.projects && data.projects.length > 0) { saveProjects(data.projects); changed = true; }
+                if (data.team && data.team.length > 0) { safeSetItem('pb_team', JSON.stringify(data.team)); changed = true; }
+                if (data.resources) { safeSetItem('pb_resources', JSON.stringify(data.resources)); changed = true; }
+                if (changed) { window._lastCooSync = Date.now(); render(); }
+            }).catch(function() {});
+            // Fetch feedback CEO
+            _cooFetchCeoActions();
+            _cooFetchCeoActionsForBacheca();
+            _updateSyncIndicator();
+        }, POLL_COO);
+    }
+})();
 </script>
 </body>
 </html>
