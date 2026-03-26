@@ -1468,6 +1468,12 @@
     <input type="file" id="importFile" accept=".json" style="display:none" onchange="handleImport(event)">
 
 <script>
+// ========== GITHUB PAGES PROTECTION ==========
+// Su GitHub Pages, senza ?ceo=1 redirect a CEO mode (il COO usa il file locale)
+if (window.location.hostname.indexOf('github.io') !== -1 && new URLSearchParams(window.location.search).get('ceo') !== '1') {
+    window.location.replace(window.location.href.split('?')[0] + '?ceo=1');
+}
+
 // ========== STORAGE SAFETY (WhatsApp in-app browser) ==========
 var _storageAvailable = (function() {
     try { var k = '__test__'; localStorage.setItem(k, '1'); localStorage.removeItem(k); return true; } catch(e) { return false; }
@@ -1866,6 +1872,130 @@ function restoreNavState() {
     } catch(e) {}
 }
 
+// ========== LANCI MARKETING ==========
+function getLaunches() {
+    try { return JSON.parse(safeGetItem('pb_launches') || '[]'); } catch(e) { return []; }
+}
+function saveLaunches(arr) { safeSetItem('pb_launches', JSON.stringify(arr)); }
+
+function getLaunchStatus(l) {
+    var t = today();
+    if (l.endDate && l.endDate < t) return 'completed';
+    if (l.startDate && l.startDate <= t && (!l.endDate || l.endDate >= t)) return 'live';
+    return 'planned';
+}
+
+function openLaunchModal(launchId) {
+    var launches = getLaunches();
+    var isNew = !launchId;
+    var launch = isNew ? { id: 'ln_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name: '', startDate: '', endDate: '', projectId: '', notes: '' } : launches.find(function(l) { return l.id === launchId; });
+    if (!launch) return;
+    var projects = getProjects();
+
+    var modal = document.getElementById('taskModalInner');
+    var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
+    html += '<input class="modal-title-input" id="lnName" placeholder="Nome lancio..." value="' + esc(launch.name) + '">';
+
+    html += '<div class="modal-row" style="margin-top:14px">';
+    html += '<div class="modal-field"><span class="modal-label">Data inizio</span><input class="modal-input" type="date" id="lnStart" value="' + (launch.startDate || '') + '"></div>';
+    html += '<div class="modal-field"><span class="modal-label">Data fine</span><input class="modal-input" type="date" id="lnEnd" value="' + (launch.endDate || '') + '"></div>';
+    html += '</div>';
+
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Progetto collegato</span>';
+    html += '<select class="modal-select" id="lnProject"><option value="">— Nessuno —</option>';
+    projects.forEach(function(p) { html += '<option value="' + p.id + '"' + (launch.projectId === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>'; });
+    html += '</select></div>';
+
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Note</span>';
+    html += '<textarea class="modal-textarea" id="lnNotes" rows="2">' + esc(launch.notes || '') + '</textarea></div>';
+
+    html += '<div class="modal-actions" style="margin-top:16px">';
+    html += isNew ? '<div></div>' : '<button class="btn-delete" onclick="deleteLaunch(\'' + launch.id + '\')">Elimina</button>';
+    html += '<div class="modal-actions-right">';
+    html += '<button class="btn-cancel" onclick="closeTaskModal()">Annulla</button>';
+    html += '<button class="btn-save" onclick="saveLaunch(\'' + launch.id + '\',' + isNew + ')">Salva</button>';
+    html += '</div></div>';
+
+    modal.innerHTML = html;
+    document.getElementById('taskModal').classList.add('open');
+    if (isNew) setTimeout(function() { document.getElementById('lnName').focus(); }, 100);
+}
+
+function saveLaunch(id, isNew) {
+    var launches = getLaunches();
+    var data = {
+        id: id,
+        name: document.getElementById('lnName').value.trim(),
+        startDate: document.getElementById('lnStart').value,
+        endDate: document.getElementById('lnEnd').value,
+        projectId: document.getElementById('lnProject').value,
+        notes: document.getElementById('lnNotes').value.trim()
+    };
+    if (!data.name) { alert('Inserisci un nome'); return; }
+    if (isNew) { launches.push(data); } else {
+        var idx = launches.findIndex(function(l) { return l.id === id; });
+        if (idx >= 0) launches[idx] = data;
+    }
+    saveLaunches(launches);
+    closeTaskModal();
+    render();
+}
+
+function deleteLaunch(id) {
+    if (!confirm('Eliminare questo lancio?')) return;
+    saveLaunches(getLaunches().filter(function(l) { return l.id !== id; }));
+    closeTaskModal();
+    render();
+}
+
+function renderLaunchesSection() {
+    var launches = getLaunches();
+    var todayStr = today();
+    // Sort: live first, then planned by startDate, then completed
+    launches.sort(function(a, b) {
+        var sa = getLaunchStatus(a), sb = getLaunchStatus(b);
+        var order = {live: 0, planned: 1, completed: 2};
+        if (order[sa] !== order[sb]) return order[sa] - order[sb];
+        return (a.startDate || '').localeCompare(b.startDate || '');
+    });
+
+    var html = '<div class="section-card" style="margin-bottom:20px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
+    html += '<div style="font-size:15px;font-weight:800;color:var(--text)">&#128640; Lanci Marketing</div>';
+    html += '<button class="add-btn" style="font-size:12px;padding:5px 12px" onclick="openLaunchModal(null)">+ Lancio</button>';
+    html += '</div>';
+
+    if (launches.length === 0) {
+        html += '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Nessun lancio programmato</div>';
+    }
+
+    launches.forEach(function(l) {
+        var st = getLaunchStatus(l);
+        var stColor = st === 'live' ? 'var(--green)' : (st === 'planned' ? 'var(--blue)' : 'var(--text-muted)');
+        var stBg = st === 'live' ? 'var(--green-bg, #F0FDF4)' : (st === 'planned' ? 'var(--blue-bg, #EFF6FF)' : 'var(--bg)');
+        var stLabel = st === 'live' ? 'IN CORSO' : (st === 'planned' ? 'PROGRAMMATO' : 'CONCLUSO');
+        var proj = l.projectId ? getProjects().find(function(p) { return p.id === l.projectId; }) : null;
+
+        html += '<div style="background:' + stBg + ';border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer" onclick="openLaunchModal(\'' + l.id + '\')">';
+        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0">' + esc(l.name) + '</div>';
+        html += '<span style="font-size:10px;font-weight:800;color:' + stColor + ';background:var(--surface);border:1px solid ' + stColor + ';border-radius:6px;padding:3px 8px;flex-shrink:0">' + stLabel + '</span>';
+        html += '</div>';
+        html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">';
+        if (l.startDate && l.endDate) {
+            html += smartDate(l.startDate) + ' — ' + smartDate(l.endDate);
+        } else if (l.startDate) {
+            html += 'Dal ' + smartDate(l.startDate);
+        }
+        if (proj) html += ' &middot; ' + esc(proj.name);
+        html += '</div>';
+        html += '</div>';
+    });
+
+    html += '</div>';
+    return html;
+}
+
 function init() {
     if (!CEO_MODE) {
         seedData();
@@ -1982,6 +2112,44 @@ function renderCEOHome() {
     if (blockedCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Bloccate</div></div>';
     if (overdueCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Scadute</div></div>';
     html += '</div>';
+
+    // ========== LANCI MARKETING (CEO) ==========
+    var launches = getLaunches();
+    var activeLaunches = launches.filter(function(l) { var s = getLaunchStatus(l); return s === 'live' || s === 'planned'; });
+    if (activeLaunches.length > 0) {
+        activeLaunches.sort(function(a, b) {
+            var sa = getLaunchStatus(a) === 'live' ? 0 : 1, sb = getLaunchStatus(b) === 'live' ? 0 : 1;
+            if (sa !== sb) return sa - sb;
+            return (a.startDate || '').localeCompare(b.startDate || '');
+        });
+        html += '<div style="margin-bottom:24px">';
+        html += '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:10px">&#128640; Lanci Marketing</div>';
+        activeLaunches.forEach(function(l) {
+            var st = getLaunchStatus(l);
+            var isLive = st === 'live';
+            var borderColor = isLive ? 'var(--green)' : 'var(--border)';
+            var bgColor = isLive ? 'var(--green-bg, #F0FDF4)' : 'var(--surface)';
+            var stLabel = isLive ? 'IN CORSO' : 'PROGRAMMATO';
+            var stColor = isLive ? 'var(--green)' : 'var(--blue)';
+            var proj = l.projectId ? getProjects().find(function(p) { return p.id === l.projectId; }) : null;
+
+            html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px' + (isLive ? ';border-left:4px solid var(--green)' : '') + '">';
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+            html += '<span style="font-size:15px;font-weight:700;color:var(--text)">' + esc(l.name) + '</span>';
+            html += '<span style="font-size:10px;font-weight:800;color:' + stColor + ';border:1px solid ' + stColor + ';border-radius:6px;padding:2px 8px;flex-shrink:0">' + stLabel + '</span>';
+            html += '</div>';
+            html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">';
+            if (l.startDate && l.endDate) {
+                var sd = new Date(l.startDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                var ed = new Date(l.endDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                html += sd + ' — ' + ed;
+            }
+            if (proj) html += ' &middot; ' + esc(proj.name);
+            html += '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
 
     // ========== PROJECT CARDS — protagonisti ==========
     html += '<div class="ceo-projects-grid">';
@@ -2193,7 +2361,8 @@ function publishForCEO() {
     var data = {
         publishedAt: new Date().toISOString(),
         projects: getProjects(),
-        team: getTeam()
+        team: getTeam(),
+        launches: getLaunches()
     };
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
@@ -2255,6 +2424,7 @@ var _origGetTeam = getTeam;
 if (CEO_MODE) {
     getProjects = function() { return (_ceoData && _ceoData.projects) || []; };
     getTeam = function() { return (_ceoData && _ceoData.team) || []; };
+    getLaunches = function() { return (_ceoData && _ceoData.launches) || []; };
 }
 
 // ========== RENDER ==========
@@ -2588,6 +2758,9 @@ function renderGlobal() {
     let html = '<div class="global-view">';
 
     const todayStr = today();
+
+    // ===== LANCI MARKETING =====
+    html += renderLaunchesSection();
 
     // ===== SBLOCCA (solo se serve) =====
     const pmData = generatePMAnalysis();
