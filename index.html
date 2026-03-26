@@ -5622,18 +5622,23 @@ function renderGlobalCalendar() {
     }
 
     var _mob = isMobile();
-    if (_mob && calView !== 'week') { calView = 'week'; }
-    // Ricalcola navLabel per settimana forzata
-    if (_mob) {
+    if (_mob && calView === 'month') { calView = 'week'; }
+    if (_mob && calView === 'year') { calMode = 'project'; }
+    // Ricalcola navLabel se settimana
+    if (calView === 'week') {
         const _ws = getWeekStart(calYear, calMonth, calWeekDay || new Date().getDate());
         const _we = new Date(_ws); _we.setDate(_we.getDate() + 6);
         navLabel = _ws.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + ' — ' + _we.toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
     }
+    if (_mob && calView === 'year') { navLabel = String(calYear); }
     let html = `<div class="calendar-nav">
         <button class="calendar-nav-btn" onclick="calNavPrev();render()">&#8249;</button>
         <span class="calendar-month-label">${navLabel}</span>
         <button class="calendar-nav-btn" onclick="calNavNext();render()">&#8250;</button>
-        ${_mob ? '' : `<div class="cal-mode-toggle">
+        ${_mob ? `<div class="cal-mode-toggle">
+            <button class="cal-mode-btn ${calView==='week'?'active':''}" onclick="calView='week';render()">Sett</button>
+            <button class="cal-mode-btn ${calView==='year'?'active':''}" onclick="calView='year';render()">Anno</button>
+        </div>` : `<div class="cal-mode-toggle">
             <button class="cal-mode-btn ${calView==='week'?'active':''}" onclick="calView='week';render()">Settimana</button>
             <button class="cal-mode-btn ${calView==='month'?'active':''}" onclick="calView='month';render()">Mese</button>
             <button class="cal-mode-btn ${calView==='year'?'active':''}" onclick="calView='year';render()">Anno</button>
