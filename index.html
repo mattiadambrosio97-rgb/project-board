@@ -2151,6 +2151,7 @@ function renderCEOProject(pid) {
         sTasks.forEach(function(t) {
             html += '<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:' + style.bg + ';border:1px solid var(--border);border-radius:8px;margin-bottom:5px">';
             html += '<span style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0">' + esc(t.title) + '</span>';
+            if (t.assignee) html += '<span style="font-size:12px;color:var(--text-muted);flex-shrink:0">' + esc(t.assignee) + '</span>';
             if (t.dueDate) {
                 var dc = dateClass(t.dueDate, t.status);
                 html += '<span class="task-card-due ' + dc + '" style="font-size:12px;flex-shrink:0">' + smartDate(t.dueDate) + '</span>';
@@ -2159,6 +2160,14 @@ function renderCEOProject(pid) {
         });
         html += '</div>';
     });
+
+    // Completate — solo conteggio, rassicurante
+    if (done > 0) {
+        html += '<div style="margin-bottom:16px;padding:12px 14px;background:var(--green-bg, #F0FDF4);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:8px">';
+        html += '<span style="font-size:16px">&#9989;</span>';
+        html += '<span style="font-size:14px;font-weight:600;color:var(--green)">' + done + ' task completate su ' + total + '</span>';
+        html += '</div>';
+    }
 
     html += '</div>';
     return html;
@@ -2225,9 +2234,9 @@ function publishForCEO() {
 var _ceoData = null;
 function loadCEOData(callback) {
     if (_ceoData) { callback(_ceoData); return; }
-    var baseUrl = window.location.href.split('?')[0].replace(/\/[^\/]*$/, '/');
-    if (!baseUrl.endsWith('/')) baseUrl += '/';
-    fetch(baseUrl + 'data.json?t=' + Date.now()).then(function(r) {
+    var loc = window.location;
+    var dataUrl = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/') + 'data.json?t=' + Date.now();
+    fetch(dataUrl).then(function(r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
     }).then(function(d) {
