@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:52:18.838Z",
+  "publishedAt": "2026-03-26T10:54:26.078Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -54,7 +54,7 @@
         {
           "id": "id_1774522152441_uko36d",
           "title": "Creare landing page",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "in_progress",
           "priority": "p0",
           "dependsOn": [],
@@ -117,7 +117,7 @@
         {
           "id": "id_1774522152441_swhgpy",
           "title": "Video presentazione pack",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -135,7 +135,7 @@
         {
           "id": "id_1774522152441_86hw5m",
           "title": "Configurare checkout WooCommerce",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -342,7 +342,7 @@
         {
           "id": "id_1774522152441_47j0wx",
           "title": "Creare 3 video ads",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "blocked",
           "priority": "p0",
           "dependsOn": [],
@@ -539,7 +539,7 @@
         {
           "id": "id_1774522152441_pxbfe8",
           "title": "Sviluppo nuova sales page",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p0",
           "dependsOn": [],
@@ -576,7 +576,7 @@
         {
           "id": "id_1774522152441_k4gpco",
           "title": "Redesign checkout",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -633,7 +633,7 @@
         {
           "id": "id_1774522152441_jhkat2",
           "title": "Go-live e redirect old URLs",
-          "assignee": "Mattia FS",
+          "assignee": "Mattia",
           "status": "todo",
           "priority": "p0",
           "dependsOn": [],
@@ -764,7 +764,7 @@
         {
           "id": "id_1774522152441_qo8cxf",
           "title": "Editing video moduli 1-5",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -801,7 +801,7 @@
         {
           "id": "id_1774522152441_555afz",
           "title": "Setup area membri su WordPress",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -991,7 +991,7 @@
         {
           "id": "id_1774522152441_7mku87",
           "title": "Setup codici sconto WooCommerce",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1047,7 +1047,7 @@
         {
           "id": "id_1774522152441_crrzbj",
           "title": "Dashboard tracking referral",
-          "assignee": "Mattia FS",
+          "assignee": "Mattia",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -1183,7 +1183,7 @@
         {
           "id": "id_1774522152441_0d9c8r",
           "title": "Migrazione altri 6 siti",
-          "assignee": "Mattia FS",
+          "assignee": "Mattia",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1348,7 +1348,7 @@
         {
           "id": "id_1774522152441_q2z2js",
           "title": "Creare coupon automatico WooCommerce",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1473,7 +1473,7 @@
         {
           "id": "id_1774522152441_tbuuse",
           "title": "Creare canale Discord VIP",
-          "assignee": "Mattia FS",
+          "assignee": "Kevin",
           "status": "in_progress",
           "priority": "p1",
           "dependsOn": [],
@@ -1548,7 +1548,7 @@
         {
           "id": "id_1774522152441_77192d",
           "title": "Video presentazione Circolo (Alberto)",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
@@ -1657,7 +1657,7 @@
         {
           "id": "id_1774522152441_vosq4y",
           "title": "Fix OPcache configurazione",
-          "assignee": "Mattia FS",
+          "assignee": "Mattia",
           "status": "in_progress",
           "priority": "p1",
           "dependsOn": [],
@@ -1676,7 +1676,7 @@
         {
           "id": "id_1774522152441_gy970e",
           "title": "Pulizia database WP (transients, revisioni)",
-          "assignee": "Mattia FS",
+          "assignee": "Mattia",
           "status": "blocked",
           "priority": "p1",
           "dependsOn": [],
@@ -1738,7 +1738,7 @@
         {
           "id": "id_1774522152441_xvelf6",
           "title": "Implementare backup automatico giornaliero",
-          "assignee": "Mattia FS",
+          "assignee": "Mattia",
           "status": "todo",
           "priority": "p1",
           "dependsOn": [],
@@ -1877,7 +1877,7 @@
         {
           "id": "id_1774522152441_yonfnv",
           "title": "Post-produzione highlights",
-          "assignee": "Kevin",
+          "assignee": "Mattia FS",
           "status": "todo",
           "priority": "p2",
           "dependsOn": [],
