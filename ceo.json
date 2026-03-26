@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T14:24:54.228Z",
+  "lastUpdate": "2026-03-26T14:31:08.660Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -22,12 +22,17 @@
       ]
     },
     "task_copy_review": {
-      "status": "complete",
+      "status": "update",
       "updates": [
         {
           "type": "complete",
           "note": "La variante 2 mi piace",
           "at": "2026-03-26T14:24:54.228Z"
+        },
+        {
+          "type": "update",
+          "note": "Variante 2 rivista",
+          "at": "2026-03-26T14:31:08.660Z"
         }
       ]
     }
