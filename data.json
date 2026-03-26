@@ -1,15 +1,15 @@
 {
-  "publishedAt": "2026-03-26T15:10:41.194Z",
+  "publishedAt": "2026-03-26T17:56:47.112Z",
   "projects": [
     {
-      "id": "id_1774537096408_znd7t3",
+      "id": "id_1774547787798_np0uym",
       "name": "Lancio Setup Pack F1-26",
       "description": "Nuovo pacchetto setup per clienti F1. Lancio previsto Q2.",
       "status": "attivo",
       "launchDate": "2026-04-07",
       "tasks": [
         {
-          "id": "id_1774537096408_h9rly5",
+          "id": "id_1774547787799_5mpjip",
           "title": "Definire lista setup inclusi nel pack",
           "assignee": "Max",
           "status": "done",
@@ -25,16 +25,16 @@
             {
               "text": "Lista pronta, 12 setup selezionati",
               "author": "Max",
-              "createdAt": 1774191496408
+              "createdAt": 1774202187798
             }
           ],
-          "createdAt": 1773241096408,
-          "completedAt": 1774191496408,
+          "createdAt": 1773251787798,
+          "completedAt": 1774202187798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_eo52m2",
+          "id": "id_1774547787799_45g6qb",
           "title": "Pricing e bundle con Alberto",
           "assignee": "Mattia",
           "status": "done",
@@ -46,13 +46,13 @@
             "pricing"
           ],
           "comments": [],
-          "createdAt": 1773327496408,
-          "completedAt": 1774277896408,
+          "createdAt": 1773338187798,
+          "completedAt": 1774288587798,
           "recurrence": null,
           "note": "Prezzo finale: 197 EUR"
         },
         {
-          "id": "id_1774537096408_ym9dwe",
+          "id": "id_1774547787799_0tyfi1",
           "title": "Creare landing page",
           "assignee": "Mattia FS",
           "status": "in_progress",
@@ -68,16 +68,16 @@
             {
               "text": "Wireframe approvato",
               "author": "Mattia",
-              "createdAt": 1774364296408
+              "createdAt": 1774374987798
             }
           ],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": "Usare template USR come base"
         },
         {
-          "id": "id_1774537096408_jylbzj",
+          "id": "id_1774547787799_9wnuab",
           "title": "Scrivere copy email lancio (5 email)",
           "assignee": "Mattia",
           "status": "in_progress",
@@ -90,13 +90,13 @@
             "email"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_89z60b",
+          "id": "id_1774547787799_h6jkd4",
           "title": "Grafica social per lancio",
           "assignee": "Kevin",
           "status": "todo",
@@ -109,13 +109,13 @@
             "social"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": "4 creativita IG + 2 storie"
         },
         {
-          "id": "id_1774537096408_sopa7g",
+          "id": "id_1774547787799_ezv398",
           "title": "Video presentazione pack",
           "assignee": "Kevin",
           "status": "todo",
@@ -127,13 +127,13 @@
             "video"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_g3nrru",
+          "id": "id_1774547787799_i5z8kv",
           "title": "Configurare checkout WooCommerce",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -146,13 +146,13 @@
             "woocommerce"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_xmgqvn",
+          "id": "id_1774547787799_oxlcvv",
           "title": "Setup automazione post-acquisto Keap",
           "assignee": "Mattia",
           "status": "todo",
@@ -165,13 +165,13 @@
             "automazione"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_izjm4g",
+          "id": "id_1774547787799_nl8kzx",
           "title": "Approvazione finale Alberto",
           "assignee": "Alberto",
           "status": "blocked",
@@ -184,16 +184,16 @@
             {
               "text": "In attesa del video di Kevin",
               "author": "Alberto",
-              "createdAt": 1774450696408
+              "createdAt": 1774461387798
             }
           ],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": "Blocco: aspettiamo video finale"
         },
         {
-          "id": "id_1774537096408_q2kbk7",
+          "id": "id_1774547787799_gugkpn",
           "title": "Test funnel end-to-end",
           "assignee": "Mattia",
           "status": "todo",
@@ -206,13 +206,13 @@
             "funnel"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_6walqk",
+          "id": "id_1774547787799_0w4qom",
           "title": "Invio email lancio",
           "assignee": "Mattia",
           "status": "todo",
@@ -225,13 +225,13 @@
             "lancio"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_bdui1y",
+          "id": "id_1774547787799_1etot2",
           "title": "Post lancio: monitoraggio e supporto",
           "assignee": "Mattia",
           "status": "todo",
@@ -243,7 +243,7 @@
             "supporto"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
@@ -251,14 +251,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_88t0tk",
+      "id": "id_1774547787799_dtlmfn",
       "name": "Campagna Meta Ads Q2",
       "description": "Nuove campagne Meta per Q2. Budget 3000 EUR/mese.",
       "status": "attivo",
       "launchDate": "2026-04-10",
       "tasks": [
         {
-          "id": "id_1774537096408_ibxybw",
+          "id": "id_1774547787799_0tnkaf",
           "title": "Analisi risultati Q1 e report",
           "assignee": "Mattia",
           "status": "done",
@@ -274,16 +274,16 @@
             {
               "text": "CPA medio 23 EUR, ROAS 2.8x",
               "author": "Mattia",
-              "createdAt": 1774018696408
+              "createdAt": 1774029387798
             }
           ],
-          "createdAt": 1772809096408,
-          "completedAt": 1774018696408,
+          "createdAt": 1772819787798,
+          "completedAt": 1774029387798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_cevgtp",
+          "id": "id_1774547787799_7zl0an",
           "title": "Definire audience Q2",
           "assignee": "Mattia",
           "status": "done",
@@ -296,13 +296,13 @@
             "meta"
           ],
           "comments": [],
-          "createdAt": 1772981896408,
-          "completedAt": 1774277896408,
+          "createdAt": 1772992587798,
+          "completedAt": 1774288587798,
           "recurrence": null,
           "note": "LAL + interesse sim racing"
         },
         {
-          "id": "id_1774537096408_58o7ob",
+          "id": "id_1774547787799_xgiwih",
           "title": "Brief creativo per Kevin",
           "assignee": "Mattia",
           "status": "in_progress",
@@ -314,13 +314,13 @@
             "brief"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_ojnuhc",
+          "id": "id_1774547787799_xgg5ml",
           "title": "Creare 6 creativita statiche",
           "assignee": "Kevin",
           "status": "todo",
@@ -333,13 +333,13 @@
             "ads"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_ev4bbh",
+          "id": "id_1774547787799_pb6ei8",
           "title": "Creare 3 video ads",
           "assignee": "Kevin",
           "status": "blocked",
@@ -355,16 +355,16 @@
             {
               "text": "Serve footage da Daniele, non ancora ricevuto",
               "author": "Kevin",
-              "createdAt": 1774450696408
+              "createdAt": 1774461387798
             }
           ],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": "Bloccata: footage mancante"
         },
         {
-          "id": "id_1774537096408_8vuc85",
+          "id": "id_1774547787799_0tk605",
           "title": "Copy ads (10 varianti)",
           "assignee": "Mattia",
           "status": "todo",
@@ -377,13 +377,13 @@
             "ads"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_ib2ijq",
+          "id": "id_1774547787799_95s5vy",
           "title": "Setup campagne su Meta Ads Manager",
           "assignee": "Mattia",
           "status": "todo",
@@ -396,13 +396,13 @@
             "setup"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_abbyz9",
+          "id": "id_1774547787799_tn9bsk",
           "title": "Monitoraggio settimanale performance",
           "assignee": "Mattia",
           "status": "todo",
@@ -414,13 +414,13 @@
             "monitoring"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": "weekly",
           "note": ""
         },
         {
-          "id": "id_1774537096408_lgr5hp",
+          "id": "id_1774547787799_qlci43",
           "title": "Ottimizzazione audience dopo 7gg",
           "assignee": "Mattia",
           "status": "todo",
@@ -433,13 +433,13 @@
             "meta"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_9h1i3v",
+          "id": "id_1774547787799_6wu76e",
           "title": "Approvare budget Ads Q2 (3000/mese)",
           "assignee": "Alberto",
           "status": "todo",
@@ -455,10 +455,10 @@
             {
               "text": "Report Q1 inviato con proiezioni Q2",
               "author": "Mattia",
-              "createdAt": 1774450696408
+              "createdAt": 1774461387798
             }
           ],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse."
@@ -466,14 +466,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_e85xmb",
+      "id": "id_1774547787799_mojeuk",
       "name": "Ristrutturazione Funnel USR",
       "description": "Rebuild completo del funnel di vendita USR.",
       "status": "attivo",
       "launchDate": "2026-05-05",
       "tasks": [
         {
-          "id": "id_1774537096408_6v6ghu",
+          "id": "id_1774547787799_5wxjug",
           "title": "Mappatura funnel attuale",
           "assignee": "Mattia",
           "status": "done",
@@ -486,13 +486,13 @@
             "funnel"
           ],
           "comments": [],
-          "createdAt": 1772377096408,
-          "completedAt": 1773673096408,
+          "createdAt": 1772387787798,
+          "completedAt": 1773683787798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_v8uhtl",
+          "id": "id_1774547787799_nrb6b0",
           "title": "Identificare colli di bottiglia",
           "assignee": "Mattia",
           "status": "done",
@@ -507,16 +507,16 @@
             {
               "text": "Drop-off 68% su checkout. Problema UX.",
               "author": "Mattia",
-              "createdAt": 1773845896408
+              "createdAt": 1773856587798
             }
           ],
-          "createdAt": 1772636296408,
-          "completedAt": 1773845896408,
+          "createdAt": 1772646987798,
+          "completedAt": 1773856587798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_4tapyw",
+          "id": "id_1774547787799_7utuwp",
           "title": "Nuovo wireframe pagina di vendita",
           "assignee": "Mattia",
           "status": "in_progress",
@@ -529,13 +529,13 @@
             "ux"
           ],
           "comments": [],
-          "createdAt": 1773500296408,
+          "createdAt": 1773510987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_gg2dur",
+          "id": "id_1774547787799_iuhz7d",
           "title": "Sviluppo nuova sales page",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -548,13 +548,13 @@
             "landing"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_hmpfi8",
+          "id": "id_1774547787799_gs7nov",
           "title": "Nuovo copy pagina vendita",
           "assignee": "Mattia",
           "status": "todo",
@@ -566,13 +566,13 @@
             "copy"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_pqud1y",
+          "id": "id_1774547787799_2zj2wr",
           "title": "Redesign checkout",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -585,13 +585,13 @@
             "checkout"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_o3602l",
+          "id": "id_1774547787799_5ohom3",
           "title": "Email sequence post-checkout",
           "assignee": "Mattia",
           "status": "todo",
@@ -604,13 +604,13 @@
             "automazione"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_mzqwh7",
+          "id": "id_1774547787799_g6qyz3",
           "title": "A/B test landing page",
           "assignee": "Mattia",
           "status": "todo",
@@ -623,13 +623,13 @@
             "ab"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_s8fq37",
+          "id": "id_1774547787799_dbmevr",
           "title": "Go-live e redirect old URLs",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -641,13 +641,13 @@
             "deploy"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_s4oku4",
+          "id": "id_1774547787799_oihvuh",
           "title": "Decidere pricing nuovo funnel USR",
           "assignee": "Alberto",
           "status": "todo",
@@ -663,10 +663,10 @@
             {
               "text": "Proposte: 297 EUR (base), 497 EUR (premium), 997 EUR (VIP)",
               "author": "Mattia",
-              "createdAt": 1774364296408
+              "createdAt": 1774374987798
             }
           ],
-          "createdAt": 1774018696408,
+          "createdAt": 1774029387798,
           "completedAt": null,
           "recurrence": null,
           "note": "Mattia ha preparato 3 opzioni di prezzo con margini e proiezioni. Scegli quale struttura adottare per il nuovo funnel USR. Vedi doc condiviso su Drive."
@@ -674,14 +674,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_9au638",
+      "id": "id_1774547787799_tmwmhu",
       "name": "Videocorso F1 Esports",
       "description": "Produzione videocorso completo F1 Esports con Daniele.",
       "status": "attivo",
       "launchDate": "2026-05-20",
       "tasks": [
         {
-          "id": "id_1774537096408_57ak8c",
+          "id": "id_1774547787799_9j2eg5",
           "title": "Scaletta moduli e lezioni",
           "assignee": "Daniele",
           "status": "done",
@@ -696,16 +696,16 @@
             {
               "text": "15 moduli, 45 lezioni totali",
               "author": "Daniele",
-              "createdAt": 1773586696408
+              "createdAt": 1773597387798
             }
           ],
-          "createdAt": 1771945096408,
-          "completedAt": 1773586696408,
+          "createdAt": 1771955787798,
+          "completedAt": 1773597387798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_cthth1",
+          "id": "id_1774547787799_vqizrg",
           "title": "Script lezioni modulo 1-5",
           "assignee": "Daniele",
           "status": "done",
@@ -717,13 +717,13 @@
             "script"
           ],
           "comments": [],
-          "createdAt": 1772377096408,
-          "completedAt": 1773932296408,
+          "createdAt": 1772387787798,
+          "completedAt": 1773942987798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_w8k6c3",
+          "id": "id_1774547787799_03t192",
           "title": "Script lezioni modulo 6-10",
           "assignee": "Daniele",
           "status": "in_progress",
@@ -735,13 +735,13 @@
             "script"
           ],
           "comments": [],
-          "createdAt": 1773241096408,
+          "createdAt": 1773251787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_8xim41",
+          "id": "id_1774547787799_8q835o",
           "title": "Registrazione moduli 1-5",
           "assignee": "Daniele",
           "status": "in_progress",
@@ -757,16 +757,16 @@
             {
               "text": "3 moduli registrati, 2 da fare",
               "author": "Daniele",
-              "createdAt": 1774364296408
+              "createdAt": 1774374987798
             }
           ],
-          "createdAt": 1773500296408,
+          "createdAt": 1773510987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_wk3l6h",
+          "id": "id_1774547787799_wjby9r",
           "title": "Registrazione moduli 6-10",
           "assignee": "Daniele",
           "status": "todo",
@@ -779,13 +779,13 @@
             "registrazione"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_9d9bp5",
+          "id": "id_1774547787799_t55egh",
           "title": "Editing video moduli 1-5",
           "assignee": "Kevin",
           "status": "todo",
@@ -798,13 +798,13 @@
             "editing"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_so3z6e",
+          "id": "id_1774547787799_zlb8i5",
           "title": "Grafica thumbnail e copertine",
           "assignee": "Kevin",
           "status": "todo",
@@ -816,13 +816,13 @@
             "grafica"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_9wspht",
+          "id": "id_1774547787799_srr8j9",
           "title": "Setup area membri su WordPress",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -835,13 +835,13 @@
             "wordpress"
           ],
           "comments": [],
-          "createdAt": 1774018696408,
+          "createdAt": 1774029387798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_j91cud",
+          "id": "id_1774547787799_xe0bdr",
           "title": "Caricamento e test video",
           "assignee": "Kevin",
           "status": "todo",
@@ -853,13 +853,13 @@
             "upload"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_740d8a",
+          "id": "id_1774547787799_pc6x3c",
           "title": "Landing page vendita corso",
           "assignee": "Mattia",
           "status": "todo",
@@ -872,13 +872,13 @@
             "copy"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_m57nqh",
+          "id": "id_1774547787799_xevddw",
           "title": "Campagna lancio email",
           "assignee": "Mattia",
           "status": "todo",
@@ -891,13 +891,13 @@
             "lancio"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_clnjbx",
+          "id": "id_1774547787799_nhmozk",
           "title": "Registrare video intro corso",
           "assignee": "Alberto",
           "status": "in_progress",
@@ -913,16 +913,16 @@
             {
               "text": "Script gia pronto, Kevin puo montarlo appena ce l'hai",
               "author": "Mattia",
-              "createdAt": 1774450696408
+              "createdAt": 1774461387798
             }
           ],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi."
         },
         {
-          "id": "id_1774537096408_6q7l5t",
+          "id": "id_1774547787799_uzt3of",
           "title": "Revisione contenuti modulo 1-3",
           "assignee": "Alberto",
           "status": "todo",
@@ -935,7 +935,7 @@
             "contenuto"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": "Daniele ha completato i moduli 1-3. Guardali e conferma che il livello tecnico sia ok per il target. Segnala correzioni su Drive."
@@ -943,14 +943,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_7ll2fk",
+      "id": "id_1774547787799_1127pl",
       "name": "Programma Referral Piloti",
       "description": "Sistema di referral per i piloti esistenti. Incentivi e tracking.",
       "status": "attivo",
       "launchDate": "2026-05-10",
       "tasks": [
         {
-          "id": "id_1774537096408_4tq87r",
+          "id": "id_1774547787799_iu8dre",
           "title": "Definire meccanica referral",
           "assignee": "Mattia",
           "status": "done",
@@ -965,16 +965,16 @@
             {
               "text": "30 EUR sconto per chi porta un amico, 20% per il referrer",
               "author": "Mattia",
-              "createdAt": 1774105096408
+              "createdAt": 1774115787798
             }
           ],
-          "createdAt": 1773241096408,
-          "completedAt": 1774105096408,
+          "createdAt": 1773251787798,
+          "completedAt": 1774115787798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_l6oaqs",
+          "id": "id_1774547787799_irds36",
           "title": "Discussione incentivi con Alberto",
           "assignee": "Alberto",
           "status": "done",
@@ -986,13 +986,13 @@
             "meeting"
           ],
           "comments": [],
-          "createdAt": 1773500296408,
-          "completedAt": 1774191496408,
+          "createdAt": 1773510987798,
+          "completedAt": 1774202187798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_gai7pm",
+          "id": "id_1774547787799_7uhp2s",
           "title": "Comunicazione piloti Manlio",
           "assignee": "Manlio",
           "status": "in_progress",
@@ -1004,13 +1004,13 @@
             "comunicazione"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": "Template WhatsApp da preparare"
         },
         {
-          "id": "id_1774537096408_3n230m",
+          "id": "id_1774547787799_0ab3p2",
           "title": "Setup codici sconto WooCommerce",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -1023,13 +1023,13 @@
             "woocommerce"
           ],
           "comments": [],
-          "createdAt": 1774018696408,
+          "createdAt": 1774029387798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_05b7qi",
+          "id": "id_1774547787799_w4omhh",
           "title": "Automazione Keap: tag referral",
           "assignee": "Mattia",
           "status": "todo",
@@ -1042,13 +1042,13 @@
             "automazione"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_wacgmt",
+          "id": "id_1774547787799_qzv960",
           "title": "Email annuncio programma",
           "assignee": "Mattia",
           "status": "todo",
@@ -1060,13 +1060,13 @@
             "email"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_s07mpr",
+          "id": "id_1774547787799_hil1bz",
           "title": "Dashboard tracking referral",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -1079,13 +1079,13 @@
             "dashboard"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_wfsr0a",
+          "id": "id_1774547787799_k70ihq",
           "title": "Chiamata con Luigi Mazzola per partnership referral",
           "assignee": "Alberto",
           "status": "todo",
@@ -1101,10 +1101,10 @@
             {
               "text": "Luigi e disponibile giovedi o venerdi pomeriggio",
               "author": "Manlio",
-              "createdAt": 1774364296408
+              "createdAt": 1774374987798
             }
           ],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": "Parlare con Luigi della possibilita che promuova il programma referral ai suoi contatti. Manlio ha gia sondato la disponibilita. Fissa la call e allineati con lui."
@@ -1112,14 +1112,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_h63ale",
+      "id": "id_1774547787799_r9pcya",
       "name": "Migrazione Tracking",
       "description": "Migrazione GTM e tracking server-side su tutti i siti.",
       "launchDate": "2026-04-13",
       "status": "attivo",
       "tasks": [
         {
-          "id": "id_1774537096408_6vgfdu",
+          "id": "id_1774547787799_hmn5qv",
           "title": "Audit tracking attuale 8 siti",
           "assignee": "Mattia",
           "status": "done",
@@ -1135,16 +1135,16 @@
             {
               "text": "Completato. 3 siti con pixel rotto.",
               "author": "Mattia",
-              "createdAt": 1773759496408
+              "createdAt": 1773770187798
             }
           ],
-          "createdAt": 1772809096408,
-          "completedAt": 1773759496408,
+          "createdAt": 1772819787798,
+          "completedAt": 1773770187798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_8t9c9j",
+          "id": "id_1774547787799_payrix",
           "title": "Setup Stape.io server container",
           "assignee": "Mattia FS",
           "status": "done",
@@ -1157,13 +1157,13 @@
             "server"
           ],
           "comments": [],
-          "createdAt": 1773241096408,
-          "completedAt": 1774105096408,
+          "createdAt": 1773251787798,
+          "completedAt": 1774115787798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_5f4a3a",
+          "id": "id_1774547787799_qe8cna",
           "title": "Migrazione metodoadt.com",
           "assignee": "Mattia",
           "status": "in_progress",
@@ -1176,13 +1176,13 @@
             "migrazione"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_y69gpt",
+          "id": "id_1774547787799_56h42j",
           "title": "Migrazione usracing.it",
           "assignee": "Mattia",
           "status": "todo",
@@ -1195,13 +1195,13 @@
             "migrazione"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_5y6xf3",
+          "id": "id_1774547787799_6304m1",
           "title": "Migrazione altri 6 siti",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -1214,13 +1214,13 @@
             "migrazione"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_nmm4su",
+          "id": "id_1774547787799_ft5sdb",
           "title": "Setup CAPI Facebook server-side",
           "assignee": "Mattia",
           "status": "todo",
@@ -1233,13 +1233,13 @@
             "meta"
           ],
           "comments": [],
-          "createdAt": 1774018696408,
+          "createdAt": 1774029387798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_xsuwl7",
+          "id": "id_1774547787799_tkbc8w",
           "title": "Validazione eventi con Tag Assistant",
           "assignee": "Mattia",
           "status": "todo",
@@ -1252,13 +1252,13 @@
             "validazione"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_zdrgz8",
+          "id": "id_1774547787799_ew3jr2",
           "title": "Report finale tracking migration",
           "assignee": "Mattia",
           "status": "todo",
@@ -1270,7 +1270,7 @@
             "report"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
@@ -1278,14 +1278,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_bi8onh",
+      "id": "id_1774547787799_n9lzrm",
       "name": "Automazioni Compleanni",
       "description": "Email e sconti automatici per compleanni piloti.",
       "status": "attivo",
       "launchDate": "2026-03-25",
       "tasks": [
         {
-          "id": "id_1774537096408_aqy0ll",
+          "id": "id_1774547787799_qry9es",
           "title": "Verificare campo data nascita Keap",
           "assignee": "Mattia",
           "status": "done",
@@ -1300,16 +1300,16 @@
             {
               "text": "Campo birthday presente, 2100 contatti compilati",
               "author": "Mattia",
-              "createdAt": 1773932296408
+              "createdAt": 1773942987798
             }
           ],
-          "createdAt": 1773241096408,
-          "completedAt": 1773932296408,
+          "createdAt": 1773251787798,
+          "completedAt": 1773942987798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_r2pchx",
+          "id": "id_1774547787799_4ibbun",
           "title": "Creare automazione Keap compleanno",
           "assignee": "Mattia",
           "status": "in_progress",
@@ -1322,13 +1322,13 @@
             "automazione"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
+          "createdAt": 1773683787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_zvxuk2",
+          "id": "id_1774547787799_cf18i2",
           "title": "Scrivere email compleanno",
           "assignee": "Mattia",
           "status": "todo",
@@ -1341,13 +1341,13 @@
             "email"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": "Tono caldo, sconto 15% incluso"
         },
         {
-          "id": "id_1774537096408_c3leay",
+          "id": "id_1774547787799_54asfm",
           "title": "Grafica email compleanno",
           "assignee": "Kevin",
           "status": "todo",
@@ -1360,13 +1360,13 @@
             "email"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_dmi5zq",
+          "id": "id_1774547787799_dlbahj",
           "title": "Creare coupon automatico WooCommerce",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -1379,13 +1379,13 @@
             "woocommerce"
           ],
           "comments": [],
-          "createdAt": 1774018696408,
+          "createdAt": 1774029387798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_nar35l",
+          "id": "id_1774547787799_xi5g0x",
           "title": "Connettere Keap + WooCommerce via Make",
           "assignee": "Mattia",
           "status": "todo",
@@ -1398,13 +1398,13 @@
             "integrazione"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_bbq7mm",
+          "id": "id_1774547787799_u7psc9",
           "title": "Test automazione con contatto fittizio",
           "assignee": "Mattia",
           "status": "todo",
@@ -1416,13 +1416,13 @@
             "test"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_8qkwjo",
+          "id": "id_1774547787799_0gu8kw",
           "title": "Go-live automazione",
           "assignee": "Mattia",
           "status": "todo",
@@ -1434,7 +1434,7 @@
             "deploy"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
@@ -1442,14 +1442,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_gwe370",
+      "id": "id_1774547787799_6yj4kw",
       "name": "Circolo Top Drivers",
       "description": "Programma esclusivo per i top 20 piloti ADT. Contenuti premium.",
       "status": "attivo",
       "launchDate": "2026-04-17",
       "tasks": [
         {
-          "id": "id_1774537096408_6s0vx1",
+          "id": "id_1774547787799_w16udt",
           "title": "Selezionare top 20 piloti con Manlio",
           "assignee": "Manlio",
           "status": "done",
@@ -1464,16 +1464,16 @@
             {
               "text": "Lista definita. 18 piloti confermati.",
               "author": "Manlio",
-              "createdAt": 1774191496408
+              "createdAt": 1774202187798
             }
           ],
-          "createdAt": 1773500296408,
-          "completedAt": 1774191496408,
+          "createdAt": 1773510987798,
+          "completedAt": 1774202187798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_etkwc3",
+          "id": "id_1774547787799_0gafrv",
           "title": "Definire benefici Circolo",
           "assignee": "Alberto",
           "status": "done",
@@ -1485,13 +1485,13 @@
             "strategia"
           ],
           "comments": [],
-          "createdAt": 1773673096408,
-          "completedAt": 1774277896408,
+          "createdAt": 1773683787798,
+          "completedAt": 1774288587798,
           "recurrence": null,
           "note": "Setup esclusivi, sessione 1:1 mensile, Discord VIP"
         },
         {
-          "id": "id_1774537096408_pbac5m",
+          "id": "id_1774547787799_h4068j",
           "title": "Creare canale Discord VIP",
           "assignee": "Mattia FS",
           "status": "in_progress",
@@ -1504,13 +1504,13 @@
             "dev"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_c63hzl",
+          "id": "id_1774547787799_s3ppla",
           "title": "Setup pack esclusivi mensili",
           "assignee": "Max",
           "status": "in_progress",
@@ -1523,13 +1523,13 @@
             "contenuto"
           ],
           "comments": [],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": "monthly",
           "note": ""
         },
         {
-          "id": "id_1774537096408_24waqs",
+          "id": "id_1774547787799_ht0pcb",
           "title": "Comunicazione invito piloti",
           "assignee": "Manlio",
           "status": "todo",
@@ -1541,13 +1541,13 @@
             "comunicazione"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_co7gq4",
+          "id": "id_1774547787799_dxyw4s",
           "title": "Email benvenuto Circolo",
           "assignee": "Mattia",
           "status": "todo",
@@ -1560,13 +1560,13 @@
             "copy"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_8dilee",
+          "id": "id_1774547787799_y16in2",
           "title": "Video presentazione Circolo (Alberto)",
           "assignee": "Kevin",
           "status": "todo",
@@ -1578,13 +1578,13 @@
             "video"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_k1g1pu",
+          "id": "id_1774547787799_iiuswm",
           "title": "Prima sessione live con Daniele",
           "assignee": "Daniele",
           "status": "todo",
@@ -1597,7 +1597,7 @@
             "coaching"
           ],
           "comments": [],
-          "createdAt": 1774364296408,
+          "createdAt": 1774374987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
@@ -1605,14 +1605,14 @@
       ]
     },
     {
-      "id": "id_1774537096408_g43yxt",
+      "id": "id_1774547787799_wizpw1",
       "name": "Revisione Siti WordPress",
       "description": "Controllo sicurezza, performance e plugin su tutti i siti WP.",
       "status": "in-pausa",
       "launchDate": "2026-03-23",
       "tasks": [
         {
-          "id": "id_1774537096408_5w542f",
+          "id": "id_1774547787799_wxnjjd",
           "title": "Audit sicurezza 8 siti",
           "assignee": "Mattia FS",
           "status": "done",
@@ -1628,16 +1628,16 @@
             {
               "text": "2 plugin vulnerabili trovati",
               "author": "Mattia FS",
-              "createdAt": 1773586696408
+              "createdAt": 1773597387798
             }
           ],
-          "createdAt": 1772809096408,
-          "completedAt": 1773586696408,
+          "createdAt": 1772819787798,
+          "completedAt": 1773597387798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_v3pnqz",
+          "id": "id_1774547787799_v3q59y",
           "title": "Aggiornamento plugin critici",
           "assignee": "Mattia FS",
           "status": "done",
@@ -1650,13 +1650,13 @@
             "update"
           ],
           "comments": [],
-          "createdAt": 1773241096408,
-          "completedAt": 1773845896408,
+          "createdAt": 1773251787798,
+          "completedAt": 1773856587798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_l71scj",
+          "id": "id_1774547787799_wxeddw",
           "title": "Ottimizzazione LiteSpeed Cache",
           "assignee": "Mattia FS",
           "status": "done",
@@ -1669,13 +1669,13 @@
             "litespeed"
           ],
           "comments": [],
-          "createdAt": 1773500296408,
-          "completedAt": 1774105096408,
+          "createdAt": 1773510987798,
+          "completedAt": 1774115787798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_3jpe58",
+          "id": "id_1774547787799_aatdt5",
           "title": "Fix OPcache configurazione",
           "assignee": "Mattia FS",
           "status": "in_progress",
@@ -1688,13 +1688,13 @@
             "opcache"
           ],
           "comments": [],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_dmvfan",
+          "id": "id_1774547787799_cl6221",
           "title": "Pulizia database WP (transients, revisioni)",
           "assignee": "Mattia FS",
           "status": "blocked",
@@ -1710,16 +1710,16 @@
             {
               "text": "Serve accesso SSH al server di produzione, ticket aperto con hosting",
               "author": "Mattia FS",
-              "createdAt": 1774450696408
+              "createdAt": 1774461387798
             }
           ],
-          "createdAt": 1773932296408,
+          "createdAt": 1773942987798,
           "completedAt": null,
           "recurrence": null,
           "note": "Bloccata: accesso SSH pending"
         },
         {
-          "id": "id_1774537096408_dcyjk8",
+          "id": "id_1774547787799_fdqe7x",
           "title": "Setup monitoring TTFB",
           "assignee": "Mattia",
           "status": "todo",
@@ -1732,13 +1732,13 @@
             "performance"
           ],
           "comments": [],
-          "createdAt": 1774105096408,
+          "createdAt": 1774115787798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_o1gb4c",
+          "id": "id_1774547787799_tvcr5b",
           "title": "Report performance mensile",
           "assignee": "Mattia",
           "status": "todo",
@@ -1750,13 +1750,13 @@
             "report"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": "monthly",
           "note": ""
         },
         {
-          "id": "id_1774537096408_t7qe1u",
+          "id": "id_1774547787799_hjvs55",
           "title": "Implementare backup automatico giornaliero",
           "assignee": "Mattia FS",
           "status": "todo",
@@ -1769,35 +1769,22 @@
             "server"
           ],
           "comments": [],
-          "createdAt": 1774364296408,
+          "createdAt": 1774374987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         }
-      ],
-      "ceoHasProjectNote": false,
-      "ceoProjectNotes": [
-        {
-          "note": "mOLTO BENE SPINGIAMO",
-          "at": "2026-03-26T15:10:28.074Z"
-        }
-      ],
-      "cooProjectResponses": [
-        {
-          "note": "Si lo stiamo facendo",
-          "at": "2026-03-26T15:10:41.194Z"
-        }
       ]
     },
     {
-      "id": "id_1774537096408_c606a2",
+      "id": "id_1774547787799_9sfay7",
       "name": "Live Settimanale Ottaviani",
       "description": "Dirette settimanali con Alessandro Ottaviani su YouTube/IG.",
       "status": "in-pausa",
       "launchDate": "2026-05-15",
       "tasks": [
         {
-          "id": "id_1774537096408_fyk0ml",
+          "id": "id_1774547787799_459me7",
           "title": "Definire format e scaletta tipo",
           "assignee": "Mattia",
           "status": "done",
@@ -1813,16 +1800,16 @@
             {
               "text": "Format: 30min Q&A + 15min hot lap analysis",
               "author": "Mattia",
-              "createdAt": 1773327496408
+              "createdAt": 1773338187798
             }
           ],
-          "createdAt": 1772377096408,
-          "completedAt": 1773327496408,
+          "createdAt": 1772387787798,
+          "completedAt": 1773338187798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_08bn6s",
+          "id": "id_1774547787799_ztradt",
           "title": "Setup OBS e grafiche live",
           "assignee": "Kevin",
           "status": "done",
@@ -1835,13 +1822,13 @@
             "grafica"
           ],
           "comments": [],
-          "createdAt": 1772809096408,
-          "completedAt": 1773673096408,
+          "createdAt": 1772819787798,
+          "completedAt": 1773683787798,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_rgmk9m",
+          "id": "id_1774547787799_aqu011",
           "title": "Coordinamento con Alessandro",
           "assignee": "Manlio",
           "status": "in_progress",
@@ -1856,16 +1843,16 @@
             {
               "text": "Alessandro ha chiesto di spostare a maggio",
               "author": "Manlio",
-              "createdAt": 1774364296408
+              "createdAt": 1774374987798
             }
           ],
-          "createdAt": 1773500296408,
+          "createdAt": 1773510987798,
           "completedAt": null,
           "recurrence": null,
           "note": ""
         },
         {
-          "id": "id_1774537096408_s10vbg",
+          "id": "id_1774547787799_uh42wm",
           "title": "Raccolta domande piloti settimanale",
           "assignee": "Manlio",
           "status": "blocked",
@@ -1880,16 +1867,16 @@
             {
               "text": "In pausa finche Alessandro non conferma",
               "author": "Manlio",
-              "createdAt": 1774450696408
+              "createdAt": 1774461387798
             }
           ],
-          "createdAt": 1773845896408,
+          "createdAt": 1773856587798,
           "completedAt": null,
           "recurrence": "weekly",
           "note": "Bloccata: in attesa conferma Alessandro"
         },
         {
-          "id": "id_1774537096408_3ged89",
+          "id": "id_1774547787799_lfxjkz",
           "title": "Promozione live sui canali social",
           "assignee": "Mattia",
           "status": "todo",
@@ -1902,13 +1889,13 @@
             "promo"
           ],
           "comments": [],
-          "createdAt": 1774018696408,
+          "createdAt": 1774029387798,
           "completedAt": null,
           "recurrence": "weekly",
           "note": ""
         },
         {
-          "id": "id_1774537096408_cmctjv",
+          "id": "id_1774547787799_2o2hpa",
           "title": "Post-produzione highlights",
           "assignee": "Kevin",
           "status": "todo",
@@ -1921,13 +1908,13 @@
             "editing"
           ],
           "comments": [],
-          "createdAt": 1774191496408,
+          "createdAt": 1774202187798,
           "completedAt": null,
           "recurrence": "weekly",
           "note": ""
         },
         {
-          "id": "id_1774537096408_icqcnr",
+          "id": "id_1774547787799_ddoe60",
           "title": "Analisi metriche engagement",
           "assignee": "Mattia",
           "status": "todo",
@@ -1939,7 +1926,7 @@
             "analytics"
           ],
           "comments": [],
-          "createdAt": 1774277896408,
+          "createdAt": 1774288587798,
           "completedAt": null,
           "recurrence": "monthly",
           "note": ""
@@ -2040,9 +2027,9 @@
     {
       "id": "ln_s6",
       "name": "Lancio USR Setup Pack",
-      "brand": "USR",
-      "startDate": "2026-03-25",
-      "endDate": "2026-03-30",
+      "brand": "GTF",
+      "startDate": "2026-04-08",
+      "endDate": "2026-04-11",
       "projectId": "",
       "notes": ""
     },
