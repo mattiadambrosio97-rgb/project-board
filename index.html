@@ -349,6 +349,10 @@
             0%, 100% { box-shadow: 0 0 0 0 rgba(217,79,79,0.4); }
             50% { box-shadow: 0 0 0 6px rgba(217,79,79,0); }
         }
+        @keyframes pulse-badge {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.5); }
+            50% { box-shadow: 0 0 0 8px rgba(220,38,38,0); }
+        }
 
         /* Launch calendar */
         .launch-timeline { display: flex; flex-direction: column; gap: 12px; }
@@ -1732,29 +1736,56 @@ function _pushDataToGH() {
     var token = getGHToken();
     if (!token) return;
     var payload = {
-        publishedAt: new Date().toISOString(),
+        savedAt: new Date().toISOString(),
         projects: _appData.projects,
         team: _appData.team,
         launches: _appData.launches,
         ceoLinks: _appData.ceoLinks,
         resources: _appData.resources
     };
-    // Anche cache locale per render veloce al prossimo load
+    // Cache locale per render veloce al prossimo load
     safeSetItem('pb_cache', JSON.stringify(payload));
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
+    // Salva su coo-data.json (dati lavoro)
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_COO_FILE + '?t=' + Date.now(), {
         headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
     }).then(function(r) { return r.json(); }).then(function(fileData) {
-        var sha = fileData.sha;
-        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+        var sha = fileData ? fileData.sha : undefined;
+        var body = { message: 'Auto-save ' + new Date().toLocaleTimeString('it-IT'), content: content };
+        if (sha) body.sha = sha;
+        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_COO_FILE, {
             method: 'PUT',
             headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: 'Auto-save ' + new Date().toLocaleTimeString('it-IT'), content: content, sha: sha })
+            body: JSON.stringify(body)
         });
     }).then(function(r) {
-        if (r.ok) { _updateSyncIndicator(); }
-        else { console.warn('GH push failed:', r.status); }
+        if (r.ok) {
+            _appData._hasUnpublished = true;
+            _updateCeoPublishBadge();
+            _updateSyncIndicator();
+        } else { console.warn('GH push failed:', r.status); }
     }).catch(function(err) { console.warn('GH push error:', err); });
+}
+
+// Badge rosso su 🚀 CEO quando ci sono modifiche non pubblicate
+function _updateCeoPublishBadge() {
+    var btns = document.querySelectorAll('.ceo-publish-btn');
+    btns.forEach(function(btn) {
+        if (_appData._hasUnpublished) {
+            btn.style.animation = 'pulse-badge 2s infinite';
+            if (!btn.querySelector('.unpub-dot')) {
+                var dot = document.createElement('span');
+                dot.className = 'unpub-dot';
+                dot.innerHTML = ' ●';
+                dot.style.cssText = 'color:var(--red);font-size:14px;';
+                btn.appendChild(dot);
+            }
+        } else {
+            btn.style.animation = '';
+            var dot = btn.querySelector('.unpub-dot');
+            if (dot) dot.remove();
+        }
+    });
 }
 
 function getTeam() { return _appData.team; }
@@ -2850,7 +2881,7 @@ function _loadAppData(callback) {
         if (callback) callback();
         return;
     }
-    _ghFetchJSON(GH_DATA_FILE, token).then(function(data) {
+    _ghFetchJSON(GH_COO_FILE, token).then(function(data) {
         if (data) {
             if (data.projects) _appData.projects = data.projects;
             if (data.team && data.team.length > 0) _appData.team = data.team;
@@ -4298,8 +4329,9 @@ function _pullFromGitHub(callback) {
 
 // ========== PUBLISH TO GITHUB (CEO sync) ==========
 var GH_REPO = 'mattiadambrosio97-rgb/project-board';
-var GH_DATA_FILE = 'data.json';
-var GH_CEO_FILE = 'ceo.json';
+var GH_COO_FILE = 'coo-data.json'; // Dati lavoro COO (auto-save)
+var GH_DATA_FILE = 'data.json';     // Dati pubblicati per CEO (manuale)
+var GH_CEO_FILE = 'ceo.json';       // Azioni CEO → COO
 // Token spezzato per evitare il blocco di GitHub Push Protection
 var CEO_FIXED_TOKEN = ['github_pat_11B6ZF','TYY066hGOchOWkwr_RzWAnZJB','jfBjV1Nhg5cDfxeuBxX6XoxAS2','b8WbSPN6tO45JI2SEoVa0hG0C'].join('');
 
@@ -4452,6 +4484,8 @@ function publishForCEO(retryCount) {
         if (r.ok) {
             window._lastCooPublish = Date.now();
             safeSetItem('pb_last_publish', new Date().toISOString());
+            _appData._hasUnpublished = false;
+            _updateCeoPublishBadge();
             _updateSyncIndicator();
             _showToast('Pubblicato per il CEO!');
         } else {
