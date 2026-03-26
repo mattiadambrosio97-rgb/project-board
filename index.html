@@ -1264,12 +1264,11 @@
                 overflow-y: auto; -webkit-overflow-scrolling: touch;
                 overscroll-behavior: contain; }
             .modal-title-input { font-size: 18px; }
-            .modal-close-bar { position: sticky; top: 0; z-index: 10;
-                background: var(--surface); padding: 4px 0 8px; margin: -4px 0 8px; }
+            .modal-close-bar { position: static; padding: 0 0 4px; margin: 0; }
             .modal-close-x { width: 44px; height: 44px; font-size: 26px;
                 background: var(--bg); border: 1px solid var(--border); }
-            .modal-actions { position: sticky; bottom: 0; background: var(--surface);
-                padding: 12px 0 4px; border-top: 1px solid var(--border-light); margin-top: 16px; }
+            .modal-actions { position: static; background: none;
+                padding: 16px 0 4px; margin-top: 12px; }
             .modal-label { font-size: 12px; }
             .modal-select, .modal-input { font-size: 15px; padding: 10px 14px; min-height: 44px; }
             .modal-textarea { font-size: 16px; padding: 10px 14px; }
@@ -6949,108 +6948,98 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
 
     const team = getTeam();
     const otherTasks = p.tasks.filter(t => t.id !== task.id);
-
     const modal = document.getElementById('taskModalInner');
     let html = '';
-    // Close button (X) at top
-    html += `<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>`;
-    // Quick "Fatto" button at top
+
+    // ── Header compatto: X + titolo sulla stessa riga ──
+    html += `<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px">`;
+    html += `<input class="modal-title-input" id="tmTitle" placeholder="Titolo task..." value="${esc(task.title)}" style="flex:1;margin:0;padding:8px 0">`;
+    html += `<button onclick="closeTaskModal()" style="width:36px;height:36px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text-muted);font-size:20px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:var(--font)">&times;</button>`;
+    html += `</div>`;
+
+    // ── Status rapido: se non done, bottone "Fatto"; se done, badge + rimetti ──
     if (!isNew && task.status !== 'done') {
-        html += `<button class="quick-done-btn" style="width:100%;padding:10px;font-size:15px;margin-bottom:14px" onclick="changeTaskStatus('${task.id}','${p.id}','done');closeTaskModal()">&#10003; Segna come FATTO</button>`;
+        html += `<button onclick="changeTaskStatus('${task.id}','${p.id}','done');closeTaskModal()" style="width:100%;padding:10px;font-size:14px;font-weight:700;background:var(--green);color:#fff;border:none;border-radius:10px;cursor:pointer;font-family:var(--font);margin-bottom:14px;touch-action:manipulation">Segna come FATTO</button>`;
     }
     if (task.status === 'done') {
-        html += `<div style="background:var(--green-bg);border-radius:8px;padding:10px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
-            <span style="color:var(--green);font-weight:700;font-size:14px">&#9989; Completata</span>
-            <button style="padding:5px 14px;border-radius:6px;border:1px solid var(--blue);background:var(--blue-bg);color:var(--blue);font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)" onclick="changeTaskStatus('${task.id}','${p.id}','in_progress');closeTaskModal();setTimeout(()=>openTaskModal('${task.id}','${p.id}'),150)">&#8617; Rimetti in corso</button>
+        html += `<div style="background:var(--green-bg);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between">
+            <span style="color:var(--green);font-weight:700;font-size:14px">Completata</span>
+            <button style="padding:6px 14px;border-radius:8px;border:none;background:var(--yellow-bg);color:var(--yellow);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)" onclick="changeTaskStatus('${task.id}','${p.id}','in_progress');closeTaskModal();setTimeout(()=>openTaskModal('${task.id}','${p.id}'),150)">Rimetti in corso</button>
         </div>`;
     }
-    html += `<input class="modal-title-input" id="tmTitle" placeholder="Titolo task..." value="${esc(task.title)}">`;
 
-    // Stato — chip colorati
-    html += `<div class="modal-field" style="margin-top:14px"><span class="modal-label">Stato</span>
-        <div class="chip-row" id="tmStatusRow">
-            ${STATUS_LIST.map(s => {
-                const colorMap = { todo:'var(--slate-bg);color:var(--slate)', in_progress:'var(--yellow-bg);color:var(--yellow)', blocked:'var(--red-bg);color:var(--red)', da_verificare:'var(--teal-bg);color:var(--teal)', done:'var(--green-bg);color:var(--green)' };
-                const parts = colorMap[s].split(';');
-                return `<span class="chip-option ${task.status===s?'selected':''}" data-val="${s}" style="background:${parts[0]};${parts[1]}" onclick="selectChip(this,'tmStatusRow')">${STATUS_LABELS[s]}</span>`;
-            }).join('')}
-        </div>
-    </div>`;
-
-    // Assegnato a — dropdown
-    html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label">Assegnato a</span>
-        <select class="modal-select" id="tmAssignee">
-            <option value="">Non assegnata</option>
+    // ── Campi principali: Stato + Assegnato + Scadenza ──
+    html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px">`;
+    // Stato dropdown
+    html += `<div class="modal-field"><span class="modal-label">Stato</span>
+        <select class="modal-select" id="tmStatus" style="font-size:14px">
+            ${STATUS_LIST.map(s => `<option value="${s}" ${task.status===s?'selected':''}>${STATUS_LABELS[s]}</option>`).join('')}
+        </select></div>`;
+    // Assegnato dropdown
+    html += `<div class="modal-field"><span class="modal-label">Assegnato a</span>
+        <select class="modal-select" id="tmAssignee" style="font-size:14px">
+            <option value="">—</option>
             ${team.map(m => `<option value="${esc(m.name)}" ${task.assignee===m.name?'selected':''}>${esc(m.name)}</option>`).join('')}
-        </select>
-    </div>`;
+        </select></div>`;
+    html += `</div>`;
 
-    // Scadenza + Prossimo check
-    html += '<div class="modal-row" style="margin-top:12px">';
-    html += `<div class="modal-field"><span class="modal-label">Scadenza</span><input type="date" class="modal-input" id="tmDue" value="${task.dueDate||''}" onclick="this.showPicker()" style="cursor:pointer"></div>`;
-    html += `<div class="modal-field"><span class="modal-label">Prossimo check</span><input type="date" class="modal-input" id="tmNextCheck" value="${task.nextCheck||''}" onclick="this.showPicker()" style="cursor:pointer"></div>`;
-    html += '</div>';
-
-    // Fatto quando
-    html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label">Fatto quando...</span>
-        <input class="modal-input" id="tmDoneWhen" placeholder="es. bozza consegnata su WeTransfer" value="${esc(task.doneWhen||'')}">
-    </div>`;
-
-    // Dipende da (label)
-    html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label">Dipende da...</span>
-        <input class="modal-input" id="tmDependsLabel" placeholder="es. aspetta che Max finisca il setup" value="${esc(task.dependsLabel||'')}">
-    </div>`;
+    // Scadenza
+    html += `<div class="modal-field" style="margin-bottom:12px"><span class="modal-label">Scadenza</span>
+        <input type="date" class="modal-input" id="tmDue" value="${task.dueDate||''}" style="cursor:pointer"></div>`;
 
     // Note
-    html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label">Note</span>
+    html += `<div class="modal-field" style="margin-bottom:12px"><span class="modal-label">Note</span>
         <textarea class="modal-textarea" id="tmNote" rows="2" placeholder="Appunti, contesto, blocchi...">${esc(task.note||'')}</textarea>
     </div>`;
 
-    // Messaggio per il CEO (visibile solo se assegnato ad Alberto)
-    html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label" style="color:var(--orange);font-weight:700">Messaggio per il CEO</span>
-        <textarea class="modal-textarea" id="tmCeoNote" rows="3" placeholder="Cosa deve fare Alberto concretamente? Scrivi in modo diretto e chiaro...">${esc(task.ceoNote||'')}</textarea>
-        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Questo testo appare nella dashboard di Alberto come istruzione principale.</div>
-    </div>`;
+    // ── Istruzioni per Alberto — solo se assegnata a lui o ha ceoNote ──
+    const showCeoNote = task.assignee === 'Alberto' || (task.ceoNote && task.ceoNote.trim());
+    html += `<div id="tmCeoNoteWrap" style="margin-bottom:12px;${showCeoNote ? '' : 'display:none'}"><div class="modal-field"><span class="modal-label" style="color:var(--orange)">Istruzioni per Alberto</span>
+        <textarea class="modal-textarea" id="tmCeoNote" rows="2" placeholder="Cosa deve fare Alberto?">${esc(task.ceoNote||'')}</textarea>
+    </div></div>`;
 
-    // Thread conversazione CEO ↔ COO (aggiornamenti + risposte)
+    // ── Chat con Alberto (se esiste) ──
     var allTaskMsgs = [];
     (task.ceoUpdates || []).forEach(function(u) { allTaskMsgs.push({ from: 'ceo', note: u.note, type: u.type, at: u.at }); });
     (task.cooResponses || []).forEach(function(r) { allTaskMsgs.push({ from: 'coo', note: r.note, type: 'response', at: r.at }); });
     allTaskMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
-    if (allTaskMsgs.length > 0 || task.ceoHasUpdate) {
-        html += '<div class="modal-field" style="margin-top:14px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px">';
-        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase">Conversazione con Alberto</div>';
-        if (allTaskMsgs.length > 0) {
-            allTaskMsgs.forEach(function(msg) {
-                var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                var isCeo = msg.from === 'ceo';
-                var typeLabel = msg.type === 'complete' ? 'Completata' : msg.type === 'update' ? 'Aggiornamento' : 'Risposta';
-                var bgCol = isCeo ? 'var(--blue-bg,#EFF6FF)' : 'var(--accent-soft,#FFF1ED)';
-                var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
-                var name = isCeo ? 'Alberto' : 'Tu (COO)';
-                html += '<div style="padding:6px 10px;background:' + bgCol + ';border-radius:8px;margin-bottom:4px;font-size:12px">';
-                html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
-                html += ' <span style="font-size:10px;font-weight:600;color:var(--text-muted)">' + typeLabel + ' &middot; ' + mDate + '</span>';
-                if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + esc(msg.note) + '</div>';
-                html += '</div>';
-            });
-        }
-        // Campo risposta rapida
-        html += '<div style="display:flex;gap:6px;margin-top:8px">';
-        html += '<input id="cooTaskReplyInput_' + task.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')">';
-        html += '<button onclick="cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
-        html += '</div>';
-        html += '</div>';
+    if (allTaskMsgs.length > 0) {
+        html += '<div style="margin-bottom:12px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px">';
+        html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">Chat con Alberto</div>';
+        allTaskMsgs.forEach(function(msg) {
+            var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            var isCeo = msg.from === 'ceo';
+            var bgCol = isCeo ? 'var(--blue-bg,#EFF6FF)' : 'var(--accent-soft,#FFF1ED)';
+            var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+            var name = isCeo ? 'Alberto' : 'Tu';
+            html += '<div style="padding:5px 8px;background:' + bgCol + ';border-radius:6px;margin-bottom:3px;font-size:12px">';
+            html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+            html += ' <span style="font-size:10px;color:var(--text-muted)">' + mDate + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
+            html += '</div>';
+        });
+        html += '<div style="display:flex;gap:6px;margin-top:6px">';
+        html += '<input id="cooTaskReplyInput_' + task.id + '" type="text" placeholder="Rispondi..." style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--surface);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')">';
+        html += '<button onclick="cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')" style="padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia</button>';
+        html += '</div></div>';
     }
 
-    // === SEZIONE AVANZATA (collapsibile) ===
-    const hasExtra = (task.tags||[]).length > 0 || (task.dependsOn||[]).length > 0 || task.recurrence;
-    html += `<button class="modal-section-toggle" onclick="toggleModalExtra()">
-        <span class="toggle-arrow ${hasExtra?'open':''}" id="extraArrow">&#9654;</span> Altro (tag, ricorrenza, dipendenze)
+    // ── Sezione avanzata (collapsibile) ──
+    const hasAdvanced = task.nextCheck || task.doneWhen || task.dependsLabel || (task.tags||[]).length > 0 || task.recurrence || (task.activityLog||[]).length > 0;
+    html += `<button class="modal-section-toggle" onclick="toggleModalExtra()" style="margin-bottom:8px">
+        <span class="toggle-arrow ${hasAdvanced?'open':''}" id="extraArrow">&#9654;</span> Dettagli avanzati
     </button>`;
-    html += `<div class="modal-extra ${hasExtra?'':'collapsed'}" id="modalExtra" style="max-height:600px">`;
+    html += `<div class="modal-extra ${hasAdvanced?'':'collapsed'}" id="modalExtra" style="max-height:2000px">`;
 
-    html += '<div class="modal-row">';
+    // Prossimo check + Fatto quando
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+    html += `<div class="modal-field"><span class="modal-label">Prossimo check</span><input type="date" class="modal-input" id="tmNextCheck" value="${task.nextCheck||''}" style="cursor:pointer"></div>`;
+    html += `<div class="modal-field"><span class="modal-label">Fatto quando</span><input class="modal-input" id="tmDoneWhen" placeholder="es. bozza su WeTransfer" value="${esc(task.doneWhen||'')}"></div>`;
+    html += '</div>';
+
+    // Dipende da + Ricorrenza
+    html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
+    html += `<div class="modal-field"><span class="modal-label">Dipende da</span><input class="modal-input" id="tmDependsLabel" placeholder="es. aspetta Max" value="${esc(task.dependsLabel||'')}"></div>`;
     html += `<div class="modal-field"><span class="modal-label">Ricorrenza</span><select class="modal-select" id="tmRecurrence">
         <option value="" ${!task.recurrence?'selected':''}>Nessuna</option>
         <option value="daily" ${task.recurrence==='daily'?'selected':''}>Giornaliera</option>
@@ -7062,7 +7051,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     html += `<input type="hidden" id="tmHours" value="0">`;
 
     // Tags
-    html += `<div class="modal-field" style="margin-top:10px"><span class="modal-label">Tag</span>
+    html += `<div class="modal-field" style="margin-bottom:10px"><span class="modal-label">Tag</span>
         <div class="tags-input-wrap" id="tmTagsWrap" onclick="document.getElementById('tmTagInput').focus()">
             ${(task.tags||[]).map(tag=>`<span class="tag-pill">${esc(tag)}<span class="tag-pill-x" onclick="removeTag(this,'${esc(tag)}')">&times;</span></span>`).join('')}
             <input class="tags-input" id="tmTagInput" placeholder="Aggiungi tag..." onkeydown="if(event.key==='Enter'){event.preventDefault();addTag(this)}">
@@ -7071,56 +7060,58 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
 
     // Dependencies
     if (otherTasks.length > 0) {
-        html += `<div class="modal-field" style="margin-top:10px"><span class="modal-label">Dipende da</span>
+        html += `<div class="modal-field" style="margin-bottom:10px"><span class="modal-label">Dipende da (task)</span>
             <div class="deps-list">
                 ${otherTasks.map(t=>`<div class="dep-item"><input type="checkbox" value="${t.id}" ${(task.dependsOn||[]).includes(t.id)?'checked':''}><span>${esc(t.title)}</span></div>`).join('')}
             </div>
         </div>`;
     }
-    html += '</div>'; // close modal-extra
-
-    // Commenti rimossi — comunicazione via WhatsApp/call
 
     // Activity Log
     const actLog = task.activityLog || [];
-    html += `<div style="margin-top:16px;border-top:1px solid var(--border-light);padding-top:14px">
-        <div style="font-size:13px;font-weight:700;margin-bottom:10px">Registro attivita</div>
+    html += `<div style="border-top:1px solid var(--border-light);padding-top:10px;margin-top:4px">
+        <div style="font-size:12px;font-weight:700;margin-bottom:8px">Registro attivita</div>
         <div class="activity-add-row">
             <input id="tmNewActivity" placeholder="Aggiungi aggiornamento..." onkeydown="if(event.key==='Enter'){event.preventDefault();addActivityEntry('${task.id}','${p.id}',${isNew})}">
-            <button class="activity-add-btn" onclick="addActivityEntry('${task.id}','${p.id}',${isNew})">Aggiungi</button>
+            <button class="activity-add-btn" onclick="addActivityEntry('${task.id}','${p.id}',${isNew})">+</button>
         </div>
         <div class="task-activity-log">`;
-    [...actLog].reverse().forEach(entry => {
+    [...actLog].reverse().slice(0, 5).forEach(entry => {
         html += `<div class="task-activity-entry">
             <div class="task-activity-date">${entry.date || ''}</div>
             <div class="task-activity-text">${esc(entry.text)}</div>
         </div>`;
     });
-    if (actLog.length === 0) {
-        html += '<div style="font-size:12px;color:var(--text-muted);padding:8px 0">Nessuna attivita registrata</div>';
-    }
+    if (actLog.length === 0) html += '<div style="font-size:11px;color:var(--text-muted);padding:4px 0">Nessuna attivita</div>';
+    if (actLog.length > 5) html += '<div style="font-size:11px;color:var(--text-muted)">...e altre ' + (actLog.length - 5) + '</div>';
     html += '</div></div>';
+
+    html += '</div>'; // close modal-extra
+
+    // ── Azioni: Salva grande, Elimina piccolo ──
+    html += `<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">`;
+    html += `<button class="btn-save" onclick="saveTask('${task.id}','${p.id}',${isNew})" style="width:100%;padding:14px;font-size:15px;border-radius:10px">Salva</button>`;
+    if (!isNew) {
+        html += `<div style="display:flex;justify-content:center;gap:16px;padding:4px 0">`;
+        html += `<button onclick="closeTaskModal()" style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:var(--font);padding:4px 8px">Annulla</button>`;
+        html += `<button onclick="if(confirm('Eliminare questa task?'))deleteTask('${task.id}','${p.id}')" style="background:none;border:none;color:var(--red);font-size:13px;cursor:pointer;font-family:var(--font);padding:4px 8px">Elimina</button>`;
+        html += `</div>`;
+    }
+    html += `</div>`;
 
     // Info
     if (!isNew) {
-        html += `<div style="margin-top:12px;font-size:11px;color:var(--text-muted)">
-            Creata: ${formatTimestamp(task.createdAt)}
-            ${task.completedAt ? ' | Completata: ' + formatTimestamp(task.completedAt) : ''}
+        html += `<div style="margin-top:8px;font-size:10px;color:var(--text-muted);text-align:center">
+            Creata: ${formatTimestamp(task.createdAt)}${task.completedAt ? ' | Completata: ' + formatTimestamp(task.completedAt) : ''}
         </div>`;
     }
-
-    // Azioni
-    html += `<div class="modal-actions">
-        ${!isNew?`<button class="btn-delete" onclick="deleteTask('${task.id}','${p.id}')">Elimina</button>`:'<div></div>'}
-        <div class="modal-actions-right">
-            <button class="btn-cancel" onclick="closeTaskModal()">Annulla</button>
-            <button class="btn-save" onclick="saveTask('${task.id}','${p.id}',${isNew})">Salva</button>
-        </div>
-    </div>`;
 
     modal.innerHTML = html;
     document.getElementById('taskModal').classList.add('open');
     document.getElementById('taskModal').onclick = (e) => { if (e.target === document.getElementById('taskModal')) closeTaskModal(); };
+    // Mostra/nascondi ceoNote quando cambia assegnazione
+    var _tmAssignee = document.getElementById('tmAssignee');
+    if (_tmAssignee) _tmAssignee.addEventListener('change', function() { var w = document.getElementById('tmCeoNoteWrap'); if(w) w.style.display = this.value === 'Alberto' ? '' : 'none'; });
     if (isNew) setTimeout(() => document.getElementById('tmTitle').focus(), 100);
 }
 
@@ -7151,7 +7142,7 @@ function saveTask(taskId, projectId, isNew) {
     const taskData = {
         id: taskId,
         title: title,
-        status: (function(){ var el = document.querySelector('#tmStatusRow .selected'); return el && el.dataset ? el.dataset.val : ''; })() || 'todo',
+        status: document.getElementById('tmStatus').value || 'todo',
         assignee: document.getElementById('tmAssignee').value || '',
         dueDate: document.getElementById('tmDue').value,
         estimateHours: parseFloat(document.getElementById('tmHours').value) || 0,
