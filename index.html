@@ -1944,20 +1944,13 @@ function openResourceModal(resId) {
 
     var modal = document.getElementById('taskModalInner');
     var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
-    html += '<input class="modal-title-input" id="resTitle" placeholder="Titolo risorsa..." value="' + esc(res.title) + '">';
+    html += '<input class="modal-title-input" id="resTitle" placeholder="Titolo (cosa deve leggere Alberto)..." value="' + esc(res.title) + '">';
 
-    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Tipo</span>';
-    html += '<select class="modal-select" id="resType" onchange="toggleResFields()">';
-    html += '<option value="note"' + (res.type === 'note' ? ' selected' : '') + '>Nota / Markdown</option>';
-    html += '<option value="link"' + (res.type === 'link' ? ' selected' : '') + '>Link esterno</option>';
-    html += '<option value="html"' + (res.type === 'html' ? ' selected' : '') + '>HTML</option>';
-    html += '</select></div>';
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Link esterno (opzionale)</span>';
+    html += '<input class="modal-input" id="resUrl" placeholder="https://... — lascia vuoto se non serve" value="' + esc(res.url || '') + '"></div>';
 
-    html += '<div class="modal-field" id="resUrlField" style="margin-top:12px;display:' + (res.type === 'link' ? 'block' : 'none') + '"><span class="modal-label">URL</span>';
-    html += '<input class="modal-input" id="resUrl" placeholder="https://..." value="' + esc(res.url || '') + '"></div>';
-
-    html += '<div class="modal-field" id="resContentField" style="margin-top:12px;display:' + (res.type !== 'link' ? 'block' : 'none') + '"><span class="modal-label">Contenuto</span>';
-    html += '<textarea class="modal-textarea" id="resContent" rows="10" placeholder="Scrivi qui... (supporta Markdown per le note)">' + esc(res.content || '') + '</textarea></div>';
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Nota / Contenuto (opzionale, supporta Markdown)</span>';
+    html += '<textarea class="modal-textarea" id="resContent" rows="8" placeholder="Scrivi istruzioni, contesto, o informazioni per Alberto...">' + esc(res.content || '') + '</textarea></div>';
 
     html += '<div class="modal-actions" style="margin-top:16px">';
     html += isNew ? '<div></div>' : '<button class="btn-delete" onclick="deleteResource(\'' + res.id + '\')">Elimina</button>';
@@ -1970,20 +1963,17 @@ function openResourceModal(resId) {
     document.getElementById('taskModal').classList.add('open');
 }
 
-function toggleResFields() {
-    var type = document.getElementById('resType').value;
-    document.getElementById('resUrlField').style.display = type === 'link' ? 'block' : 'none';
-    document.getElementById('resContentField').style.display = type !== 'link' ? 'block' : 'none';
-}
-
 function saveResource(id, isNew) {
     var resources = getResources();
+    var url = document.getElementById('resUrl').value.trim();
+    var content = document.getElementById('resContent').value;
+    var type = url && !content.trim() ? 'link' : content.trim() && !url ? 'note' : url && content.trim() ? 'note' : 'note';
     var data = {
         id: id,
         title: document.getElementById('resTitle').value.trim(),
-        type: document.getElementById('resType').value,
-        url: document.getElementById('resUrl').value.trim(),
-        content: document.getElementById('resContent').value,
+        type: type,
+        url: url,
+        content: content,
         createdAt: isNew ? new Date().toISOString() : (resources.find(function(r) { return r.id === id; }) || {}).createdAt || new Date().toISOString()
     };
     if (!data.title) { alert('Inserisci un titolo'); return; }
@@ -2064,7 +2054,23 @@ function deleteCeoLink(id) {
 
 // ========== LANCI MARKETING ==========
 function getLaunches() {
-    try { return JSON.parse(safeGetItem('pb_launches') || '[]'); } catch(e) { return []; }
+    try {
+        var ls = JSON.parse(safeGetItem('pb_launches') || '[]');
+        if (ls.length === 0 && !safeGetItem('pb_launches_seeded')) {
+            ls = [
+                {id:'ln_s1',name:'Lancio ADT Setup Pack F1-26',brand:'ADT',startDate:'2026-03-28',endDate:'2026-03-31',projectId:'',notes:''},
+                {id:'ln_s2',name:'Lancio Database Strategia ADT',brand:'ADT',startDate:'2026-04-03',endDate:'2026-04-07',projectId:'',notes:''},
+                {id:'ln_s3',name:'Lancio ADT Kick Off',brand:'ADT',startDate:'2026-04-12',endDate:'2026-04-16',projectId:'',notes:''},
+                {id:'ln_s4',name:'Lancio Circolo dei Top Drivers Aprile',brand:'ADT',startDate:'2026-04-21',endDate:'2026-04-28',projectId:'',notes:''},
+                {id:'ln_s5',name:'Lancio USR Kick Off',brand:'USR',startDate:'2026-04-12',endDate:'2026-04-16',projectId:'',notes:''},
+                {id:'ln_s6',name:'Lancio USR Setup Pack',brand:'GTF',startDate:'2026-04-08',endDate:'2026-04-11',projectId:'',notes:''},
+                {id:'ln_s7',name:'Lancio Gentleman Driver Lead Magnet',brand:'USR',startDate:'2026-03-31',endDate:'2026-04-05',projectId:'',notes:''}
+            ];
+            safeSetItem('pb_launches', JSON.stringify(ls));
+            safeSetItem('pb_launches_seeded', '1');
+        }
+        return ls;
+    } catch(e) { return []; }
 }
 function saveLaunches(arr) { safeSetItem('pb_launches', JSON.stringify(arr)); }
 
@@ -2990,12 +2996,13 @@ function renderCEOHome() {
 
             // Contenuto espandibile
             html += '<div id="resBody_' + res.id + '" style="display:none;padding:0 14px 12px;border-top:1px solid var(--border-light)">';
-            if (res.type === 'link' && res.url) {
-                html += '<a href="' + esc(res.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">Apri &#8599;</a>';
-            } else if (res.type === 'html') {
-                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + (res.content || '') + '</div>';
-            } else {
-                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content || '') + '</div>';
+            // Contenuto (nota/markdown)
+            if (res.content && res.content.trim()) {
+                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content) + '</div>';
+            }
+            // Link (sempre visibile se presente)
+            if (res.url && res.url.trim()) {
+                html += '<a href="' + esc(res.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">Apri link &#8599;</a>';
             }
 
             // Feedback precedenti
@@ -4099,38 +4106,11 @@ function renderGlobal() {
         html += '</div>';
     }
 
-    // ========== CEO TOOLS (Risorse + Quick Links) — gestione COO ==========
+    // ========== CEO TOOLS (Quick Links) — gestione COO ==========
     html += '<div style="border-top:2px solid var(--border);padding-top:20px;margin-top:8px">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
     html += '<div style="font-size:15px;font-weight:800;color:var(--text)">Pannello CEO</div>';
-    html += '<div style="font-size:11px;color:var(--text-muted)">Visibile al CEO dopo la pubblicazione</div>';
-    html += '</div>';
-
-    // Resources management PRIMA — badges fetched from ceo.json
-    html += '<div style="margin-bottom:18px">';
-    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-    html += '<span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Bacheca Risorse</span>';
-    html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
-    html += '</div>';
-    var ress = getResources();
-    if (ress.length === 0) {
-        html += '<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nessuna risorsa. Clicca "+ Nuova" per aggiungere link, note o HTML per Alberto.</div>';
-    } else {
-        html += '<div id="cooResourcesList" style="display:flex;flex-direction:column;gap:6px">';
-        ress.forEach(function(r) {
-            var typeIcon = r.type === 'link' ? '&#128279;' : r.type === 'html' ? '&#128196;' : '&#128221;';
-            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
-            html += '<div onclick="openResourceModal(\'' + r.id + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;cursor:pointer;font-size:12px" title="Clicca per modificare">';
-            html += '<span>' + typeIcon + '</span>';
-            html += '<span style="font-weight:600;color:var(--text);flex:1">' + esc(r.title) + '</span>';
-            html += '<span id="cooResBadge_' + r.id + '" style="font-size:9px;font-weight:800;color:var(--text-muted);background:var(--bg);border-radius:4px;padding:1px 5px">...</span>';
-            html += '<span style="font-size:10px;color:var(--text-muted)">' + (r.type === 'link' ? 'Link' : r.type === 'html' ? 'HTML' : 'Nota') + '</span>';
-            html += '</div>';
-            html += '<div id="cooResFeedback_' + r.id + '"></div>';
-            html += '</div>';
-        });
-        html += '</div>';
-    }
+    html += '<div style="font-size:11px;color:var(--text-muted)">Quick Links visibili al CEO</div>';
     html += '</div>';
 
     // Quick Links management
