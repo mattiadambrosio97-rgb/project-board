@@ -3627,6 +3627,12 @@ var GH_CEO_FILE = 'ceo.json';
 function getGHToken() { return safeGetItem('pb_gh_token'); }
 function setGHToken(t) { safeSetItem('pb_gh_token', t); }
 
+// Registro CEO actions gestite dal COO (separato da projects, sopravvive ai sync)
+function _getCooAcked() { try { return JSON.parse(safeGetItem('pb_coo_acked') || '{}'); } catch(e) { return {}; } }
+function _setCooAcked(taskId) { var a = _getCooAcked(); a[taskId] = new Date().toISOString(); safeSetItem('pb_coo_acked', JSON.stringify(a)); }
+function _isCooAcked(taskId) { return !!_getCooAcked()[taskId]; }
+function _clearCooAcked(taskId) { var a = _getCooAcked(); delete a[taskId]; safeSetItem('pb_coo_acked', JSON.stringify(a)); }
+
 function _showCooOnboarding(onSuccess) {
     var mc = document.getElementById('mainContent');
     if (!mc) return;
@@ -3996,7 +4002,7 @@ function _cooFetchCeoActions() {
                     var ta = ceoActs.taskActions[t.id];
                     if (!ta) return;
                     // Skip se il COO ha già gestito questa azione (confermata o rifiutata)
-                    if (t.cooAcknowledgedCeoAction) return;
+                    if (_isCooAcked(t.id)) return;
                     // Completate → da_verificare
                     if (ta.status === 'complete' && t.status !== 'done' && t.status !== 'da_verificare') {
                         t.status = 'da_verificare';
@@ -6883,7 +6889,7 @@ function confirmTask(taskId, projectId) {
     if (!t) { _showToast('Task non trovata', true); return; }
     t.status = 'done';
     t.completedAt = new Date().toISOString();
-    t.cooAcknowledgedCeoAction = true;
+    _setCooAcked(taskId);
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Confermata dal COO (completata da Alberto)' });
     saveProjects(projects);
@@ -6899,7 +6905,7 @@ function rejectTask(taskId, projectId) {
     var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
     if (!t) { _showToast('Task non trovata', true); return; }
     t.status = 'in_progress';
-    t.cooAcknowledgedCeoAction = true;
+    _setCooAcked(taskId);
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO (era da verificare)' });
     saveProjects(projects);
