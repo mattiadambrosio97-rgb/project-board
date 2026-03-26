@@ -1469,10 +1469,13 @@
 
 <script>
 // ========== GITHUB PAGES PROTECTION ==========
-// Su GitHub Pages, senza ?ceo=1 redirect a CEO mode (il COO usa il file locale)
-if (window.location.hostname.indexOf('github.io') !== -1 && new URLSearchParams(window.location.search).get('ceo') !== '1') {
+// Su GitHub Pages: senza parametri → redirect a CEO. Con ?coo=1 → accesso COO.
+(function() {
+    if (window.location.hostname.indexOf('github.io') === -1) return;
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('ceo') === '1' || params.get('coo') === '1') return;
     window.location.replace(window.location.href.split('?')[0] + '?ceo=1');
-}
+})();
 
 // ========== STORAGE SAFETY (WhatsApp in-app browser) ==========
 var _storageAvailable = (function() {
@@ -1959,7 +1962,7 @@ function renderLaunchesSection() {
         return (a.startDate || '').localeCompare(b.startDate || '');
     });
 
-    var html = '<div class="section-card" style="margin-bottom:20px">';
+    var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
     html += '<div style="font-size:15px;font-weight:800;color:var(--text)">&#128640; Lanci Marketing</div>';
     html += '<button class="add-btn" style="font-size:12px;padding:5px 12px" onclick="openLaunchModal(null)">+ Lancio</button>';
