@@ -2861,17 +2861,23 @@ function ceoMarkResource(resId, action) {
     });
 }
 
-function ceoResourceFeedback(resId) {
-    // Toggle campo di testo inline
-    var wrap = document.getElementById('ceoResFeedbackWrap_' + resId);
-    if (wrap) {
-        wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
-        if (wrap.style.display === 'flex') {
-            var input = document.getElementById('ceoResFeedbackInput_' + resId);
-            if (input) input.focus();
-        }
-        return;
+function ceoMarkResourceWithNote(resId) {
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions.resourceActions[resId]) _ceoActions.resourceActions[resId] = {};
+    var ra = _ceoActions.resourceActions[resId];
+    ra.read = true;
+    ra.readAt = new Date().toISOString();
+    // Se c'e' un commento, aggiungilo come feedback
+    var input = document.getElementById('ceoResFeedbackInput_' + resId);
+    var note = input ? input.value.trim() : '';
+    if (note) {
+        if (!ra.feedback) ra.feedback = [];
+        ra.feedback.push({ note: note, at: new Date().toISOString() });
     }
+    ceoPushActions(function(ok) {
+        if (ok) renderCEOView();
+        else alert('Errore nel salvataggio. Riprova.');
+    });
 }
 
 function ceoSendResourceFeedback(resId) {
@@ -3259,17 +3265,15 @@ function renderCEOHome() {
                 html += '</div>';
             }
 
-            // Azioni
-            html += '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">';
+            // Campo risposta + azioni
+            html += '<div style="margin-top:10px" onclick="event.stopPropagation()">';
+            html += '<input id="ceoResFeedbackInput_' + res.id + '" type="text" placeholder="Commento (opzionale)..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;margin-bottom:6px" onkeydown="if(event.key===\'Enter\')ceoSendResourceFeedback(\'' + res.id + '\')">';
+            html += '<div style="display:flex;gap:6px">';
             if (!isRead) {
-                html += '<button onclick="event.stopPropagation();ceoMarkResource(\'' + res.id + '\',\'read\')" style="flex:1;min-width:90px;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Segna come letto</button>';
+                html += '<button onclick="ceoMarkResourceWithNote(\'' + res.id + '\')" style="flex:1;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Segna come letto</button>';
             }
-            html += '<button onclick="event.stopPropagation();ceoResourceFeedback(\'' + res.id + '\')" style="flex:1;min-width:90px;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Rispondi al COO</button>';
+            html += '<button onclick="ceoSendResourceFeedback(\'' + res.id + '\')" style="flex:1;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia risposta</button>';
             html += '</div>';
-            // Campo risposta inline (nascosto di default)
-            html += '<div id="ceoResFeedbackWrap_' + res.id + '" style="display:none;gap:6px;margin-top:8px" onclick="event.stopPropagation()">';
-            html += '<input id="ceoResFeedbackInput_' + res.id + '" type="text" placeholder="Scrivi la tua risposta..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')ceoSendResourceFeedback(\'' + res.id + '\')">';
-            html += '<button onclick="ceoSendResourceFeedback(\'' + res.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
             html += '</div>';
 
             html += '</div>';
