@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T15:25:33.431Z",
+  "lastUpdate": "2026-03-26T19:45:06.207Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -33,6 +33,16 @@
           "type": "update",
           "note": "Variante 2 rivista",
           "at": "2026-03-26T14:31:08.660Z"
+        }
+      ]
+    },
+    "test_ceo_3_1774553970292": {
+      "status": "update",
+      "updates": [
+        {
+          "type": "update",
+          "note": "mmm 22 aprile",
+          "at": "2026-03-26T19:45:06.207Z"
         }
       ]
     }
