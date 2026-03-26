@@ -1390,6 +1390,9 @@
         .today-item.today-alert:hover { background: var(--red-bg); filter: brightness(0.97); }
 
         /* ===== MINI TIMELINE ===== */
+        .gantt-handle:hover { background: rgba(0,0,0,0.08); }
+        .dark .gantt-handle:hover { background: rgba(255,255,255,0.08); }
+        .gantt-bar:active { opacity: 0.85; }
         .mini-timeline { position: relative; height: 28px; background: var(--bg); border-radius: 6px; overflow: hidden; margin: 8px 0; border: 1px solid var(--border-light); }
         .mini-tl-today { position: absolute; top: 0; width: 2px; height: 100%; background: var(--accent); z-index: 2; }
         .mini-tl-dot { position: absolute; top: 50%; width: 8px; height: 8px; border-radius: 50%; transform: translate(-50%, -50%); z-index: 3; border: 1.5px solid var(--surface); }
@@ -1991,6 +1994,13 @@ function renderLaunchCalendar(allLaunches, editable) {
     var totalW = labelW + days.length * dayW;
     var isDark = document.body.classList.contains('dark');
 
+    // Store for drag logic
+    if (editable) {
+        window._ganttDays = days;
+        window._ganttDayW = dayW;
+        window._ganttLabelW = labelW;
+    }
+
     // Group by brand
     var grouped = {};
     allLaunches.forEach(function(l) {
@@ -2092,15 +2102,21 @@ function renderLaunchCalendar(allLaunches, editable) {
             var isLive = st === 'live';
             var borderStyle = isLive ? '2px solid ' + bColor : '1px solid ' + bColor + '80';
 
-            var onclick = editable ? ' onclick="event.stopPropagation();openLaunchModal(\'' + l.id + '\')"' : '';
-            var cursor = editable ? 'cursor:pointer;' : '';
+            var cursor = editable ? 'cursor:grab;' : '';
 
             // Clean name: strip "Lancio " and brand prefix
             var cleanName = l.name.replace(/^Lancio\s+/i, '').replace(/^(ADT|USR)\s+/i, '');
 
-            html += '<div style="position:absolute;left:' + barL + 'px;width:' + barW + 'px;top:5px;bottom:5px;background:' + bBg + ';border:' + borderStyle + ';border-radius:6px;display:flex;align-items:center;padding:0 8px;overflow:hidden;z-index:1;gap:4px;' + cursor + '"' + onclick + '>';
+            html += '<div class="gantt-bar" data-launch-id="' + l.id + '" style="position:absolute;left:' + barL + 'px;width:' + barW + 'px;top:5px;bottom:5px;background:' + bBg + ';border:' + borderStyle + ';border-radius:6px;display:flex;align-items:center;overflow:hidden;z-index:1;' + cursor + 'user-select:none;touch-action:none">';
+            // Left resize handle
+            if (editable) html += '<div class="gantt-handle gantt-handle-l" style="position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:2;border-radius:6px 0 0 6px" data-side="left"></div>';
+            // Content
+            html += '<div style="flex:1;display:flex;align-items:center;gap:4px;padding:0 10px;overflow:hidden;min-width:0">';
             html += '<span style="font-size:11px;font-weight:700;color:' + bColor + ';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1">' + esc(cleanName) + '</span>';
             if (isLive) html += '<span style="font-size:8px;font-weight:800;color:#fff;background:' + bColor + ';border-radius:3px;padding:1px 5px;flex-shrink:0">LIVE</span>';
+            html += '</div>';
+            // Right resize handle
+            if (editable) html += '<div class="gantt-handle gantt-handle-r" style="position:absolute;right:0;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:2;border-radius:0 6px 6px 0" data-side="right"></div>';
             html += '</div>';
 
             html += '</div>'; // close bar area
@@ -2117,6 +2133,123 @@ function renderLaunchCalendar(allLaunches, editable) {
     html += '</div></div>'; // close containers
     return html;
 }
+
+// ========== GANTT DRAG & RESIZE ==========
+(function() {
+    var _drag = null; // { bar, launchId, mode:'move'|'left'|'right', startX, origLeft, origWidth, startSi, startEi }
+
+    function ganttPointerDown(e) {
+        var handle = e.target.closest('.gantt-handle');
+        var bar = e.target.closest('.gantt-bar');
+        if (!bar) return;
+        var launchId = bar.getAttribute('data-launch-id');
+        if (!launchId) return;
+
+        var mode = 'move';
+        if (handle) {
+            mode = handle.getAttribute('data-side') === 'left' ? 'left' : 'right';
+        }
+
+        var dayW = window._ganttDayW || 38;
+        var days = window._ganttDays || [];
+        var launches = getLaunches();
+        var launch = launches.find(function(l) { return l.id === launchId; });
+        if (!launch) return;
+
+        var si = days.indexOf(launch.startDate);
+        var ei = days.indexOf(launch.endDate);
+        if (si < 0) si = 0;
+        if (ei < 0) ei = days.length - 1;
+
+        e.preventDefault();
+        bar.setPointerCapture(e.pointerId);
+        bar.style.opacity = '0.85';
+        bar.style.zIndex = '10';
+        if (mode === 'move') bar.style.cursor = 'grabbing';
+
+        _drag = {
+            bar: bar,
+            launchId: launchId,
+            mode: mode,
+            startX: e.clientX,
+            origLeft: parseFloat(bar.style.left),
+            origWidth: parseFloat(bar.style.width),
+            startSi: si,
+            startEi: ei,
+            dayW: dayW,
+            days: days,
+            minWidth: dayW - 4
+        };
+    }
+
+    function ganttPointerMove(e) {
+        if (!_drag) return;
+        var dx = e.clientX - _drag.startX;
+        var dayShift = Math.round(dx / _drag.dayW);
+
+        if (_drag.mode === 'move') {
+            var newSi = _drag.startSi + dayShift;
+            var newEi = _drag.startEi + dayShift;
+            if (newSi < 0) { newEi -= newSi; newSi = 0; }
+            if (newEi >= _drag.days.length) { newSi -= (newEi - _drag.days.length + 1); newEi = _drag.days.length - 1; }
+            var newLeft = newSi * _drag.dayW + 2;
+            _drag.bar.style.left = newLeft + 'px';
+            _drag._newSi = newSi;
+            _drag._newEi = newEi;
+        } else if (_drag.mode === 'left') {
+            var newSi = _drag.startSi + dayShift;
+            if (newSi < 0) newSi = 0;
+            if (newSi > _drag.startEi) newSi = _drag.startEi;
+            var newLeft = newSi * _drag.dayW + 2;
+            var newWidth = (_drag.startEi - newSi + 1) * _drag.dayW - 4;
+            _drag.bar.style.left = newLeft + 'px';
+            _drag.bar.style.width = newWidth + 'px';
+            _drag._newSi = newSi;
+            _drag._newEi = _drag.startEi;
+        } else if (_drag.mode === 'right') {
+            var newEi = _drag.startEi + dayShift;
+            if (newEi >= _drag.days.length) newEi = _drag.days.length - 1;
+            if (newEi < _drag.startSi) newEi = _drag.startSi;
+            var newWidth = (newEi - _drag.startSi + 1) * _drag.dayW - 4;
+            _drag.bar.style.width = newWidth + 'px';
+            _drag._newSi = _drag.startSi;
+            _drag._newEi = newEi;
+        }
+    }
+
+    function ganttPointerUp(e) {
+        if (!_drag) return;
+        _drag.bar.style.opacity = '';
+        _drag.bar.style.zIndex = '';
+        _drag.bar.style.cursor = '';
+
+        var newSi = _drag._newSi;
+        var newEi = _drag._newEi;
+        var changed = (newSi !== undefined && newEi !== undefined) && (newSi !== _drag.startSi || newEi !== _drag.startEi);
+
+        if (changed) {
+            var launches = getLaunches();
+            var idx = launches.findIndex(function(l) { return l.id === _drag.launchId; });
+            if (idx >= 0 && _drag.days[newSi] && _drag.days[newEi]) {
+                launches[idx].startDate = _drag.days[newSi];
+                launches[idx].endDate = _drag.days[newEi];
+                saveLaunches(launches);
+                render();
+            }
+        } else if (_drag.mode === 'move' && Math.abs(e.clientX - _drag.startX) < 5) {
+            // Click senza drag → apri modal
+            openLaunchModal(_drag.launchId);
+        }
+
+        _drag = null;
+    }
+
+    document.addEventListener('pointerdown', function(e) {
+        if (e.target.closest('.gantt-bar') || e.target.closest('.gantt-handle')) ganttPointerDown(e);
+    });
+    document.addEventListener('pointermove', ganttPointerMove);
+    document.addEventListener('pointerup', ganttPointerUp);
+})();
 
 function deleteLaunch(id) {
     if (!confirm('Eliminare questo lancio?')) return;
