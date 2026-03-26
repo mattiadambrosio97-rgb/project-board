@@ -2857,6 +2857,9 @@ function renderCEOView() {
     }
     mc.scrollTop = 0;
     window.scrollTo(0, 0);
+    // Dopo il primo render il browser potrebbe non aver ancora calcolato il layout
+    setTimeout(function() { window.scrollTo(0, 0); }, 50);
+    setTimeout(function() { window.scrollTo(0, 0); }, 200);
 }
 
 // Su mobile: apri task/risorsa inline invece che in modal
