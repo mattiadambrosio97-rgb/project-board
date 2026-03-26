@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:50:52.935Z",
+  "publishedAt": "2026-03-26T10:52:18.838Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -2027,14 +2027,14 @@
     {
       "id": "lk_keap",
       "label": "Keap CRM",
-      "url": "https://app.keap.com",
+      "url": "https://qh917.infusionsoft.com/",
       "icon": "📇",
       "color": "#16A34A"
     },
     {
       "id": "lk_drive",
       "label": "Google Drive",
-      "url": "https://drive.google.com",
+      "url": "https://drive.google.com/",
       "icon": "📁",
       "color": "#2563EB"
     },
@@ -2048,14 +2048,21 @@
     {
       "id": "lk_coaches",
       "label": "Programmi Coach e Piloti",
-      "url": "",
+      "url": "https://docs.google.com/spreadsheets/d/1gxNtqoWbNV2KgfqydifrT60hJ2quR4AfPyll4FNSpG4/edit?gid=563466402#gid=563466402",
       "icon": "🎯",
       "color": "#7C3AED"
     },
     {
+      "id": "lk_vendite",
+      "label": "Report Vendite Manlio",
+      "url": "https://docs.google.com/spreadsheets/d/1crrpOv5hw9P68FIKktFPmvqoTmLoVziCC40j-VmkS74/edit?gid=1369235724#gid=1369235724",
+      "icon": "💰",
+      "color": "#CA8A04"
+    },
+    {
       "id": "lk_notebook",
       "label": "NotebookLM",
-      "url": "https://notebooklm.google.com",
+      "url": "https://notebooklm.google.com/",
       "icon": "📓",
       "color": "#4285F4"
     },

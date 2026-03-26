@@ -1893,20 +1893,22 @@ function getCeoLinks() {
     try {
         var d = JSON.parse(safeGetItem('pb_ceo_links') || '[]');
         if (d.length === 0) return getDefaultCeoLinks();
-        // Migrazione v2: se ci sono i vecchi link default (analytics/vendite), resetta
-        var hasOld = d.some(function(l) { return l.id === 'lk_vendite' || l.id === 'lk_analytics'; });
-        if (hasOld) { safeSetItem('pb_ceo_links', ''); return getDefaultCeoLinks(); }
+        // Migrazione v3: se mancano notebook/chatgpt o c'e analytics, resetta ai nuovi default
+        var hasOld = d.some(function(l) { return l.id === 'lk_analytics'; });
+        var missingNew = !d.some(function(l) { return l.id === 'lk_notebook'; });
+        if (hasOld || missingNew) { safeSetItem('pb_ceo_links', ''); return getDefaultCeoLinks(); }
         return d;
     } catch(e) { return getDefaultCeoLinks(); }
 }
 function saveCeoLinks(arr) { safeSetItem('pb_ceo_links', JSON.stringify(arr)); }
 function getDefaultCeoLinks() {
     return [
-        { id: 'lk_keap', label: 'Keap CRM', url: 'https://app.keap.com', icon: '📇', color: '#16A34A' },
-        { id: 'lk_drive', label: 'Google Drive', url: 'https://drive.google.com', icon: '📁', color: '#2563EB' },
+        { id: 'lk_keap', label: 'Keap CRM', url: 'https://qh917.infusionsoft.com/', icon: '📇', color: '#16A34A' },
+        { id: 'lk_drive', label: 'Google Drive', url: 'https://drive.google.com/', icon: '📁', color: '#2563EB' },
         { id: 'lk_gmail', label: 'Gmail', url: 'https://mail.google.com', icon: '✉️', color: '#DC2626' },
-        { id: 'lk_coaches', label: 'Programmi Coach e Piloti', url: '', icon: '🎯', color: '#7C3AED' },
-        { id: 'lk_notebook', label: 'NotebookLM', url: 'https://notebooklm.google.com', icon: '📓', color: '#4285F4' },
+        { id: 'lk_coaches', label: 'Programmi Coach e Piloti', url: 'https://docs.google.com/spreadsheets/d/1gxNtqoWbNV2KgfqydifrT60hJ2quR4AfPyll4FNSpG4/edit?gid=563466402#gid=563466402', icon: '🎯', color: '#7C3AED' },
+        { id: 'lk_vendite', label: 'Report Vendite Manlio', url: 'https://docs.google.com/spreadsheets/d/1crrpOv5hw9P68FIKktFPmvqoTmLoVziCC40j-VmkS74/edit?gid=1369235724#gid=1369235724', icon: '💰', color: '#CA8A04' },
+        { id: 'lk_notebook', label: 'NotebookLM', url: 'https://notebooklm.google.com/', icon: '📓', color: '#4285F4' },
         { id: 'lk_chatgpt', label: 'ChatGPT', url: 'https://chat.openai.com', icon: '🤖', color: '#10A37F' }
     ];
 }
