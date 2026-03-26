@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:48.102Z",
+  "publishedAt": "2026-03-26T21:28:51.185Z",
   "projects": [],
   "team": [
     {
@@ -45,17 +45,7 @@
       "color": "#6366F1"
     }
   ],
-  "launches": [
-    {
-      "id": "ln_s4",
-      "name": "Lancio Circolo dei Top Drivers Aprile",
-      "brand": "ADT",
-      "startDate": "2026-04-21",
-      "endDate": "2026-04-28",
-      "projectId": "",
-      "notes": ""
-    }
-  ],
+  "launches": [],
   "ceoLinks": [
     {
       "id": "lk_keap",
