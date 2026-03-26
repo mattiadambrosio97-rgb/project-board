@@ -3762,16 +3762,26 @@ function renderTeamHome() {
     html += '</div>';
     html += '</div>';
 
-    // Stats rapide
-    var totalMy = myTasks.length;
-    var overdueMy = myTasks.filter(function(i) { return i.task.dueDate && i.task.dueDate < todayStr; }).length;
-    var blockedMy = myTasks.filter(function(i) { return i.task.status === 'blocked'; }).length;
+    // Stats rapide — usa lo stato effettivo (team action override)
+    function _effectiveStatus(item) {
+        var ta = (myActions.taskActions || {})[item.task.id];
+        return (ta && ta.status) ? ta.status : (item.task.status || 'todo');
+    }
+    var todoMy = myTasks.filter(function(i) { return _effectiveStatus(i) === 'todo'; }).length;
+    var inProgressMy = myTasks.filter(function(i) { return _effectiveStatus(i) === 'in_progress'; }).length;
+    var blockedMy = myTasks.filter(function(i) { return _effectiveStatus(i) === 'blocked'; }).length;
+    var overdueMy = myTasks.filter(function(i) { return i.task.dueDate && i.task.dueDate < todayStr && _effectiveStatus(i) !== 'done'; }).length;
     var cooRepliedMy = myTasks.filter(function(i) { return i.cooHasReplied; }).length;
 
     html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
     html += '<div onclick="teamBoardColumnPopup(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-    html += '<div style="font-size:24px;font-weight:800;color:var(--text)">' + totalMy + '</div>';
+    html += '<div style="font-size:24px;font-weight:800;color:var(--text)">' + todoMy + '</div>';
     html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600">Da fare</div></div>';
+    if (inProgressMy > 0) {
+        html += '<div onclick="teamBoardColumnPopup(\'in_progress\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--yellow-bg,#FFFBEB);border:1px solid var(--yellow);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+        html += '<div style="font-size:24px;font-weight:800;color:var(--yellow,#F59E0B)">' + inProgressMy + '</div>';
+        html += '<div style="font-size:13px;color:var(--yellow,#F59E0B);font-weight:600">In corso</div></div>';
+    }
     if (overdueMy > 0) {
         html += '<div onclick="teamBoardColumnPopup(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueMy + '</div>';
@@ -3820,7 +3830,7 @@ function renderTeamHome() {
                 { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal)', items: [] }
             ];
             myTasks.forEach(function(item) {
-                var st = item.memberStatus || item.task.status || 'todo';
+                var st = _effectiveStatus(item);
                 var grp = listGroups.find(function(g) { return g.key === st; });
                 if (grp) grp.items.push(item);
                 else listGroups[1].items.push(item); // fallback to "Da fare"
@@ -3855,7 +3865,7 @@ function renderTeamHome() {
         ];
         html += '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch">';
         columns.forEach(function(col) {
-            var colTasks = allMyTasks.filter(function(i) { return (i.task._effectiveStatus || i.task.status || 'todo') === col.key; });
+            var colTasks = allMyTasks.filter(function(i) { return _effectiveStatus(i) === col.key; });
             html += '<div data-team-col="' + col.key + '" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')" style="min-width:220px;flex:1;background:' + col.bg + ';border:2px dashed transparent;border-radius:12px;padding:10px;min-height:120px;transition:border-color 0.15s,background 0.15s">';
             html += '<div onclick="teamBoardColumnPopup(\'' + col.key + '\')" style="cursor:pointer;font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
             html += col.label;
