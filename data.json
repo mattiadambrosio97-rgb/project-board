@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:11:35.702Z",
+  "publishedAt": "2026-03-26T21:11:38.856Z",
   "projects": [],
   "team": [
     {
@@ -20,11 +20,67 @@
   ],
   "launches": [
     {
-      "id": "launch_webinar",
-      "name": "Webinar Aprile",
-      "startDate": "2026-04-18",
-      "endDate": "2026-04-20",
-      "color": "#457B9D"
+      "id": "ln_s1",
+      "name": "Lancio ADT Setup Pack F1-26",
+      "brand": "ADT",
+      "startDate": "2026-03-28",
+      "endDate": "2026-03-31",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s2",
+      "name": "Lancio Database Strategia ADT",
+      "brand": "ADT",
+      "startDate": "2026-04-03",
+      "endDate": "2026-04-07",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s3",
+      "name": "Lancio ADT Kick Off",
+      "brand": "ADT",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s4",
+      "name": "Lancio Circolo dei Top Drivers Aprile",
+      "brand": "ADT",
+      "startDate": "2026-04-21",
+      "endDate": "2026-04-28",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s5",
+      "name": "Lancio USR Kick Off",
+      "brand": "USR",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s6",
+      "name": "Lancio USR Setup Pack",
+      "brand": "GTF",
+      "startDate": "2026-04-08",
+      "endDate": "2026-04-11",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_s7",
+      "name": "Lancio Gentleman Driver Lead Magnet",
+      "brand": "USR",
+      "startDate": "2026-03-31",
+      "endDate": "2026-04-05",
+      "projectId": "",
+      "notes": ""
     }
   ],
   "ceoLinks": [
