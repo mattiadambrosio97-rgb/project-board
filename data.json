@@ -1,6 +1,36 @@
 {
-  "publishedAt": "2026-03-26T21:29:20.969Z",
-  "projects": [],
+  "publishedAt": "2026-03-26T21:42:19.920Z",
+  "projects": [
+    {
+      "id": "id_1774561315044_2num0g",
+      "name": "fwef",
+      "description": "wefw",
+      "status": "attivo",
+      "launchDate": null,
+      "tasks": [
+        {
+          "id": "id_1774561331895_ggv8s3",
+          "title": "wegewg",
+          "status": "todo",
+          "assignee": "Mattia",
+          "dueDate": "",
+          "estimateHours": 0,
+          "recurrence": null,
+          "note": "",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "",
+          "dependsLabel": "",
+          "tags": [],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774561335996,
+          "completedAt": null,
+          "activityLog": []
+        }
+      ]
+    }
+  ],
   "team": [
     {
       "name": "Mattia",
