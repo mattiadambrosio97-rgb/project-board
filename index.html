@@ -2769,7 +2769,7 @@ function init() {
     if (safeGetItem('pb_theme') === 'dark') document.body.classList.add('dark');
     updateThemeIcon();
 
-    if (CEO_MODE) {
+    if (CEO_MODE || TEAM_MODE) {
         render();
         return;
     }
