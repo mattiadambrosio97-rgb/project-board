@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:23.359Z",
+  "publishedAt": "2026-03-26T21:28:29.849Z",
   "projects": [],
   "team": [
     {
@@ -46,15 +46,6 @@
     }
   ],
   "launches": [
-    {
-      "id": "ln_s1",
-      "name": "Lancio ADT Setup Pack F1-26",
-      "brand": "ADT",
-      "startDate": "2026-03-28",
-      "endDate": "2026-03-31",
-      "projectId": "",
-      "notes": ""
-    },
     {
       "id": "ln_s2",
       "name": "Lancio Database Strategia ADT",
