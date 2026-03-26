@@ -196,18 +196,7 @@
         }
         .add-btn:hover { background: var(--accent-strong); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(240,101,67,0.35); }
 
-        .theme-toggle {
-            width: 44px; height: 24px; border-radius: 12px;
-            background: var(--border); border: none; cursor: pointer;
-            position: relative; transition: background 0.3s; flex-shrink: 0;
-        }
-        .theme-toggle::after {
-            content: ''; position: absolute; top: 3px; left: 3px;
-            width: 18px; height: 18px; border-radius: 50%;
-            background: var(--surface); box-shadow: var(--shadow-sm); transition: transform 0.3s;
-        }
-        .dark .theme-toggle { background: var(--accent); }
-        .dark .theme-toggle::after { transform: translateX(20px); }
+        /* theme toggle is now an icon-btn with sun/moon */
 
         /* ===== MAIN CONTENT ===== */
         .main-content { flex: 1; overflow: auto; position: relative; }
@@ -406,11 +395,11 @@
             overflow-x: auto;
         }
         .tab-btn {
-            padding: 14px 20px; font-size: 13px; font-weight: 600;
+            padding: 14px 24px; font-size: 15px; font-weight: 600;
             color: var(--text-muted); border: none; background: none;
             cursor: pointer; font-family: var(--font); position: relative;
             transition: all 0.2s; white-space: nowrap; letter-spacing: 0.1px;
-            border-radius: 8px 8px 0 0;
+            border-radius: 8px 8px 0 0; flex: 1; text-align: center;
         }
         .tab-btn:hover { color: var(--text); background: var(--accent-glow); }
         .tab-btn.active { color: var(--accent); font-weight: 700; }
@@ -987,16 +976,16 @@
         .modal-title-input:focus { border-bottom-color: var(--accent); }
         .modal-row { display: flex; gap: 12px; margin-top: 14px; }
         .modal-field { flex: 1; display: flex; flex-direction: column; gap: 4px; }
-        .modal-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+        .modal-label { font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
         .modal-select, .modal-input {
-            padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
-            background: var(--surface); color: var(--text); font-size: 13px;
+            padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-size: 15px;
             font-family: var(--font); outline: none; width: 100%; transition: border-color 0.2s;
         }
         .modal-select:focus, .modal-input:focus { border-color: var(--accent); }
         .modal-textarea {
-            padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border);
-            background: var(--surface); color: var(--text); font-size: 13px;
+            padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text); font-size: 15px;
             font-family: var(--font); outline: none; width: 100%;
             resize: vertical; min-height: 60px; transition: border-color 0.2s;
         }
@@ -1269,9 +1258,9 @@
                 background: var(--bg); border: 1px solid var(--border); }
             .modal-actions { position: static; background: none;
                 padding: 16px 0 4px; margin-top: 12px; }
-            .modal-label { font-size: 12px; }
-            .modal-select, .modal-input { font-size: 15px; padding: 10px 14px; min-height: 44px; }
-            .modal-textarea { font-size: 16px; padding: 10px 14px; }
+            .modal-label { font-size: 14px; }
+            .modal-select, .modal-input { font-size: 16px; padding: 12px 16px; min-height: 48px; }
+            .modal-textarea { font-size: 16px; padding: 12px 16px; }
 
             /* Chips — wrap nicely */
             .chip-row { gap: 6px; }
@@ -1490,7 +1479,6 @@
             </div>
         </div>
         <div class="header-right" id="headerRight">
-            <a href="TASK_BOARD.html" class="icon-btn" title="Task Board" style="text-decoration:none;">&#128203;</a>
             <button class="add-btn" id="addBtn" onclick="handleAdd()">+ Nuovo</button>
             <button class="icon-btn" title="Backup" onclick="openBackupModal()">&#128190;</button>
             <button class="copy-data-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
@@ -1499,7 +1487,7 @@
             <span id="syncIndicator" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>
             <button class="icon-btn" title="Refresh dati" onclick="_manualRefresh()" style="font-size:14px">&#8635;</button>
             <button class="icon-btn" title="Ricarica app (forza aggiornamento)" onclick="_hardReload()" style="font-size:14px">&#9889;</button>
-            <button class="theme-toggle" onclick="toggleTheme()"></button>
+            <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Tema chiaro/scuro" style="font-size:18px"></button>
         </div>
     </div>
 
@@ -2793,12 +2781,18 @@ function init() {
         restoreNavState();
     }
     if (safeGetItem('pb_theme') === 'dark') document.body.classList.add('dark');
+    updateThemeIcon();
     render();
 }
 
 function toggleTheme() {
     document.body.classList.toggle('dark');
     safeSetItem('pb_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    updateThemeIcon();
+}
+function updateThemeIcon() {
+    var btn = document.getElementById('themeToggleBtn');
+    if (btn) btn.innerHTML = document.body.classList.contains('dark') ? '&#9728;' : '&#9790;';
 }
 
 // ========== NAVIGATION ==========
@@ -4660,8 +4654,10 @@ function renderHeader() {
     const addBtn = document.getElementById('addBtn');
 
     if (state.currentView === 'global') {
-        bc.innerHTML = '<span>ADT Esports</span>';
-        title.innerHTML = 'Project Command Center <span id="header-xp" style="display:inline-block;vertical-align:middle;margin-left:12px;">' + renderXPBarInline() + '</span>';
+        var _h = new Date().getHours();
+        var _greet = _h < 12 ? 'Buongiorno' : (_h < 18 ? 'Buon pomeriggio' : 'Buonasera');
+        bc.innerHTML = '<span>' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}) + '</span>';
+        title.innerHTML = _greet + ', Mattia';
         desc.textContent = '';
         addBtn.textContent = '+ Progetto';
     } else {
@@ -5054,9 +5050,16 @@ function renderGlobal() {
             <div class="project-card-stat"><span class="project-card-stat-label">Completate</span><span class="project-card-stat-value" style="color:${completionColor(pct)}">${doneCount}</span></div>
             <div class="project-card-stat"><span class="project-card-stat-label">Avanzamento</span><span class="project-card-stat-value" style="color:${completionColor(pct)}">${pct}%</span></div>
         </div>`;
-        // Mini-timeline
-        html += renderMiniTimeline(p, tasks);
-        html += `<div class="project-card-progress"><div class="project-card-progress-bar" style="width:${pct}%;background:${completionColor(pct)}"></div></div>`;
+        // Progress bar multi-colore (stile dettaglio progetto)
+        var _inProg = tasks.filter(t => t.status === 'in_progress').length;
+        var _blocked = tasks.filter(t => t.status === 'blocked').length;
+        var _todo = tasks.filter(t => t.status === 'todo').length;
+        var _total = tasks.length || 1;
+        html += `<div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:10px;display:flex">`;
+        if (doneCount > 0) html += `<div style="width:${doneCount/_total*100}%;background:var(--green);transition:width 0.3s"></div>`;
+        if (_inProg > 0) html += `<div style="width:${_inProg/_total*100}%;background:var(--yellow);transition:width 0.3s"></div>`;
+        if (_blocked > 0) html += `<div style="width:${_blocked/_total*100}%;background:var(--red);transition:width 0.3s"></div>`;
+        html += `</div>`;
         html += `<div class="project-card-footer">
             <div class="project-card-avatars">${assignees.slice(0,5).map(a => {
                 const m = getTeamMember(a);
