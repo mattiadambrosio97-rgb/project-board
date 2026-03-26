@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T13:26:46.671Z",
+  "publishedAt": "2026-03-26T13:37:14.087Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -457,7 +457,7 @@
           "id": "id_1774522152441_weslvk",
           "title": "Approvare budget Ads Q2 (3000/mese)",
           "assignee": "Alberto",
-          "status": "todo",
+          "status": "da_verificare",
           "priority": "p0",
           "dependsOn": [],
           "dueDate": "2026-03-27",
@@ -477,7 +477,26 @@
           "completedAt": null,
           "recurrence": null,
           "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse.",
-          "ceoNote": "Devi confermare il budget di 3.000 EUR/mese per le campagne Meta Q2. Mattia ha preparato il report con i risultati Q1 (ROAS 2.8x). Leggi il report e comunicagli il tuo ok."
+          "ceoNote": "Devi confermare il budget di 3.000 EUR/mese per le campagne Meta Q2. Mattia ha preparato il report con i risultati Q1 (ROAS 2.8x). Leggi il report e comunicagli il tuo ok.",
+          "ceoUpdates": [
+            {
+              "type": "update",
+              "note": "Cosa devo fare non ho capito",
+              "at": "2026-03-26T12:46:00.834Z"
+            },
+            {
+              "type": "complete",
+              "note": "Devi fare x e y",
+              "at": "2026-03-26T13:36:23.959Z"
+            }
+          ],
+          "ceoCompletedAt": "2026-03-26T13:36:23.959Z",
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Rimessa in lavorazione dal COO (era da verificare)"
+            }
+          ]
         }
       ]
     },
@@ -911,7 +930,32 @@
           "completedAt": null,
           "recurrence": null,
           "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi.",
-          "ceoNote": "Registra il video introduttivo del Videocorso F1 Esports (3-5 minuti). Lo script e gia pronto nella cartella Drive condivisa. Kevin lo montera appena glielo mandi. Serve entro venerdi."
+          "ceoNote": "Registra il video introduttivo del Videocorso F1 Esports (3-5 minuti). Lo script e gia pronto nella cartella Drive condivisa. Kevin lo montera appena glielo mandi. Serve entro venerdi.",
+          "ceoHasUpdate": false,
+          "ceoUpdates": [
+            {
+              "type": "update",
+              "note": "Cosa faccio qui?",
+              "at": "2026-03-26T13:27:40.489Z"
+            },
+            {
+              "type": "update",
+              "note": "Cosa faccio qui?",
+              "at": "2026-03-26T13:27:41.252Z"
+            }
+          ],
+          "cooResponses": [
+            {
+              "note": "devi fare x e y",
+              "at": "2026-03-26T13:37:06.039Z"
+            }
+          ],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Risposta inviata ad Alberto: devi fare x e y"
+            }
+          ]
         },
         {
           "id": "id_1774522152441_cnriu6",
