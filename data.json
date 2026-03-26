@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T19:46:42.296Z",
+  "publishedAt": "2026-03-26T19:47:22.826Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -53,7 +53,7 @@
           "id": "task_copy_review",
           "title": "Revisionare copy ads (3 varianti)",
           "assignee": "Alberto",
-          "status": "todo",
+          "status": "done",
           "dueDate": "2026-03-28",
           "ceoNote": "Ho preparato 3 varianti di copy per le ads. Leggile e dimmi quale preferisci o se vuoi modifiche.",
           "tags": [
@@ -67,10 +67,14 @@
             {
               "date": "2026-03-26",
               "text": "Rimessa in lavorazione dal COO: Vedi anche la variante 4 però"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Completata dal COO (da popup risposte Alberto)"
             }
           ],
           "createdAt": 1774534628500,
-          "completedAt": null,
+          "completedAt": "2026-03-26T19:47:22.825Z",
           "recurrence": null,
           "nextCheck": "",
           "doneWhen": "Alberto sceglie una variante",
@@ -95,7 +99,7 @@
               "at": "2026-03-26T14:25:17.613Z"
             }
           ],
-          "ceoHasUpdate": true
+          "ceoHasUpdate": false
         },
         {
           "id": "task_landing",
