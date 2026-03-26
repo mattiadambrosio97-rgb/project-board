@@ -1892,13 +1892,20 @@ function getLaunchStatus(l) {
 function openLaunchModal(launchId) {
     var launches = getLaunches();
     var isNew = !launchId;
-    var launch = isNew ? { id: 'ln_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name: '', startDate: '', endDate: '', projectId: '', notes: '' } : launches.find(function(l) { return l.id === launchId; });
+    var launch = isNew ? { id: 'ln_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), name: '', brand: '', startDate: '', endDate: '', projectId: '', notes: '' } : launches.find(function(l) { return l.id === launchId; });
     if (!launch) return;
     var projects = getProjects();
 
     var modal = document.getElementById('taskModalInner');
     var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
     html += '<input class="modal-title-input" id="lnName" placeholder="Nome lancio..." value="' + esc(launch.name) + '">';
+
+    var LAUNCH_BRANDS = ['ADT', 'USR', 'ComeUnaVolta', 'Camp'];
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Brand</span>';
+    html += '<select class="modal-select" id="lnBrand">';
+    html += '<option value="">— Seleziona brand —</option>';
+    LAUNCH_BRANDS.forEach(function(b) { html += '<option value="' + b + '"' + ((launch.brand || '') === b ? ' selected' : '') + '>' + b + '</option>'; });
+    html += '</select></div>';
 
     html += '<div class="modal-row" style="margin-top:14px">';
     html += '<div class="modal-field"><span class="modal-label">Data inizio</span><input class="modal-input" type="date" id="lnStart" value="' + (launch.startDate || '') + '" onclick="this.showPicker()" style="cursor:pointer"></div>';
@@ -1930,6 +1937,7 @@ function saveLaunch(id, isNew) {
     var data = {
         id: id,
         name: document.getElementById('lnName').value.trim(),
+        brand: document.getElementById('lnBrand').value,
         startDate: document.getElementById('lnStart').value,
         endDate: document.getElementById('lnEnd').value,
         projectId: document.getElementById('lnProject').value,
@@ -1963,6 +1971,19 @@ function renderLaunchesSection() {
         return (a.startDate || '').localeCompare(b.startDate || '');
     });
 
+    // Raggruppa per brand
+    var brandOrder = ['ADT', 'USR', 'ComeUnaVolta', 'Camp'];
+    var brandColors = { ADT: 'var(--accent)', USR: 'var(--blue)', ComeUnaVolta: 'var(--purple)', Camp: 'var(--teal)' };
+    var grouped = {};
+    launches.forEach(function(l) {
+        var b = l.brand || 'Altro';
+        if (!grouped[b]) grouped[b] = [];
+        grouped[b].push(l);
+    });
+    // Ordina brand: prima quelli noti, poi "Altro"
+    var brandKeys = brandOrder.filter(function(b) { return grouped[b]; });
+    Object.keys(grouped).forEach(function(b) { if (brandKeys.indexOf(b) === -1) brandKeys.push(b); });
+
     var html = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:20px">';
     html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
     html += '<div style="font-size:15px;font-weight:800;color:var(--text)">&#128640; Lanci Marketing</div>';
@@ -1973,27 +1994,40 @@ function renderLaunchesSection() {
         html += '<div style="font-size:13px;color:var(--text-muted);padding:8px 0">Nessun lancio programmato</div>';
     }
 
-    launches.forEach(function(l) {
-        var st = getLaunchStatus(l);
-        var stColor = st === 'live' ? 'var(--green)' : (st === 'planned' ? 'var(--blue)' : 'var(--text-muted)');
-        var stBg = st === 'live' ? 'var(--green-bg, #F0FDF4)' : (st === 'planned' ? 'var(--blue-bg, #EFF6FF)' : 'var(--bg)');
-        var stLabel = st === 'live' ? 'IN CORSO' : (st === 'planned' ? 'PROGRAMMATO' : 'CONCLUSO');
-        var proj = l.projectId ? getProjects().find(function(p) { return p.id === l.projectId; }) : null;
+    brandKeys.forEach(function(brand) {
+        var brandLaunches = grouped[brand];
+        var bColor = brandColors[brand] || 'var(--slate)';
+        // Brand header
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-top:10px;margin-bottom:6px">';
+        html += '<div style="width:4px;height:18px;border-radius:2px;background:' + bColor + '"></div>';
+        html += '<span style="font-size:13px;font-weight:800;color:' + bColor + ';text-transform:uppercase;letter-spacing:0.5px">' + esc(brand) + '</span>';
+        html += '<div style="flex:1;height:1px;background:var(--border-light)"></div>';
+        html += '</div>';
 
-        html += '<div style="background:' + stBg + ';border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer" onclick="openLaunchModal(\'' + l.id + '\')">';
-        html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0">' + esc(l.name) + '</div>';
-        html += '<span style="font-size:10px;font-weight:800;color:' + stColor + ';background:var(--surface);border:1px solid ' + stColor + ';border-radius:6px;padding:3px 8px;flex-shrink:0">' + stLabel + '</span>';
-        html += '</div>';
-        html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">';
-        if (l.startDate && l.endDate) {
-            html += smartDate(l.startDate) + ' — ' + smartDate(l.endDate);
-        } else if (l.startDate) {
-            html += 'Dal ' + smartDate(l.startDate);
-        }
-        if (proj) html += ' &middot; ' + esc(proj.name);
-        html += '</div>';
-        html += '</div>';
+        brandLaunches.forEach(function(l) {
+            var st = getLaunchStatus(l);
+            var stColor = st === 'live' ? 'var(--green)' : (st === 'planned' ? 'var(--blue)' : 'var(--text-muted)');
+            var stBg = st === 'live' ? 'var(--green-bg, #F0FDF4)' : (st === 'planned' ? 'var(--blue-bg, #EFF6FF)' : 'var(--bg)');
+            var stLabel = st === 'live' ? 'IN CORSO' : (st === 'planned' ? 'PROGRAMMATO' : 'CONCLUSO');
+            var proj = l.projectId ? getProjects().find(function(p) { return p.id === l.projectId; }) : null;
+
+            html += '<div style="background:' + stBg + ';border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;cursor:pointer' + (st === 'live' ? ';border-left:3px solid var(--green)' : '') + '" onclick="openLaunchModal(\'' + l.id + '\')">';
+            html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+            html += '<div style="font-size:14px;font-weight:700;color:var(--text);flex:1;min-width:0">' + esc(l.name) + '</div>';
+            html += '<span style="font-size:10px;font-weight:800;color:' + stColor + ';background:var(--surface);border:1px solid ' + stColor + ';border-radius:6px;padding:3px 8px;flex-shrink:0">' + stLabel + '</span>';
+            html += '</div>';
+            html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">';
+            if (l.startDate && l.endDate) {
+                var sd = new Date(l.startDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                var ed = new Date(l.endDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                html += sd + ' — ' + ed;
+            } else if (l.startDate) {
+                html += 'Dal ' + smartDate(l.startDate);
+            }
+            if (proj) html += ' &middot; ' + esc(proj.name);
+            html += '</div>';
+            html += '</div>';
+        });
     });
 
     html += '</div>';
@@ -2135,7 +2169,7 @@ function renderCEOHome() {
     if (overdueCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Scadute</div></div>';
     html += '</div>';
 
-    // ========== LANCI MARKETING (CEO) ==========
+    // ========== LANCI MARKETING (CEO) — raggruppati per brand ==========
     var launches = getLaunches();
     var activeLaunches = launches.filter(function(l) { var s = getLaunchStatus(l); return s === 'live' || s === 'planned'; });
     if (activeLaunches.length > 0) {
@@ -2144,31 +2178,54 @@ function renderCEOHome() {
             if (sa !== sb) return sa - sb;
             return (a.startDate || '').localeCompare(b.startDate || '');
         });
+        // Raggruppa per brand
+        var ceoBrandOrder = ['ADT', 'USR', 'ComeUnaVolta', 'Camp'];
+        var ceoBrandColors = { ADT: 'var(--accent)', USR: 'var(--blue)', ComeUnaVolta: 'var(--purple)', Camp: 'var(--teal)' };
+        var ceoGrouped = {};
+        activeLaunches.forEach(function(l) {
+            var b = l.brand || 'Altro';
+            if (!ceoGrouped[b]) ceoGrouped[b] = [];
+            ceoGrouped[b].push(l);
+        });
+        var ceoBrandKeys = ceoBrandOrder.filter(function(b) { return ceoGrouped[b]; });
+        Object.keys(ceoGrouped).forEach(function(b) { if (ceoBrandKeys.indexOf(b) === -1) ceoBrandKeys.push(b); });
+
         html += '<div style="margin-bottom:24px">';
         html += '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:10px">&#128640; Lanci Marketing</div>';
-        activeLaunches.forEach(function(l) {
-            var st = getLaunchStatus(l);
-            var isLive = st === 'live';
-            var borderColor = isLive ? 'var(--green)' : 'var(--border)';
-            var bgColor = isLive ? 'var(--green-bg, #F0FDF4)' : 'var(--surface)';
-            var stLabel = isLive ? 'IN CORSO' : 'PROGRAMMATO';
-            var stColor = isLive ? 'var(--green)' : 'var(--blue)';
-            var proj = l.projectId ? getProjects().find(function(p) { return p.id === l.projectId; }) : null;
 
-            html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px' + (isLive ? ';border-left:4px solid var(--green)' : '') + '">';
-            html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
-            html += '<span style="font-size:15px;font-weight:700;color:var(--text)">' + esc(l.name) + '</span>';
-            html += '<span style="font-size:10px;font-weight:800;color:' + stColor + ';border:1px solid ' + stColor + ';border-radius:6px;padding:2px 8px;flex-shrink:0">' + stLabel + '</span>';
+        ceoBrandKeys.forEach(function(brand) {
+            var bColor = ceoBrandColors[brand] || 'var(--slate)';
+            // Brand header
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-top:8px;margin-bottom:6px">';
+            html += '<div style="width:4px;height:16px;border-radius:2px;background:' + bColor + '"></div>';
+            html += '<span style="font-size:12px;font-weight:800;color:' + bColor + ';text-transform:uppercase;letter-spacing:0.5px">' + esc(brand) + '</span>';
+            html += '<div style="flex:1;height:1px;background:var(--border-light)"></div>';
             html += '</div>';
-            html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">';
-            if (l.startDate && l.endDate) {
-                var sd = new Date(l.startDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
-                var ed = new Date(l.endDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
-                html += sd + ' — ' + ed;
-            }
-            if (proj) html += ' &middot; ' + esc(proj.name);
-            html += '</div>';
-            html += '</div>';
+
+            ceoGrouped[brand].forEach(function(l) {
+                var st = getLaunchStatus(l);
+                var isLive = st === 'live';
+                var borderColor = isLive ? 'var(--green)' : 'var(--border)';
+                var bgColor = isLive ? 'var(--green-bg, #F0FDF4)' : 'var(--surface)';
+                var stLabel = isLive ? 'IN CORSO' : 'PROGRAMMATO';
+                var stColor = isLive ? 'var(--green)' : 'var(--blue)';
+                var proj = l.projectId ? getProjects().find(function(p) { return p.id === l.projectId; }) : null;
+
+                html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:10px;padding:12px 14px;margin-bottom:8px' + (isLive ? ';border-left:4px solid var(--green)' : '') + '">';
+                html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px">';
+                html += '<span style="font-size:15px;font-weight:700;color:var(--text)">' + esc(l.name) + '</span>';
+                html += '<span style="font-size:10px;font-weight:800;color:' + stColor + ';border:1px solid ' + stColor + ';border-radius:6px;padding:2px 8px;flex-shrink:0">' + stLabel + '</span>';
+                html += '</div>';
+                html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">';
+                if (l.startDate && l.endDate) {
+                    var sd = new Date(l.startDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                    var ed = new Date(l.endDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                    html += sd + ' — ' + ed;
+                }
+                if (proj) html += ' &middot; ' + esc(proj.name);
+                html += '</div>';
+                html += '</div>';
+            });
         });
         html += '</div>';
     }
@@ -2850,6 +2907,21 @@ function renderGlobal() {
             <span class="project-card-name">${esc(p.name)} <span class="health-emoji">${projectHealthEmoji(p)}</span></span>
             <span class="status-badge status-${p.status}" style="font-size:10px;padding:2px 8px;">${p.status.replace('-',' ')}</span>
         </div>`;
+        // Scadenza progetto — prominente
+        if (p.launchDate) {
+            const dLeft = daysDiff(p.launchDate);
+            const isOverdue = dLeft < 0;
+            const isUrgent = dLeft >= 0 && dLeft <= 14;
+            const dlColor = isOverdue ? 'var(--red)' : (isUrgent ? 'var(--orange)' : 'var(--green)');
+            const dlBg = isOverdue ? 'var(--red-bg)' : (isUrgent ? 'var(--orange-bg)' : 'var(--green-bg)');
+            const dlDateFmt = new Date(p.launchDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'long'});
+            const dlLabel = isOverdue ? `Scaduto da ${Math.abs(dLeft)}g` : (dLeft === 0 ? 'OGGI' : `${dLeft}g`);
+            html += `<div style="display:flex;align-items:center;gap:8px;margin:8px 0;padding:6px 10px;background:${dlBg};border-radius:8px;border:1px solid ${dlColor}20">
+                <span style="font-size:16px">&#127937;</span>
+                <span style="font-size:14px;font-weight:700;color:${dlColor}">${dlDateFmt}</span>
+                <span style="font-size:11px;font-weight:800;color:${dlColor};margin-left:auto;background:var(--surface);border:1px solid ${dlColor};border-radius:5px;padding:1px 7px">${dlLabel}</span>
+            </div>`;
+        }
         html += `<div class="project-card-stats">
             <div class="project-card-stat"><span class="project-card-stat-label">Task</span><span class="project-card-stat-value">${tasks.length}</span></div>
             <div class="project-card-stat"><span class="project-card-stat-label">Completate</span><span class="project-card-stat-value" style="color:${completionColor(pct)}">${doneCount}</span></div>
