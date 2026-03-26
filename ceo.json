@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T20:58:56.920Z",
+  "lastUpdate": "2026-03-26T21:07:29.652Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -118,6 +118,14 @@
         {
           "note": "Anticipiamo di 5gg",
           "at": "2026-03-26T20:58:56.919Z"
+        }
+      ]
+    },
+    "proj_webinar_apr": {
+      "notes": [
+        {
+          "note": "Qui come siamo messi",
+          "at": "2026-03-26T21:07:29.652Z"
         }
       ]
     }
