@@ -2926,13 +2926,14 @@ function ceoTaskAction(taskId, projectId, actionType) {
     });
 }
 
-function ceoPushActions(callback) {
+function ceoPushActions(callback, retryCount) {
     var token = safeGetItem('pb_gh_token_ceo');
     if (!token) {
         _showCeoOnboarding();
         callback(false);
         return;
     }
+    retryCount = retryCount || 0;
 
     if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
     _ceoActions.lastUpdate = new Date().toISOString();
@@ -2955,12 +2956,16 @@ function ceoPushActions(callback) {
         if (r.ok) {
             callback(true);
         } else {
-            r.json().then(function(err) {
+            return r.json().then(function(err) {
                 if (err.message && err.message.indexOf('Bad credentials') !== -1) {
                     safeSetItem('pb_gh_token_ceo', '');
                     _showCeoOnboarding();
+                    callback(false);
+                } else if (err.message && err.message.indexOf('does not match') !== -1 && retryCount < 3) {
+                    setTimeout(function() { ceoPushActions(callback, retryCount + 1); }, 1000);
+                } else {
+                    callback(false);
                 }
-                callback(false);
             });
         }
     }).catch(function() { callback(false); });
@@ -3505,12 +3510,13 @@ function _cooOnboardSubmit() {
     });
 }
 
-function publishForCEO() {
+function publishForCEO(retryCount) {
     var token = getGHToken();
     if (!token) {
         _showCooOnboarding(function() { publishForCEO(); });
         return;
     }
+    retryCount = retryCount || 0;
 
     var data = {
         publishedAt: new Date().toISOString(),
@@ -3521,6 +3527,8 @@ function publishForCEO() {
         resources: getResources()
     };
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+    _showToast('Pubblicazione in corso...');
 
     // Get current file SHA (needed for update)
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
@@ -3547,10 +3555,14 @@ function publishForCEO() {
             _updateSyncIndicator();
             _showToast('Pubblicato per il CEO!');
         } else {
-            r.json().then(function(err) {
+            return r.json().then(function(err) {
                 if (err.message && err.message.indexOf('Bad credentials') !== -1) {
                     setGHToken('');
                     _showCooOnboarding(function() { publishForCEO(); });
+                } else if (err.message && err.message.indexOf('does not match') !== -1 && retryCount < 3) {
+                    // SHA conflict — retry with fresh SHA
+                    _showToast('Conflitto SHA, riprovo...');
+                    setTimeout(function() { publishForCEO(retryCount + 1); }, 1000);
                 } else {
                     _showToast('Errore: ' + (err.message || 'sconosciuto'), true);
                 }
