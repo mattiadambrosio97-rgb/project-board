@@ -2490,7 +2490,7 @@ function renderCEOHome() {
         html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Aggiornato: ' + pubDate.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) + '</div>';
     }
     html += '</div>';
-    html += '<button onclick="ceoToggleTheme()" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;width:42px;height:42px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
+    html += '<button onclick="ceoToggleTheme()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:42px;height:42px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
     html += '</div>';
 
     // Quick stats bar
