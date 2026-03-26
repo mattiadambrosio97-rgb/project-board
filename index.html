@@ -1436,6 +1436,7 @@
             <button class="add-btn" id="addBtn" onclick="handleAdd()">+ Nuovo</button>
             <button class="icon-btn" title="Backup" onclick="openBackupModal()">&#128190;</button>
             <button class="copy-data-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
+            <button class="icon-btn" title="Anteprima CEO" onclick="previewCEO()">&#128065;</button>
             <button class="copy-data-btn" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
             <button class="theme-toggle" onclick="toggleTheme()"></button>
         </div>
@@ -1900,8 +1901,8 @@ function openLaunchModal(launchId) {
     html += '<input class="modal-title-input" id="lnName" placeholder="Nome lancio..." value="' + esc(launch.name) + '">';
 
     html += '<div class="modal-row" style="margin-top:14px">';
-    html += '<div class="modal-field"><span class="modal-label">Data inizio</span><input class="modal-input" type="date" id="lnStart" value="' + (launch.startDate || '') + '"></div>';
-    html += '<div class="modal-field"><span class="modal-label">Data fine</span><input class="modal-input" type="date" id="lnEnd" value="' + (launch.endDate || '') + '"></div>';
+    html += '<div class="modal-field"><span class="modal-label">Data inizio</span><input class="modal-input" type="date" id="lnStart" value="' + (launch.startDate || '') + '" onclick="this.showPicker()" style="cursor:pointer"></div>';
+    html += '<div class="modal-field"><span class="modal-label">Data fine</span><input class="modal-input" type="date" id="lnEnd" value="' + (launch.endDate || '') + '" onclick="this.showPicker()" style="cursor:pointer"></div>';
     html += '</div>';
 
     html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Progetto collegato</span>';
@@ -2061,6 +2062,21 @@ function handleAdd() {
 // ========== CEO MODE ==========
 var CEO_MODE = new URLSearchParams(window.location.search).get('ceo') === '1';
 
+var _ceoPreview = false; // preview mode from COO
+function previewCEO() {
+    _ceoPreview = true;
+    // In preview, use local data directly
+    _ceoData = { publishedAt: new Date().toISOString(), projects: _origGetProjects(), team: _origGetTeam(), launches: getLaunches() };
+    document.getElementById('header').style.display = 'none';
+    renderCEOView();
+}
+function exitCEOPreview() {
+    _ceoPreview = false;
+    _ceoData = null;
+    document.getElementById('header').style.display = '';
+    render();
+}
+
 var _ceoOpenProject = null; // project ID aperto in CEO view
 
 function ceoGoHome() { _ceoOpenProject = null; renderCEOView(); }
@@ -2098,6 +2114,9 @@ function renderCEOHome() {
     // Header con theme toggle
     html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px">';
     html += '<div>';
+    if (_ceoPreview) {
+        html += '<button onclick="exitCEOPreview()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-bottom:8px">&#8592; Torna al COO</button>';
+    }
     html += '<div style="font-size:22px;font-weight:800;color:var(--text)">ADT Esports</div>';
     html += '<div style="font-size:13px;color:var(--text-muted);margin-top:2px">' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + '</div>';
     if (_ceoData && _ceoData.publishedAt) {
