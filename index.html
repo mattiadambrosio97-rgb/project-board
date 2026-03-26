@@ -6578,7 +6578,10 @@ function showDaVerificareTasks() {
             if (t.status === 'da_verificare') items.push({ ...t, projectName: p.name, projectId: p.id });
         });
     });
-    if (!items.length) return;
+    if (!items.length) {
+        document.getElementById('backupModal').classList.remove('open');
+        return;
+    }
     const modal = document.getElementById('backupModalInner');
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:6px;color:var(--teal)">Da verificare (${items.length})</div>`;
     html += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Alberto ha segnato queste task come completate. Conferma o rimetti in lavorazione.</div>`;
@@ -6601,32 +6604,34 @@ function showDaVerificareTasks() {
 }
 
 function confirmTask(taskId, projectId) {
-    const projects = getProjects();
-    const p = projects.find(pr => pr.id === projectId);
-    if (!p) return;
-    const t = (p.tasks||[]).find(tk => tk.id === taskId);
-    if (!t) return;
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) { _showToast('Progetto non trovato', true); return; }
+    var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
+    if (!t) { _showToast('Task non trovata', true); return; }
     t.status = 'done';
     t.completedAt = new Date().toISOString();
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Confermata dal COO (completata da Alberto)' });
     saveProjects(projects);
+    document.getElementById('backupModal').classList.remove('open');
+    _showToast('Task confermata!');
     render();
-    showDaVerificareTasks(); // refresh popup
 }
 
 function rejectTask(taskId, projectId) {
-    const projects = getProjects();
-    const p = projects.find(pr => pr.id === projectId);
-    if (!p) return;
-    const t = (p.tasks||[]).find(tk => tk.id === taskId);
-    if (!t) return;
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) { _showToast('Progetto non trovato', true); return; }
+    var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
+    if (!t) { _showToast('Task non trovata', true); return; }
     t.status = 'in_progress';
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO (era da verificare)' });
     saveProjects(projects);
+    document.getElementById('backupModal').classList.remove('open');
+    _showToast('Task rimessa in lavorazione');
     render();
-    showDaVerificareTasks(); // refresh popup
 }
 
 function showCheckPopup() {
