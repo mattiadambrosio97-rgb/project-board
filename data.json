@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T14:58:32.595Z",
+  "publishedAt": "2026-03-26T15:10:41.194Z",
   "projects": [
     {
       "id": "id_1774537096408_znd7t3",
@@ -1774,6 +1774,19 @@
           "recurrence": null,
           "note": ""
         }
+      ],
+      "ceoHasProjectNote": false,
+      "ceoProjectNotes": [
+        {
+          "note": "mOLTO BENE SPINGIAMO",
+          "at": "2026-03-26T15:10:28.074Z"
+        }
+      ],
+      "cooProjectResponses": [
+        {
+          "note": "Si lo stiamo facendo",
+          "at": "2026-03-26T15:10:41.194Z"
+        }
       ]
     },
     {
@@ -2027,9 +2040,9 @@
     {
       "id": "ln_s6",
       "name": "Lancio USR Setup Pack",
-      "brand": "GTF",
-      "startDate": "2026-04-08",
-      "endDate": "2026-04-11",
+      "brand": "USR",
+      "startDate": "2026-03-25",
+      "endDate": "2026-03-30",
       "projectId": "",
       "notes": ""
     },
