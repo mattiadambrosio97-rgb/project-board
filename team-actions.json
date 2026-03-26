@@ -38,8 +38,12 @@
       "task_t1_logo": {
         "updates": [],
         "status": "blocked"
+      },
+      "task_t6_locandina": {
+        "updates": [],
+        "status": "in_progress"
       }
     }
   },
-  "lastUpdate": "2026-03-26T22:59:07.353Z"
+  "lastUpdate": "2026-03-26T23:01:41.982Z"
 }
