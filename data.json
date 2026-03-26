@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T22:40:26.884Z",
+  "publishedAt": "2026-03-26T22:46:23.488Z",
   "projects": [
     {
       "id": "id_1774561315044_2num0g",
@@ -11,7 +11,7 @@
         {
           "id": "id_1774561331895_ggv8s3",
           "title": "wegewg",
-          "status": "in_progress",
+          "status": "done",
           "assignee": "Mattia",
           "dueDate": "2026-03-29",
           "estimateHours": 0,
@@ -25,11 +25,15 @@
           "dependsOn": [],
           "comments": [],
           "createdAt": 1774561335996,
-          "completedAt": null,
+          "completedAt": 1774565154596,
           "activityLog": [
             {
               "date": "2026-03-26",
               "text": "Stato cambiato in: In corso"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
             }
           ]
         },
@@ -80,7 +84,7 @@
         {
           "id": "id_1774564812015_ritklo",
           "title": "Landing 2",
-          "status": "todo",
+          "status": "blocked",
           "assignee": "Kevin",
           "dueDate": "",
           "estimateHours": 0,
@@ -94,8 +98,29 @@
           "dependsOn": [],
           "comments": [],
           "createdAt": 1774564818803,
-          "completedAt": null,
-          "activityLog": []
+          "completedAt": 1774565158364,
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: Completata"
+            }
+          ]
         }
       ]
     }
