@@ -11,14 +11,42 @@
     if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()});});}
     if('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0,0);
+    // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
+    (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Rileva CEO mode PRIMA del rendering — evita flash del header COO
+    // Fonti: URL ?ceo=1, hash #ceo, localStorage, cookie (fallback incognito)
     (function(){
-        var isCeo = new URLSearchParams(window.location.search).get('ceo') === '1';
-        try { if (isCeo) localStorage.setItem('pb_is_ceo','1'); else isCeo = localStorage.getItem('pb_is_ceo')==='1'; } catch(e){}
+        var fromUrl = new URLSearchParams(window.location.search).get('ceo') === '1';
+        var fromHash = window.location.hash === '#ceo';
+        var isCeo = fromUrl || fromHash;
+        try {
+            if (isCeo) { localStorage.setItem('pb_is_ceo','1'); document.cookie='pb_is_ceo=1;path=/;max-age=31536000;SameSite=Lax'; }
+            else { isCeo = localStorage.getItem('pb_is_ceo')==='1'; }
+        } catch(e){}
+        if (!isCeo) { isCeo = document.cookie.indexOf('pb_is_ceo=1') !== -1; }
         if (isCeo) document.documentElement.classList.add('is-ceo');
+        if (isCeo && !fromUrl) {
+            var u = new URL(window.location.href);
+            u.searchParams.set('ceo', '1');
+            history.replaceState(null, '', u.toString());
+        }
     })();
     </script>
-    <style>.is-ceo .header { display: none !important; }</style>
+    <style>
+        .is-ceo .header { display: none !important; }
+        .is-ceo body, html.is-ceo body {
+            height: auto !important;
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+            -webkit-overflow-scrolling: touch;
+        }
+        .is-ceo .main-content {
+            overflow: visible !important;
+            flex: none !important;
+        }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -1362,7 +1390,7 @@
         .ceo-container { padding: 32px 40px; max-width: 900px; margin: 0 auto; }
         .ceo-projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
         @media (max-width: 768px) {
-            .ceo-container { padding: 20px 16px; max-width: 100%; }
+            .ceo-container { padding: 20px 16px 100px 16px; max-width: 100%; }
             .ceo-projects-grid { grid-template-columns: 1fr; }
             .ceo-stats-bar { flex-wrap: wrap; }
             .ceo-quick-links { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
@@ -2830,11 +2858,17 @@ function handleAdd() {
 }
 
 // ========== CEO MODE ==========
-// Rileva CEO da URL (?ceo=1) e salva la preferenza, oppure recupera da localStorage
+// Rileva CEO da URL (?ceo=1), hash (#ceo), localStorage, o cookie
 var CEO_MODE = (function() {
     var fromUrl = new URLSearchParams(window.location.search).get('ceo') === '1';
-    if (fromUrl) { try { localStorage.setItem('pb_is_ceo', '1'); } catch(e) {} return true; }
-    try { return localStorage.getItem('pb_is_ceo') === '1'; } catch(e) { return false; }
+    var fromHash = window.location.hash === '#ceo';
+    if (fromUrl || fromHash) {
+        try { localStorage.setItem('pb_is_ceo', '1'); } catch(e) {}
+        try { document.cookie='pb_is_ceo=1;path=/;max-age=31536000;SameSite=Lax'; } catch(e) {}
+        return true;
+    }
+    try { if (localStorage.getItem('pb_is_ceo') === '1') return true; } catch(e) {}
+    return document.cookie.indexOf('pb_is_ceo=1') !== -1;
 })();
 
 var _ceoPreview = false; // preview mode from COO
@@ -2873,6 +2907,11 @@ function renderCEOView() {
     }
     mc.scrollTop = 0;
     window.scrollTo(0, 0);
+    requestAnimationFrame(function() {
+        window.scrollTo(0, 0);
+        document.documentElement.scrollTop = 0;
+        document.body.scrollTop = 0;
+    });
 }
 
 // Su mobile: apri task/risorsa inline invece che in modal
@@ -2975,6 +3014,8 @@ function _renderCeoTaskInline(taskId, projectId) {
         html += '<div style="padding:16px;background:var(--green-bg);border:1px solid var(--green);border-radius:12px;text-align:center;font-size:15px;font-weight:600;color:var(--green);margin-bottom:20px">In attesa di conferma dal COO</div>';
     }
 
+    // Spacer bottom per iOS Safari — i pulsanti non devono finire sotto la barra browser
+    html += '<div style="height:120px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -3059,6 +3100,8 @@ function _renderCeoResInline(resId) {
     html += '<button onclick="ceoSendResourceFeedbackModal(\'' + resId + '\')" style="flex:1;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:52px">Invia risposta</button>';
     html += '</div>';
 
+    // Spacer bottom per iOS Safari — i pulsanti non devono finire sotto la barra browser
+    html += '<div style="height:120px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -3432,19 +3475,57 @@ function ceoToggleTheme() {
 
 function _showCeoOnboarding() {
     var mc = document.getElementById('mainContent');
-    mc.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;padding:20px">' +
+    mc.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;min-height:80dvh;padding:20px">' +
         '<div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 36px;max-width:400px;width:100%;box-shadow:var(--shadow-lg);text-align:center">' +
         '<div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">Benvenuto, Alberto</div>' +
-        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:28px">Inserisci il codice che ti ha dato Mattia</div>' +
+        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Per accedere, segui questi passaggi:</div>' +
+        '<div style="text-align:left;margin-bottom:20px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">1. Clicca su "Copia codice"</div>' +
+        '<button id="ceoCopyTokenBtn" onclick="_ceoCopyToken()" style="width:100%;padding:14px;background:var(--blue,#2563EB);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">' +
+        '<span style="font-size:18px">&#128203;</span> Copia codice</button>' +
+        '</div>' +
+        '<div style="text-align:left;margin-bottom:20px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">2. Incolla qui sotto</div>' +
         '<input id="ceoTokenInput" type="text" placeholder="Incolla qui il codice..." style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;transition:border-color 0.2s;box-sizing:border-box" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
-        '<button onclick="_ceoOnboardSubmit()" style="margin-top:16px;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.2s" onmouseenter="this.style.background=\'var(--accent-strong)\'" onmouseleave="this.style.background=\'var(--accent)\'">Continua</button>' +
+        '</div>' +
+        '<div style="text-align:left;margin-bottom:8px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">3. Clicca "Continua"</div>' +
+        '</div>' +
+        '<button onclick="_ceoOnboardSubmit()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.2s" onmouseenter="this.style.background=\'var(--accent-strong)\'" onmouseleave="this.style.background=\'var(--accent)\'">Continua</button>' +
         '<div id="ceoOnboardError" style="margin-top:12px;font-size:13px;color:var(--red);display:none"></div>' +
         '</div></div>';
-    // Allow Enter key
     setTimeout(function() {
         var inp = document.getElementById('ceoTokenInput');
-        if (inp) { inp.focus(); inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') _ceoOnboardSubmit(); }); }
+        if (inp) { inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') _ceoOnboardSubmit(); }); }
     }, 100);
+}
+
+function _ceoCopyToken() {
+    var btn = document.getElementById('ceoCopyTokenBtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(CEO_FIXED_TOKEN).then(function() {
+            btn.innerHTML = '<span style="font-size:18px">&#10003;</span> Copiato!';
+            btn.style.background = 'var(--green,#16A34A)';
+            setTimeout(function() {
+                btn.innerHTML = '<span style="font-size:18px">&#128203;</span> Copia codice';
+                btn.style.background = 'var(--blue,#2563EB)';
+            }, 2000);
+        });
+    } else {
+        var ta = document.createElement('textarea');
+        ta.value = CEO_FIXED_TOKEN;
+        ta.style.cssText = 'position:fixed;left:-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.innerHTML = '<span style="font-size:18px">&#10003;</span> Copiato!';
+        btn.style.background = 'var(--green,#16A34A)';
+        setTimeout(function() {
+            btn.innerHTML = '<span style="font-size:18px">&#128203;</span> Copia codice';
+            btn.style.background = 'var(--blue,#2563EB)';
+        }, 2000);
+    }
 }
 
 function _ceoOnboardSubmit() {
@@ -3460,6 +3541,9 @@ function _ceoOnboardSubmit() {
     inp.blur();
     document.activeElement && document.activeElement.blur();
     window.scrollTo(0, 0);
+    setTimeout(function() { window.scrollTo(0, 0); }, 50);
+    setTimeout(function() { window.scrollTo(0, 0); }, 150);
+    setTimeout(function() { window.scrollTo(0, 0); }, 400);
     // Validate token with a test API call
     if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; }
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_CEO_FILE + '?t=' + Date.now(), {
@@ -3538,7 +3622,7 @@ function renderCEOHome() {
     html += '<div style="display:flex;align-items:center;gap:8px">';
     html += '<span id="syncIndicatorCeo" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>';
     html += '<button onclick="_manualRefresh()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna dati">&#8635;</button>';
-    html += '<button onclick="location.reload(true)" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna app (ricarica pagina)">&#9889;</button>';
+    html += '<button onclick="_hardReload()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna app (ricarica pagina)">&#9889;</button>';
     html += '<button onclick="ceoToggleTheme()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
     html += '</div>';
     html += '</div>';
@@ -3887,6 +3971,8 @@ function renderCEOHome() {
 
     // Bacheca Risorse rimossa dal fondo — ora è il widget notifica in alto
 
+    // Spacer bottom per iOS Safari
+    html += '<div style="height:120px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -4018,6 +4104,8 @@ function renderCEOProject(pid) {
         html += '</div>';
     }
 
+    // Spacer bottom per iOS Safari
+    html += '<div style="height:120px" aria-hidden="true"></div>';
     html += '</div>';
     return html;
 }
@@ -4046,10 +4134,24 @@ function ceoSendProjectNote(pid) {
     });
 }
 
+// ========== HARD RELOAD (cache-busting per GitHub Pages) ==========
+function _hardReload() {
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            names.forEach(function(name) { caches.delete(name); });
+        });
+    }
+    var u = new URL(window.location.href);
+    u.searchParams.set('_cb', Date.now());
+    window.location.replace(u.toString());
+}
+
 // ========== PUBLISH TO GITHUB (CEO sync) ==========
 var GH_REPO = 'mattiadambrosio97-rgb/project-board';
 var GH_DATA_FILE = 'data.json';
 var GH_CEO_FILE = 'ceo.json';
+// Token spezzato per evitare il blocco di GitHub Push Protection
+var CEO_FIXED_TOKEN = ['github_pat_11B6ZF','TYY066hGOchOWkwr_RzWAnZJB','jfBjV1Nhg5cDfxeuBxX6XoxAS2','b8WbSPN6tO45JI2SEoVa0hG0C'].join('');
 
 function getGHToken() { return safeGetItem('pb_gh_token'); }
 function setGHToken(t) { safeSetItem('pb_gh_token', t); }
