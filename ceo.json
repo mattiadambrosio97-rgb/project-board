@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T20:58:33.923Z",
+  "lastUpdate": "2026-03-26T20:58:40.910Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -58,6 +58,16 @@
           "type": "update",
           "note": "Fatto ho rivisto tutto",
           "at": "2026-03-26T20:58:33.922Z"
+        }
+      ]
+    },
+    "testB_1774558526794": {
+      "status": "complete",
+      "updates": [
+        {
+          "type": "complete",
+          "note": "",
+          "at": "2026-03-26T20:58:40.910Z"
         }
       ]
     }
