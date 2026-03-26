@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T13:24:25.023Z",
+  "publishedAt": "2026-03-26T13:26:46.671Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -174,7 +174,7 @@
           "id": "id_1774522152441_zf0809",
           "title": "Approvazione finale Alberto",
           "assignee": "Alberto",
-          "status": "blocked",
+          "status": "done",
           "priority": "p0",
           "dependsOn": [],
           "dueDate": "2026-03-28",
@@ -188,25 +188,22 @@
             }
           ],
           "createdAt": 1774090152440,
-          "completedAt": null,
+          "completedAt": "2026-03-26T13:26:45.777Z",
           "recurrence": null,
           "note": "Blocco: aspettiamo video finale",
           "ceoNote": "Serve la tua approvazione finale sul Lancio Setup Pack F1-26. Siamo in attesa del video di Kevin — appena arriva, dacci il via libera per partire.",
           "ceoUpdates": [
             {
-              "type": "update",
-              "note": "Non ho capito che cosa devo fare qui.",
-              "at": "2026-03-26T13:23:59.079Z"
-            },
+              "type": "complete",
+              "note": "Fatto contattato e va tutto bene",
+              "at": "2026-03-26T12:45:53.656Z"
+            }
+          ],
+          "ceoCompletedAt": "2026-03-26T12:45:53.656Z",
+          "activityLog": [
             {
-              "type": "update",
-              "note": "Non ho capito che cosa devo fare qui.",
-              "at": "2026-03-26T13:24:22.207Z"
-            },
-            {
-              "type": "update",
-              "note": "Non ho capito che cosa devo fare qui.",
-              "at": "2026-03-26T13:24:25.023Z"
+              "date": "2026-03-26",
+              "text": "Confermata dal COO (completata da Alberto)"
             }
           ]
         },
