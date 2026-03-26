@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T19:48:12.062Z",
+  "publishedAt": "2026-03-26T19:48:48.435Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -363,7 +363,7 @@
           "id": "task_piattaforma",
           "title": "Decidere piattaforma (Zoom vs YouTube Live)",
           "assignee": "Alberto",
-          "status": "blocked",
+          "status": "done",
           "dueDate": "2026-03-29",
           "ceoNote": "Zoom costa 40 euro/mese ma ha le breakout rooms. YouTube Live e gratis ma niente interazione diretta. Tu che preferisci?",
           "tags": [
@@ -377,10 +377,14 @@
             {
               "date": "2026-03-26",
               "text": "Risposta inviata ad Alberto: Ok zoom"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Confermata dal COO (completata da Alberto)"
             }
           ],
           "createdAt": 1774534628500,
-          "completedAt": null,
+          "completedAt": "2026-03-26T19:48:48.435Z",
           "recurrence": null,
           "nextCheck": "",
           "doneWhen": "Alberto sceglie la piattaforma",
@@ -392,14 +396,24 @@
               "type": "update",
               "note": "Io preferirei Zoom per le breakout rooms",
               "at": "2026-03-26T14:22:22.797Z"
+            },
+            {
+              "type": "complete",
+              "note": "",
+              "at": "2026-03-26T19:48:40.125Z"
             }
           ],
           "cooResponses": [
             {
               "note": "Ok zoom",
               "at": "2026-03-26T14:23:56.518Z"
+            },
+            {
+              "note": "[Task confermata]",
+              "at": "2026-03-26T19:48:48.435Z"
             }
-          ]
+          ],
+          "ceoCompletedAt": "2026-03-26T19:48:40.125Z"
         },
         {
           "id": "task_slide",
