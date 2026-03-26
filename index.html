@@ -13,11 +13,18 @@
     window.scrollTo(0,0);
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
-    // Rileva CEO mode PRIMA del rendering — evita flash del header COO
-    // Fonti: URL ?ceo=1, hash #ceo, localStorage, cookie (fallback incognito)
+    // Rileva CEO/COO mode PRIMA del rendering — evita flash
     (function(){
-        var fromUrl = new URLSearchParams(window.location.search).get('ceo') === '1';
+        var params = new URLSearchParams(window.location.search);
+        var forceCoo = params.get('coo') === '1';
+        var fromUrl = params.get('ceo') === '1';
         var fromHash = window.location.hash === '#ceo';
+        // ?coo=1 forza COO: pulisci stato CEO da localStorage/cookie
+        if (forceCoo) {
+            try { localStorage.removeItem('pb_is_ceo'); } catch(e){}
+            document.cookie='pb_is_ceo=;path=/;max-age=0';
+            return; // NON aggiungere is-ceo
+        }
         var isCeo = fromUrl || fromHash;
         try {
             if (isCeo) { localStorage.setItem('pb_is_ceo','1'); document.cookie='pb_is_ceo=1;path=/;max-age=31536000;SameSite=Lax'; }
@@ -2863,8 +2870,11 @@ function handleAdd() {
 
 // ========== CEO MODE ==========
 // Rileva CEO da URL (?ceo=1), hash (#ceo), localStorage, o cookie
+// ?coo=1 forza COO mode — ignora localStorage/cookie CEO
 var CEO_MODE = (function() {
-    var fromUrl = new URLSearchParams(window.location.search).get('ceo') === '1';
+    var params = new URLSearchParams(window.location.search);
+    if (params.get('coo') === '1') return false;
+    var fromUrl = params.get('ceo') === '1';
     var fromHash = window.location.hash === '#ceo';
     if (fromUrl || fromHash) {
         try { localStorage.setItem('pb_is_ceo', '1'); } catch(e) {}
