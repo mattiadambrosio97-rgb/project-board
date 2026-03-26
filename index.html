@@ -2862,14 +2862,28 @@ function ceoMarkResource(resId, action) {
 }
 
 function ceoResourceFeedback(resId) {
-    var note = prompt('Scrivi la tua risposta per il COO:');
-    if (!note || !note.trim()) return;
+    // Toggle campo di testo inline
+    var wrap = document.getElementById('ceoResFeedbackWrap_' + resId);
+    if (wrap) {
+        wrap.style.display = wrap.style.display === 'none' ? 'flex' : 'none';
+        if (wrap.style.display === 'flex') {
+            var input = document.getElementById('ceoResFeedbackInput_' + resId);
+            if (input) input.focus();
+        }
+        return;
+    }
+}
+
+function ceoSendResourceFeedback(resId) {
+    var input = document.getElementById('ceoResFeedbackInput_' + resId);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
     if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
     if (!_ceoActions.resourceActions[resId]) _ceoActions.resourceActions[resId] = {};
     var ra = _ceoActions.resourceActions[resId];
     if (!ra.feedback) ra.feedback = [];
-    ra.feedback.push({ note: note.trim(), at: new Date().toISOString() });
-    // Segnala anche come letto automaticamente
+    ra.feedback.push({ note: note, at: new Date().toISOString() });
     if (!ra.read) {
         ra.read = true;
         ra.readAt = new Date().toISOString();
@@ -3252,6 +3266,11 @@ function renderCEOHome() {
             }
             html += '<button onclick="event.stopPropagation();ceoResourceFeedback(\'' + res.id + '\')" style="flex:1;min-width:90px;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Rispondi al COO</button>';
             html += '</div>';
+            // Campo risposta inline (nascosto di default)
+            html += '<div id="ceoResFeedbackWrap_' + res.id + '" style="display:none;gap:6px;margin-top:8px" onclick="event.stopPropagation()">';
+            html += '<input id="ceoResFeedbackInput_' + res.id + '" type="text" placeholder="Scrivi la tua risposta..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')ceoSendResourceFeedback(\'' + res.id + '\')">';
+            html += '<button onclick="ceoSendResourceFeedback(\'' + res.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+            html += '</div>';
 
             html += '</div>';
             html += '</div>';
@@ -3618,6 +3637,7 @@ function _setCooAcked(taskId) { var a = _getCooAcked(); a[taskId] = new Date().t
 function _isCooAcked(taskId, ceoLatestAt) { var at = _getCooAcked()[taskId]; if (!at) return false; if (ceoLatestAt && new Date(ceoLatestAt) > new Date(at)) return false; return true; }
 function _clearCooAcked(taskId) { var a = _getCooAcked(); delete a[taskId]; safeSetItem('pb_coo_acked', JSON.stringify(a)); }
 function _autoPublishForCEO() { if (CEO_MODE || _ceoPreview) return; if (!getGHToken()) return; publishForCEO(); }
+function openTaskFromPopup(taskId, projectId) { document.getElementById('backupModal').classList.remove('open'); document.getElementById('backupModalInner').innerHTML = ''; setTimeout(function() { openTaskModal(taskId, projectId); }, 350); }
 
 function _showCooOnboarding(onSuccess) {
     var mc = document.getElementById('mainContent');
@@ -6845,7 +6865,7 @@ function showCeoUpdatedTasks() {
         html += '<button onclick="cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
         html += '</div>';
         html += '<button onclick="markDoneFromCeoPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-bottom:6px">Segna come completata</button>';
-        html += '<button onclick="document.getElementById(\'backupModal\').classList.remove(\'open\');setTimeout(function(){openTaskModal(\'' + t.id + '\',\'' + t.projectId + '\')},250)" style="width:100%;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Apri task completa</button>';
+        html += '<button onclick="openTaskFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Apri task completa</button>';
         html += '</div>';
     });
     html += '<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')">Chiudi</button></div>';
