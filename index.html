@@ -3650,6 +3650,32 @@ function _cooFetchCeoActions() {
                 }
             });
         });
+        // Aggiorna badge sommario sul rettangolo Bacheca
+        var summaryEl = document.getElementById('cooResBadgeSummary');
+        if (summaryEl) {
+            var readCount = 0;
+            var msgCount = 0;
+            var taskDoneCount = 0;
+            ress.forEach(function(r) {
+                var ra = (ceoActs.resourceActions && ceoActs.resourceActions[r.id]) || {};
+                if (ra.read) readCount++;
+                if (ra.feedback) msgCount += ra.feedback.length;
+            });
+            if (ceoActs.taskActions) {
+                Object.keys(ceoActs.taskActions).forEach(function(tid) {
+                    var ta = ceoActs.taskActions[tid];
+                    if (ta.updates && ta.updates.length > 0) taskDoneCount += ta.updates.length;
+                });
+            }
+            var parts = [];
+            if (msgCount > 0) parts.push(msgCount + ' rispost' + (msgCount === 1 ? 'a' : 'e'));
+            if (readCount > 0) parts.push(readCount + '/' + ress.length + ' lette');
+            if (taskDoneCount > 0) parts.push(taskDoneCount + ' aggiornament' + (taskDoneCount === 1 ? 'o' : 'i') + ' task');
+            if (parts.length > 0) {
+                summaryEl.innerHTML = '<span style="color:var(--blue);font-weight:700">' + parts.join(' &middot; ') + '</span>';
+            }
+        }
+
         // Also check task actions for ceo_done
         if (ceoActs.taskActions) {
             var projects = getProjects();
