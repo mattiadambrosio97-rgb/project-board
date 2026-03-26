@@ -42,8 +42,12 @@
       "task_t6_locandina": {
         "updates": [],
         "status": "in_progress"
+      },
+      "task_t3_template": {
+        "updates": [],
+        "status": "in_progress"
       }
     }
   },
-  "lastUpdate": "2026-03-26T23:01:41.982Z"
+  "lastUpdate": "2026-03-26T23:02:49.219Z"
 }
