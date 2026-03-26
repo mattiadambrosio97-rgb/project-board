@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T12:43:53.961Z",
+  "publishedAt": "2026-03-26T12:45:24.665Z",
   "projects": [
     {
       "id": "id_1774522152440_22g45z",
@@ -2095,21 +2095,6 @@
     }
   ],
   "resources": [
-    {
-      "id": "res_1774528768122_2zmf",
-      "title": "Aggiunta 13 39",
-      "type": "note",
-      "url": "wqrgqewrg",
-      "content": "ergergh",
-      "createdAt": "2026-03-26T12:39:32.866Z"
-    },
-    {
-      "id": "res_demo_001",
-      "title": "Analisi competitor SimRacing Academy (Q1 2026)",
-      "type": "note",
-      "content": "Ho analizzato i 5 competitor principali nel mercato SimRacing coaching EU.\n\n**Pure Driving School** — pricing aggressivo, 49€/mese membership. Puntano tutto su volumi.\n\n**Coach Dave Academy** — setup-focused, vendono pacchetti setup singoli (15-25€). No coaching 1-to-1.\n\n**SimGrid** — community-first, monetizzano con eventi e sponsor. Modello diverso dal nostro.\n\n**Driver61** — YouTube-first, funnel da contenuti gratuiti a corsi premium (297-497€). Molto forte su SEO.\n\n**Nessuno** ha un percorso strutturato pilota come il nostro. Questo è il vantaggio competitivo da comunicare nelle prossime campagne.\n\nLeggi tutto e dimmi se vuoi che approfondiamo qualcuno di questi.",
-      "createdAt": "2026-03-25T14:00:00.000Z"
-    },
     {
       "id": "res_demo_002",
       "title": "Video reference: come Coach Dave presenta i setup",
