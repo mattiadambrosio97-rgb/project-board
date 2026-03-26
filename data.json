@@ -1,1 +1,1862 @@
-{"publishedAt":"","projects":[],"team":[]}
+{
+  "publishedAt": "2026-03-26T08:26:54.984Z",
+  "projects": [
+    {
+      "id": "id_1774509286071_hsatnk",
+      "name": "Lancio Setup Pack F1-26",
+      "description": "Nuovo pacchetto setup per clienti F1. Lancio previsto Q2.",
+      "status": "attivo",
+      "launchDate": "2026-04-07",
+      "tasks": [
+        {
+          "id": "id_1774509286071_o5flar",
+          "title": "Definire lista setup inclusi nel pack",
+          "assignee": "Max",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-21",
+          "estimateHours": 3,
+          "tags": [
+            "setup",
+            "f1"
+          ],
+          "comments": [
+            {
+              "text": "Lista pronta, 12 setup selezionati",
+              "author": "Max",
+              "createdAt": 1774163686071
+            }
+          ],
+          "createdAt": 1773213286071,
+          "completedAt": 1774163686071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_l4987v",
+          "title": "Pricing e bundle con Alberto",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-23",
+          "estimateHours": 2,
+          "tags": [
+            "pricing"
+          ],
+          "comments": [],
+          "createdAt": 1773299686071,
+          "completedAt": 1774250086071,
+          "recurrence": null,
+          "note": "Prezzo finale: 197 EUR"
+        },
+        {
+          "id": "id_1774509286071_y5f8p8",
+          "title": "Creare landing page",
+          "assignee": "Mattia FS",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 8,
+          "tags": [
+            "landing",
+            "dev"
+          ],
+          "comments": [
+            {
+              "text": "Wireframe approvato",
+              "author": "Mattia",
+              "createdAt": 1774336486071
+            }
+          ],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Usare template USR come base"
+        },
+        {
+          "id": "id_1774509286071_h82ukf",
+          "title": "Scrivere copy email lancio (5 email)",
+          "assignee": "Mattia",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 6,
+          "tags": [
+            "copy",
+            "email"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_cbs54j",
+          "title": "Grafica social per lancio",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-02",
+          "estimateHours": 5,
+          "tags": [
+            "grafica",
+            "social"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "4 creativita IG + 2 storie"
+        },
+        {
+          "id": "id_1774509286071_otap1j",
+          "title": "Video presentazione pack",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-03",
+          "estimateHours": 6,
+          "tags": [
+            "video"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_9vz9l2",
+          "title": "Configurare checkout WooCommerce",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-04",
+          "estimateHours": 3,
+          "tags": [
+            "dev",
+            "woocommerce"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_3tp3o3",
+          "title": "Setup automazione post-acquisto Keap",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 3,
+          "tags": [
+            "keap",
+            "automazione"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_qjqs0j",
+          "title": "Approvazione finale Alberto",
+          "assignee": "Alberto",
+          "status": "blocked",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-28",
+          "estimateHours": 1,
+          "tags": [],
+          "comments": [
+            {
+              "text": "In attesa del video di Kevin",
+              "author": "Alberto",
+              "createdAt": 1774422886071
+            }
+          ],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Blocco: aspettiamo video finale"
+        },
+        {
+          "id": "id_1774509286071_eofer0",
+          "title": "Test funnel end-to-end",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-06",
+          "estimateHours": 2,
+          "tags": [
+            "test",
+            "funnel"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_oquul5",
+          "title": "Invio email lancio",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-07",
+          "estimateHours": 1,
+          "tags": [
+            "email",
+            "lancio"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_a1avq4",
+          "title": "Post lancio: monitoraggio e supporto",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-10",
+          "estimateHours": 4,
+          "tags": [
+            "supporto"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_eggpih",
+      "name": "Campagna Meta Ads Q2",
+      "description": "Nuove campagne Meta per Q2. Budget 3000 EUR/mese.",
+      "status": "attivo",
+      "launchDate": "2026-04-10",
+      "tasks": [
+        {
+          "id": "id_1774509286071_6271xu",
+          "title": "Analisi risultati Q1 e report",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-19",
+          "estimateHours": 4,
+          "tags": [
+            "analisi",
+            "meta"
+          ],
+          "comments": [
+            {
+              "text": "CPA medio 23 EUR, ROAS 2.8x",
+              "author": "Mattia",
+              "createdAt": 1773990886071
+            }
+          ],
+          "createdAt": 1772781286071,
+          "completedAt": 1773990886071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_dpnvq2",
+          "title": "Definire audience Q2",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-22",
+          "estimateHours": 3,
+          "tags": [
+            "audience",
+            "meta"
+          ],
+          "comments": [],
+          "createdAt": 1772954086071,
+          "completedAt": 1774250086071,
+          "recurrence": null,
+          "note": "LAL + interesse sim racing"
+        },
+        {
+          "id": "id_1774509286071_6o1o1h",
+          "title": "Brief creativo per Kevin",
+          "assignee": "Mattia",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 2,
+          "tags": [
+            "brief"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_z3l4u4",
+          "title": "Creare 6 creativita statiche",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-01",
+          "estimateHours": 8,
+          "tags": [
+            "grafica",
+            "ads"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_vou2wp",
+          "title": "Creare 3 video ads",
+          "assignee": "Kevin",
+          "status": "blocked",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-25",
+          "estimateHours": 10,
+          "tags": [
+            "video",
+            "ads"
+          ],
+          "comments": [
+            {
+              "text": "Serve footage da Daniele, non ancora ricevuto",
+              "author": "Kevin",
+              "createdAt": 1774422886071
+            }
+          ],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Bloccata: footage mancante"
+        },
+        {
+          "id": "id_1774509286071_wfmtyo",
+          "title": "Copy ads (10 varianti)",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 4,
+          "tags": [
+            "copy",
+            "ads"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_gvfwup",
+          "title": "Setup campagne su Meta Ads Manager",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 3,
+          "tags": [
+            "meta",
+            "setup"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_hvfsjo",
+          "title": "Monitoraggio settimanale performance",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-09",
+          "estimateHours": 2,
+          "tags": [
+            "monitoring"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": "weekly",
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_7510oc",
+          "title": "Ottimizzazione audience dopo 7gg",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-12",
+          "estimateHours": 2,
+          "tags": [
+            "ottimizzazione",
+            "meta"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_2tufld",
+      "name": "Ristrutturazione Funnel USR",
+      "description": "Rebuild completo del funnel di vendita USR.",
+      "status": "attivo",
+      "launchDate": "2026-05-05",
+      "tasks": [
+        {
+          "id": "id_1774509286071_vphn5c",
+          "title": "Mappatura funnel attuale",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-16",
+          "estimateHours": 3,
+          "tags": [
+            "analisi",
+            "funnel"
+          ],
+          "comments": [],
+          "createdAt": 1772349286071,
+          "completedAt": 1773645286071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_rrpzxf",
+          "title": "Identificare colli di bottiglia",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-18",
+          "estimateHours": 2,
+          "tags": [
+            "analisi"
+          ],
+          "comments": [
+            {
+              "text": "Drop-off 68% su checkout. Problema UX.",
+              "author": "Mattia",
+              "createdAt": 1773818086071
+            }
+          ],
+          "createdAt": 1772608486071,
+          "completedAt": 1773818086071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_maf1us",
+          "title": "Nuovo wireframe pagina di vendita",
+          "assignee": "Mattia",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 5,
+          "tags": [
+            "wireframe",
+            "ux"
+          ],
+          "comments": [],
+          "createdAt": 1773472486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_c93sh2",
+          "title": "Sviluppo nuova sales page",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-03",
+          "estimateHours": 12,
+          "tags": [
+            "dev",
+            "landing"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_tdxmty",
+          "title": "Nuovo copy pagina vendita",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-01",
+          "estimateHours": 6,
+          "tags": [
+            "copy"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_mgny2h",
+          "title": "Redesign checkout",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 6,
+          "tags": [
+            "dev",
+            "checkout"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_6dcymz",
+          "title": "Email sequence post-checkout",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-07",
+          "estimateHours": 4,
+          "tags": [
+            "email",
+            "automazione"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_ig1puc",
+          "title": "A/B test landing page",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-10",
+          "estimateHours": 3,
+          "tags": [
+            "test",
+            "ab"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_r4dgav",
+          "title": "Go-live e redirect old URLs",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-13",
+          "estimateHours": 2,
+          "tags": [
+            "deploy"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_vzbi6m",
+      "name": "Videocorso F1 Esports",
+      "description": "Produzione videocorso completo F1 Esports con Daniele.",
+      "status": "attivo",
+      "launchDate": "2026-05-20",
+      "tasks": [
+        {
+          "id": "id_1774509286071_nhd6lk",
+          "title": "Scaletta moduli e lezioni",
+          "assignee": "Daniele",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-14",
+          "estimateHours": 4,
+          "tags": [
+            "contenuto"
+          ],
+          "comments": [
+            {
+              "text": "15 moduli, 45 lezioni totali",
+              "author": "Daniele",
+              "createdAt": 1773558886071
+            }
+          ],
+          "createdAt": 1771917286071,
+          "completedAt": 1773558886071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_lgq66t",
+          "title": "Script lezioni modulo 1-5",
+          "assignee": "Daniele",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-18",
+          "estimateHours": 8,
+          "tags": [
+            "script"
+          ],
+          "comments": [],
+          "createdAt": 1772349286071,
+          "completedAt": 1773904486071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_3eyxr8",
+          "title": "Script lezioni modulo 6-10",
+          "assignee": "Daniele",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-29",
+          "estimateHours": 8,
+          "tags": [
+            "script"
+          ],
+          "comments": [],
+          "createdAt": 1773213286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_lixdju",
+          "title": "Registrazione moduli 1-5",
+          "assignee": "Daniele",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-30",
+          "estimateHours": 12,
+          "tags": [
+            "video",
+            "registrazione"
+          ],
+          "comments": [
+            {
+              "text": "3 moduli registrati, 2 da fare",
+              "author": "Daniele",
+              "createdAt": 1774336486071
+            }
+          ],
+          "createdAt": 1773472486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_xf9v68",
+          "title": "Registrazione moduli 6-10",
+          "assignee": "Daniele",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-09",
+          "estimateHours": 12,
+          "tags": [
+            "video",
+            "registrazione"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_sjpucj",
+          "title": "Editing video moduli 1-5",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 15,
+          "tags": [
+            "video",
+            "editing"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_9bgsga",
+          "title": "Grafica thumbnail e copertine",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-07",
+          "estimateHours": 4,
+          "tags": [
+            "grafica"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_rsehs3",
+          "title": "Setup area membri su WordPress",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-11",
+          "estimateHours": 6,
+          "tags": [
+            "dev",
+            "wordpress"
+          ],
+          "comments": [],
+          "createdAt": 1773990886071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_kpv1k6",
+          "title": "Caricamento e test video",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-15",
+          "estimateHours": 3,
+          "tags": [
+            "upload"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_qdeokc",
+          "title": "Landing page vendita corso",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-13",
+          "estimateHours": 6,
+          "tags": [
+            "landing",
+            "copy"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_fuacil",
+          "title": "Campagna lancio email",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-17",
+          "estimateHours": 4,
+          "tags": [
+            "email",
+            "lancio"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_daultg",
+      "name": "Programma Referral Piloti",
+      "description": "Sistema di referral per i piloti esistenti. Incentivi e tracking.",
+      "status": "attivo",
+      "launchDate": "2026-05-10",
+      "tasks": [
+        {
+          "id": "id_1774509286071_b9xzr4",
+          "title": "Definire meccanica referral",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-20",
+          "estimateHours": 2,
+          "tags": [
+            "strategia"
+          ],
+          "comments": [
+            {
+              "text": "30 EUR sconto per chi porta un amico, 20% per il referrer",
+              "author": "Mattia",
+              "createdAt": 1774077286071
+            }
+          ],
+          "createdAt": 1773213286071,
+          "completedAt": 1774077286071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_wmrd6r",
+          "title": "Discussione incentivi con Alberto",
+          "assignee": "Alberto",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-22",
+          "estimateHours": 1,
+          "tags": [
+            "meeting"
+          ],
+          "comments": [],
+          "createdAt": 1773472486071,
+          "completedAt": 1774163686071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_wc9aw6",
+          "title": "Comunicazione piloti Manlio",
+          "assignee": "Manlio",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 2,
+          "tags": [
+            "comunicazione"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Template WhatsApp da preparare"
+        },
+        {
+          "id": "id_1774509286071_4fuu39",
+          "title": "Setup codici sconto WooCommerce",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 3,
+          "tags": [
+            "dev",
+            "woocommerce"
+          ],
+          "comments": [],
+          "createdAt": 1773990886071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_sn50qg",
+          "title": "Automazione Keap: tag referral",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-02",
+          "estimateHours": 2,
+          "tags": [
+            "keap",
+            "automazione"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_s49lmx",
+          "title": "Email annuncio programma",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-04",
+          "estimateHours": 2,
+          "tags": [
+            "email"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_0c4pc7",
+          "title": "Dashboard tracking referral",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-07",
+          "estimateHours": 5,
+          "tags": [
+            "dev",
+            "dashboard"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_79pdk6",
+      "name": "Migrazione Tracking",
+      "description": "Migrazione GTM e tracking server-side su tutti i siti.",
+      "launchDate": "2026-04-13",
+      "status": "attivo",
+      "tasks": [
+        {
+          "id": "id_1774509286071_i4s81z",
+          "title": "Audit tracking attuale 8 siti",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-16",
+          "estimateHours": 6,
+          "tags": [
+            "audit",
+            "tracking"
+          ],
+          "comments": [
+            {
+              "text": "Completato. 3 siti con pixel rotto.",
+              "author": "Mattia",
+              "createdAt": 1773731686071
+            }
+          ],
+          "createdAt": 1772781286071,
+          "completedAt": 1773731686071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_b8w18g",
+          "title": "Setup Stape.io server container",
+          "assignee": "Mattia FS",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-20",
+          "estimateHours": 4,
+          "tags": [
+            "stape",
+            "server"
+          ],
+          "comments": [],
+          "createdAt": 1773213286071,
+          "completedAt": 1774077286071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_o8v8h0",
+          "title": "Migrazione metodoadt.com",
+          "assignee": "Mattia",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 4,
+          "tags": [
+            "gtm",
+            "migrazione"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_ip1rnp",
+          "title": "Migrazione usracing.it",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 4,
+          "tags": [
+            "gtm",
+            "migrazione"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_n0gv5m",
+          "title": "Migrazione altri 6 siti",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 12,
+          "tags": [
+            "gtm",
+            "migrazione"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_7b0cwy",
+          "title": "Setup CAPI Facebook server-side",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-03",
+          "estimateHours": 3,
+          "tags": [
+            "capi",
+            "meta"
+          ],
+          "comments": [],
+          "createdAt": 1773990886071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_irj9g0",
+          "title": "Validazione eventi con Tag Assistant",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-07",
+          "estimateHours": 3,
+          "tags": [
+            "test",
+            "validazione"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_8at4ym",
+          "title": "Report finale tracking migration",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-10",
+          "estimateHours": 2,
+          "tags": [
+            "report"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_vpldyk",
+      "name": "Automazioni Compleanni",
+      "description": "Email e sconti automatici per compleanni piloti.",
+      "status": "attivo",
+      "launchDate": "2026-03-25",
+      "tasks": [
+        {
+          "id": "id_1774509286071_us3iho",
+          "title": "Verificare campo data nascita Keap",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-18",
+          "estimateHours": 1,
+          "tags": [
+            "keap"
+          ],
+          "comments": [
+            {
+              "text": "Campo birthday presente, 2100 contatti compilati",
+              "author": "Mattia",
+              "createdAt": 1773904486071
+            }
+          ],
+          "createdAt": 1773213286071,
+          "completedAt": 1773904486071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_ssedhj",
+          "title": "Creare automazione Keap compleanno",
+          "assignee": "Mattia",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 3,
+          "tags": [
+            "keap",
+            "automazione"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_pg0fao",
+          "title": "Scrivere email compleanno",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-30",
+          "estimateHours": 2,
+          "tags": [
+            "copy",
+            "email"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Tono caldo, sconto 15% incluso"
+        },
+        {
+          "id": "id_1774509286071_a0nbsk",
+          "title": "Grafica email compleanno",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 2,
+          "tags": [
+            "grafica",
+            "email"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_jcg51c",
+          "title": "Creare coupon automatico WooCommerce",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-30",
+          "estimateHours": 3,
+          "tags": [
+            "dev",
+            "woocommerce"
+          ],
+          "comments": [],
+          "createdAt": 1773990886071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_me5ahp",
+          "title": "Connettere Keap + WooCommerce via Make",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-01",
+          "estimateHours": 2,
+          "tags": [
+            "make",
+            "integrazione"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_1z0qyw",
+          "title": "Test automazione con contatto fittizio",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-04-03",
+          "estimateHours": 1,
+          "tags": [
+            "test"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_1jx9ls",
+          "title": "Go-live automazione",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 1,
+          "tags": [
+            "deploy"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286071_zacuir",
+      "name": "Circolo Top Drivers",
+      "description": "Programma esclusivo per i top 20 piloti ADT. Contenuti premium.",
+      "status": "attivo",
+      "launchDate": "2026-04-17",
+      "tasks": [
+        {
+          "id": "id_1774509286071_8s0e37",
+          "title": "Selezionare top 20 piloti con Manlio",
+          "assignee": "Manlio",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-21",
+          "estimateHours": 2,
+          "tags": [
+            "selezione"
+          ],
+          "comments": [
+            {
+              "text": "Lista definita. 18 piloti confermati.",
+              "author": "Manlio",
+              "createdAt": 1774163686071
+            }
+          ],
+          "createdAt": 1773472486071,
+          "completedAt": 1774163686071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_q9kwhk",
+          "title": "Definire benefici Circolo",
+          "assignee": "Alberto",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-23",
+          "estimateHours": 2,
+          "tags": [
+            "strategia"
+          ],
+          "comments": [],
+          "createdAt": 1773645286071,
+          "completedAt": 1774250086071,
+          "recurrence": null,
+          "note": "Setup esclusivi, sessione 1:1 mensile, Discord VIP"
+        },
+        {
+          "id": "id_1774509286071_h1xv7n",
+          "title": "Creare canale Discord VIP",
+          "assignee": "Mattia FS",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 3,
+          "tags": [
+            "discord",
+            "dev"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_wswcb9",
+          "title": "Setup pack esclusivi mensili",
+          "assignee": "Max",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-30",
+          "estimateHours": 5,
+          "tags": [
+            "setup",
+            "contenuto"
+          ],
+          "comments": [],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": "monthly",
+          "note": ""
+        },
+        {
+          "id": "id_1774509286071_xh6cql",
+          "title": "Comunicazione invito piloti",
+          "assignee": "Manlio",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 2,
+          "tags": [
+            "comunicazione"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_txlc7k",
+          "title": "Email benvenuto Circolo",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-01",
+          "estimateHours": 2,
+          "tags": [
+            "email",
+            "copy"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_m9tef2",
+          "title": "Video presentazione Circolo (Alberto)",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-03",
+          "estimateHours": 4,
+          "tags": [
+            "video"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_l7l87w",
+          "title": "Prima sessione live con Daniele",
+          "assignee": "Daniele",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-07",
+          "estimateHours": 2,
+          "tags": [
+            "live",
+            "coaching"
+          ],
+          "comments": [],
+          "createdAt": 1774336486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286072_atrdhm",
+      "name": "Revisione Siti WordPress",
+      "description": "Controllo sicurezza, performance e plugin su tutti i siti WP.",
+      "status": "in-pausa",
+      "launchDate": "2026-03-23",
+      "tasks": [
+        {
+          "id": "id_1774509286072_2zlq5o",
+          "title": "Audit sicurezza 8 siti",
+          "assignee": "Mattia FS",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-14",
+          "estimateHours": 8,
+          "tags": [
+            "audit",
+            "sicurezza"
+          ],
+          "comments": [
+            {
+              "text": "2 plugin vulnerabili trovati",
+              "author": "Mattia FS",
+              "createdAt": 1773558886071
+            }
+          ],
+          "createdAt": 1772781286071,
+          "completedAt": 1773558886071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_jd8ttx",
+          "title": "Aggiornamento plugin critici",
+          "assignee": "Mattia FS",
+          "status": "done",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-18",
+          "estimateHours": 4,
+          "tags": [
+            "plugin",
+            "update"
+          ],
+          "comments": [],
+          "createdAt": 1773213286071,
+          "completedAt": 1773818086071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_3mco7j",
+          "title": "Ottimizzazione LiteSpeed Cache",
+          "assignee": "Mattia FS",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-21",
+          "estimateHours": 5,
+          "tags": [
+            "performance",
+            "litespeed"
+          ],
+          "comments": [],
+          "createdAt": 1773472486071,
+          "completedAt": 1774077286071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_ijuhzt",
+          "title": "Fix OPcache configurazione",
+          "assignee": "Mattia FS",
+          "status": "in_progress",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-24",
+          "estimateHours": 3,
+          "tags": [
+            "server",
+            "opcache"
+          ],
+          "comments": [],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_vf881t",
+          "title": "Pulizia database WP (transients, revisioni)",
+          "assignee": "Mattia FS",
+          "status": "blocked",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-25",
+          "estimateHours": 3,
+          "tags": [
+            "database",
+            "cleanup"
+          ],
+          "comments": [
+            {
+              "text": "Serve accesso SSH al server di produzione, ticket aperto con hosting",
+              "author": "Mattia FS",
+              "createdAt": 1774422886071
+            }
+          ],
+          "createdAt": 1773904486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Bloccata: accesso SSH pending"
+        },
+        {
+          "id": "id_1774509286072_kr4pyi",
+          "title": "Setup monitoring TTFB",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 2,
+          "tags": [
+            "monitoring",
+            "performance"
+          ],
+          "comments": [],
+          "createdAt": 1774077286071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_sa0wao",
+          "title": "Report performance mensile",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 2,
+          "tags": [
+            "report"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": "monthly",
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_lixu7u",
+          "title": "Implementare backup automatico giornaliero",
+          "assignee": "Mattia FS",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-03",
+          "estimateHours": 3,
+          "tags": [
+            "backup",
+            "server"
+          ],
+          "comments": [],
+          "createdAt": 1774336486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        }
+      ]
+    },
+    {
+      "id": "id_1774509286072_vbpw21",
+      "name": "Live Settimanale Ottaviani",
+      "description": "Dirette settimanali con Alessandro Ottaviani su YouTube/IG.",
+      "status": "in-pausa",
+      "launchDate": "2026-05-15",
+      "tasks": [
+        {
+          "id": "id_1774509286072_8o9qns",
+          "title": "Definire format e scaletta tipo",
+          "assignee": "Mattia",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-11",
+          "estimateHours": 2,
+          "tags": [
+            "format",
+            "live"
+          ],
+          "comments": [
+            {
+              "text": "Format: 30min Q&A + 15min hot lap analysis",
+              "author": "Mattia",
+              "createdAt": 1773299686071
+            }
+          ],
+          "createdAt": 1772349286071,
+          "completedAt": 1773299686071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_fdqp09",
+          "title": "Setup OBS e grafiche live",
+          "assignee": "Kevin",
+          "status": "done",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-16",
+          "estimateHours": 4,
+          "tags": [
+            "obs",
+            "grafica"
+          ],
+          "comments": [],
+          "createdAt": 1772781286071,
+          "completedAt": 1773645286071,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_75py4d",
+          "title": "Coordinamento con Alessandro",
+          "assignee": "Manlio",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-23",
+          "estimateHours": 1,
+          "tags": [
+            "coordinamento"
+          ],
+          "comments": [
+            {
+              "text": "Alessandro ha chiesto di spostare a maggio",
+              "author": "Manlio",
+              "createdAt": 1774336486071
+            }
+          ],
+          "createdAt": 1773472486071,
+          "completedAt": null,
+          "recurrence": null,
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_fch6ik",
+          "title": "Raccolta domande piloti settimanale",
+          "assignee": "Manlio",
+          "status": "blocked",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-24",
+          "estimateHours": 1,
+          "tags": [
+            "community"
+          ],
+          "comments": [
+            {
+              "text": "In pausa finche Alessandro non conferma",
+              "author": "Manlio",
+              "createdAt": 1774422886071
+            }
+          ],
+          "createdAt": 1773818086071,
+          "completedAt": null,
+          "recurrence": "weekly",
+          "note": "Bloccata: in attesa conferma Alessandro"
+        },
+        {
+          "id": "id_1774509286072_43iyex",
+          "title": "Promozione live sui canali social",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 1,
+          "tags": [
+            "social",
+            "promo"
+          ],
+          "comments": [],
+          "createdAt": 1773990886071,
+          "completedAt": null,
+          "recurrence": "weekly",
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_wj2dl2",
+          "title": "Post-produzione highlights",
+          "assignee": "Kevin",
+          "status": "todo",
+          "priority": "p2",
+          "dependsOn": [],
+          "dueDate": "2026-04-02",
+          "estimateHours": 3,
+          "tags": [
+            "video",
+            "editing"
+          ],
+          "comments": [],
+          "createdAt": 1774163686071,
+          "completedAt": null,
+          "recurrence": "weekly",
+          "note": ""
+        },
+        {
+          "id": "id_1774509286072_0fh1yz",
+          "title": "Analisi metriche engagement",
+          "assignee": "Mattia",
+          "status": "todo",
+          "priority": "p3",
+          "dependsOn": [],
+          "dueDate": "2026-04-05",
+          "estimateHours": 1,
+          "tags": [
+            "analytics"
+          ],
+          "comments": [],
+          "createdAt": 1774250086071,
+          "completedAt": null,
+          "recurrence": "monthly",
+          "note": ""
+        }
+      ]
+    }
+  ],
+  "team": [
+    {
+      "name": "Mattia",
+      "role": "COO / Marketing",
+      "hoursPerWeek": 40,
+      "color": "#0D9488"
+    },
+    {
+      "name": "Kevin",
+      "role": "Grafica & Video",
+      "hoursPerWeek": 30,
+      "color": "#3B7DD8"
+    },
+    {
+      "name": "Mattia FS",
+      "role": "Tech & Sviluppo",
+      "hoursPerWeek": 25,
+      "color": "#8B5CF6"
+    },
+    {
+      "name": "Alberto",
+      "role": "Fondatore",
+      "hoursPerWeek": 15,
+      "color": "#E87B35"
+    },
+    {
+      "name": "Manlio",
+      "role": "Direttore Piloti",
+      "hoursPerWeek": 20,
+      "color": "#DB2777"
+    },
+    {
+      "name": "Max",
+      "role": "Setup & Telemetria",
+      "hoursPerWeek": 15,
+      "color": "#3D9A50"
+    },
+    {
+      "name": "Daniele",
+      "role": "F1 Esports Coach",
+      "hoursPerWeek": 15,
+      "color": "#6366F1"
+    }
+  ]
+}
