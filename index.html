@@ -1951,11 +1951,17 @@ function openBachecaModal() {
     html += '<button onclick="closeTaskModal();openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
     html += '</div>';
 
-    if (resources.length === 0) {
+    var activeRes = resources.filter(function(r) { return !r.archived; });
+    var archivedRes = resources.filter(function(r) { return r.archived; });
+
+    if (activeRes.length === 0 && archivedRes.length === 0) {
         html += '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:14px">Nessun elemento. Clicca "+ Nuova" per aggiungere link, note o documenti per Alberto.</div>';
     } else {
+        if (activeRes.length === 0) {
+            html += '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nessun elemento attivo.</div>';
+        }
         html += '<div style="display:flex;flex-direction:column;gap:8px">';
-        resources.forEach(function(r) {
+        activeRes.forEach(function(r) {
             var typeIcon = r.url && r.url.trim() ? '&#128279;' : '&#128221;';
             var dateStr = r.createdAt ? new Date(r.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short'}) : '';
             var preview = (r.content || '').replace(/[#*_\n]/g, ' ').trim();
@@ -1976,17 +1982,59 @@ function openBachecaModal() {
             html += '<span id="cooResModalBadge_' + r.id + '" style="font-size:9px;font-weight:800;color:var(--text-muted);background:var(--surface);border-radius:4px;padding:2px 6px">...</span>';
             html += '</div>';
 
-            // Feedback di Alberto
+            // Feedback di Alberto + Risposte COO (thread)
             html += '<div id="cooResModalFeedback_' + r.id + '"></div>';
+            // Risposte COO già salvate
+            var cooReplies = r.cooReplies || [];
+            if (cooReplies.length > 0) {
+                html += '<div style="margin-top:4px">';
+                cooReplies.forEach(function(cr) {
+                    var crDate = new Date(cr.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    html += '<div style="font-size:11px;padding:4px 8px;background:var(--accent-soft,#FFF1ED);border-radius:6px;margin-bottom:3px"><span style="font-weight:700;color:var(--accent)">Tu (COO):</span> <span style="color:var(--text-secondary)">' + esc(cr.note) + '</span> <span style="color:var(--text-muted);font-size:10px">' + crDate + '</span></div>';
+                });
+                html += '</div>';
+            }
+
+            // Campo risposta inline
+            html += '<div style="display:flex;gap:6px;margin-top:6px">';
+            html += '<input id="cooReplyInput_' + r.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooReplyToResource(\'' + r.id + '\')">';
+            html += '<button onclick="cooReplyToResource(\'' + r.id + '\')" style="padding:6px 12px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+            html += '</div>';
 
             // Azioni
             html += '<div style="display:flex;gap:6px;margin-top:8px">';
             html += '<button onclick="closeTaskModal();openResourceModal(\'' + r.id + '\')" style="padding:6px 12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Modifica</button>';
+            html += '<button onclick="archiveResource(\'' + r.id + '\')" style="padding:6px 12px;background:var(--surface);border:1px solid var(--teal,#14B8A6);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--teal,#14B8A6)">Archivia</button>';
             html += '<button onclick="if(confirm(\'Eliminare?\')){deleteResource(\'' + r.id + '\');openBachecaModal()}" style="padding:6px 12px;background:none;border:1px solid var(--red);border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--red)">Elimina</button>';
             html += '</div>';
             html += '</div>';
         });
         html += '</div>';
+
+        // Sezione Archiviate (collassabile)
+        if (archivedRes.length > 0) {
+            html += '<div style="margin-top:16px;border-top:1px solid var(--border);padding-top:12px">';
+            html += '<div onclick="var p=document.getElementById(\'bachecaArchived\');var c=document.getElementById(\'bachecaArchChev\');if(p.style.display===\'none\'){p.style.display=\'flex\';c.style.transform=\'rotate(90deg)\'}else{p.style.display=\'none\';c.style.transform=\'rotate(0deg)\'}" style="cursor:pointer;display:flex;align-items:center;gap:6px;margin-bottom:8px">';
+            html += '<span id="bachecaArchChev" style="font-size:12px;color:var(--text-muted);transition:transform 0.2s">&#9654;</span>';
+            html += '<span style="font-size:13px;font-weight:700;color:var(--text-muted)">Archiviate (' + archivedRes.length + ')</span>';
+            html += '</div>';
+            html += '<div id="bachecaArchived" style="display:none;flex-direction:column;gap:6px">';
+            archivedRes.forEach(function(r) {
+                var archDate = r.archivedAt ? new Date(r.archivedAt).toLocaleDateString('it-IT', {day:'numeric', month:'short'}) : '';
+                html += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;opacity:0.6">';
+                html += '<div style="display:flex;align-items:center;justify-content:space-between">';
+                html += '<div style="font-size:13px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">' + esc(r.title) + '</div>';
+                html += '<div style="display:flex;gap:6px;flex-shrink:0;margin-left:8px">';
+                html += '<button onclick="unarchiveResource(\'' + r.id + '\')" style="padding:4px 10px;background:var(--surface);border:1px solid var(--border);border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Ripristina</button>';
+                html += '<button onclick="if(confirm(\'Eliminare definitivamente?\')){deleteResource(\'' + r.id + '\');openBachecaModal()}" style="padding:4px 10px;background:none;border:1px solid var(--red);border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--red)">Elimina</button>';
+                html += '</div>';
+                html += '</div>';
+                if (archDate) html += '<div style="font-size:10px;color:var(--text-muted);margin-top:2px">Archiviata il ' + archDate + '</div>';
+                html += '</div>';
+            });
+            html += '</div>';
+            html += '</div>';
+        }
     }
 
     modal.innerHTML = html;
@@ -2072,7 +2120,13 @@ function saveResource(id, isNew) {
     if (!data.title) { alert('Inserisci un titolo'); return; }
     if (isNew) { resources.unshift(data); } else {
         var idx = resources.findIndex(function(r) { return r.id === id; });
-        if (idx >= 0) resources[idx] = data;
+        if (idx >= 0) {
+            // Preserva cooReplies e archived dalla versione precedente
+            var prev = resources[idx];
+            if (prev.cooReplies) data.cooReplies = prev.cooReplies;
+            if (prev.archived) { data.archived = prev.archived; data.archivedAt = prev.archivedAt; }
+            resources[idx] = data;
+        }
     }
     saveResources(resources);
     closeTaskModal();
@@ -2084,6 +2138,43 @@ function deleteResource(id) {
     saveResources(getResources().filter(function(r) { return r.id !== id; }));
     closeTaskModal();
     render();
+}
+
+function cooReplyToResource(resId) {
+    var input = document.getElementById('cooReplyInput_' + resId);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    var resources = getResources();
+    var r = resources.find(function(res) { return res.id === resId; });
+    if (!r) return;
+    if (!r.cooReplies) r.cooReplies = [];
+    r.cooReplies.push({ note: note, at: new Date().toISOString() });
+    saveResources(resources);
+    _showToast('Risposta inviata!');
+    openBachecaModal();
+}
+
+function archiveResource(resId) {
+    var resources = getResources();
+    var r = resources.find(function(res) { return res.id === resId; });
+    if (!r) return;
+    r.archived = true;
+    r.archivedAt = new Date().toISOString();
+    saveResources(resources);
+    _showToast('Elemento archiviato');
+    openBachecaModal();
+}
+
+function unarchiveResource(resId) {
+    var resources = getResources();
+    var r = resources.find(function(res) { return res.id === resId; });
+    if (!r) return;
+    r.archived = false;
+    r.archivedAt = null;
+    saveResources(resources);
+    _showToast('Elemento ripristinato');
+    openBachecaModal();
 }
 
 function simpleMarkdown(text) {
@@ -2843,20 +2934,26 @@ function ceoOpenTask(taskId, projectId) {
         html += '<div style="padding:12px 14px;background:var(--bg);border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);line-height:1.5">' + esc(t.note) + '</div>';
     }
 
-    // Storico aggiornamenti CEO
-    var ceoUpdates = t.ceoUpdates || [];
-    if (ceoUpdates.length > 0) {
+    // Thread conversazione CEO ↔ COO (cronologico)
+    var allMsgs = [];
+    (t.ceoUpdates || []).forEach(function(u) { allMsgs.push({ from: 'ceo', note: u.note, type: u.type, at: u.at }); });
+    (t.cooResponses || []).forEach(function(r) { allMsgs.push({ from: 'coo', note: r.note, type: 'response', at: r.at }); });
+    allMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+    if (allMsgs.length > 0) {
         html += '<div style="margin-bottom:16px">';
-        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">Aggiornamenti precedenti</div>';
-        ceoUpdates.slice().reverse().forEach(function(u) {
-            var d = new Date(u.at);
+        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">Conversazione</div>';
+        allMsgs.forEach(function(msg) {
+            var d = new Date(msg.at);
             var dateStr = d.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            var typeLabel = u.type === 'complete' ? 'Completata' : u.type === 'update' ? 'Aggiornamento' : 'Nota';
-            var typeColor = u.type === 'complete' ? 'var(--green)' : 'var(--blue)';
-            html += '<div style="padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:4px;font-size:12px">';
-            html += '<span style="font-weight:700;color:' + typeColor + '">' + typeLabel + '</span>';
-            html += '<span style="color:var(--text-muted);margin-left:8px">' + dateStr + '</span>';
-            if (u.note) html += '<div style="color:var(--text-secondary);margin-top:4px">' + esc(u.note) + '</div>';
+            var isCeo = msg.from === 'ceo';
+            var typeLabel = msg.type === 'complete' ? 'Completata' : msg.type === 'update' ? 'Aggiornamento' : 'Risposta';
+            var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
+            var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+            var name = isCeo ? 'Tu' : 'Mattia (COO)';
+            html += '<div style="padding:8px 12px;background:' + bgCol + ';border-radius:8px;margin-bottom:4px;font-size:12px">';
+            html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+            html += ' <span style="font-size:10px;font-weight:600;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px">' + esc(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -3066,7 +3163,7 @@ function renderCEOHome() {
     html += '</div>';
 
     // ========== NOTIFICHE / BACHECA RISORSE — widget in alto ==========
-    var resources = getResources();
+    var resources = getResources().filter(function(r) { return !r.archived; });
     var _ca = _ceoActions || { taskActions: {}, resourceActions: {} };
     var unreadRes = resources.filter(function(r) { var ra = _ca.resourceActions[r.id]; return !(ra && ra.read); });
     if (resources.length > 0) {
@@ -3134,16 +3231,28 @@ function renderCEOHome() {
                 }
             }
 
-            // Feedback precedenti
+            // Thread conversazione: feedback Alberto + risposte COO, in ordine cronologico
             var ceoFeedback = (resActions.feedback) || [];
-            if (ceoFeedback.length > 0) {
+            var cooReplies = res.cooReplies || [];
+            var allMessages = [];
+            ceoFeedback.forEach(function(fb) { allMessages.push({ type: 'ceo', note: fb.note, at: fb.at }); });
+            cooReplies.forEach(function(cr) { allMessages.push({ type: 'coo', note: cr.note, at: cr.at }); });
+            allMessages.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+            if (allMessages.length > 0) {
                 html += '<div style="margin-top:10px">';
-                ceoFeedback.slice().reverse().forEach(function(fb) {
-                    var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    html += '<div style="padding:5px 8px;background:var(--surface);border-radius:6px;margin-bottom:3px;font-size:11px">';
-                    html += '<span style="font-weight:700;color:var(--blue)">Tu</span> <span style="color:var(--text-muted);margin-left:4px">' + fDate + '</span>';
-                    html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(fb.note) + '</div>';
-                    html += '</div>';
+                allMessages.forEach(function(msg) {
+                    var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    if (msg.type === 'ceo') {
+                        html += '<div style="padding:5px 8px;background:var(--surface);border-radius:6px;margin-bottom:3px;font-size:11px">';
+                        html += '<span style="font-weight:700;color:var(--blue)">Tu</span> <span style="color:var(--text-muted);margin-left:4px">' + mDate + '</span>';
+                        html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
+                        html += '</div>';
+                    } else {
+                        html += '<div style="padding:5px 8px;background:var(--accent-soft,#FFF1ED);border-radius:6px;margin-bottom:3px;font-size:11px">';
+                        html += '<span style="font-weight:700;color:var(--accent)">Mattia (COO)</span> <span style="color:var(--text-muted);margin-left:4px">' + mDate + '</span>';
+                        html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
+                        html += '</div>';
+                    }
                 });
                 html += '</div>';
             }
@@ -3216,14 +3325,22 @@ function renderCEOHome() {
             var isOverdue = t.dueDate && t.dueDate < todayStr;
             var isDueToday = t.dueDate && t.dueDate === todayStr;
             var isCeoDone = t.status === 'ceo_done';
-            var borderColor = isCeoDone ? 'var(--green)' : isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
-            var bgColor = isCeoDone ? 'var(--green-bg, #F0FDF4)' : isBlocked ? 'var(--red-bg, #FEF2F2)' : isOverdue ? 'var(--red-bg, #FEF2F2)' : isDueToday ? 'var(--orange-bg, #FFF7ED)' : 'var(--surface)';
+            // Determina se COO ha risposto dopo ultimo update CEO
+            var ceoTa = _ca.taskActions[t.id];
+            var lastCeoUpd = (ceoTa && ceoTa.updates && ceoTa.updates.length > 0) ? ceoTa.updates[ceoTa.updates.length - 1] : null;
+            var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+            var awaitingCooReply = lastCeoUpd && lastCeoUpd.type === 'update' && (!lastCooResp || new Date(lastCeoUpd.at) > new Date(lastCooResp.at));
+            var cooHasReplied = lastCooResp && lastCeoUpd && new Date(lastCooResp.at) > new Date(lastCeoUpd.at);
+            var borderColor = cooHasReplied ? 'var(--accent)' : awaitingCooReply ? 'var(--purple,#8B5CF6)' : isCeoDone ? 'var(--green)' : isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
+            var bgColor = cooHasReplied ? 'var(--accent-soft,#FFF1ED)' : awaitingCooReply ? 'var(--purple-bg,#F5F3FF)' : isCeoDone ? 'var(--green-bg, #F0FDF4)' : isBlocked ? 'var(--red-bg, #FEF2F2)' : isOverdue ? 'var(--red-bg, #FEF2F2)' : isDueToday ? 'var(--orange-bg, #FFF7ED)' : 'var(--surface)';
             var hasCeoNote = t.ceoNote && t.ceoNote.trim();
 
             html += '<div onclick="ceoOpenTask(\'' + t.id + '\',\'' + item.projectId + '\')" style="cursor:pointer;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:16px 18px;margin-bottom:10px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
 
             // Top: badge urgenza + progetto + scadenza
             html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
+            if (cooHasReplied) html += '<span style="background:var(--accent);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">&#128172; IL COO HA RISPOSTO</span>';
+            else if (awaitingCooReply) html += '<span style="background:var(--purple,#8B5CF6);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">&#9203; IN ATTESA DI RISPOSTA</span>';
             if (isCeoDone) html += '<span style="background:var(--green);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">COMPLETATA</span>';
             else if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
             else if (isOverdue) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
@@ -3827,17 +3944,31 @@ function _cooFetchCeoActions() {
         }
 
         // Task completate da CEO → status 'da_verificare' (COO conferma poi)
+        // Task con update da CEO → ceoHasUpdate flag
         if (ceoActs.taskActions) {
             var projects = getProjects();
             var needSave = false;
             projects.forEach(function(p) {
                 (p.tasks || []).forEach(function(t) {
                     var ta = ceoActs.taskActions[t.id];
-                    if (ta && ta.status === 'complete' && t.status !== 'done' && t.status !== 'da_verificare') {
+                    if (!ta) return;
+                    // Completate → da_verificare
+                    if (ta.status === 'complete' && t.status !== 'done' && t.status !== 'da_verificare') {
                         t.status = 'da_verificare';
                         t.ceoUpdates = ta.updates || [];
                         t.ceoCompletedAt = (ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1].at : new Date().toISOString();
                         needSave = true;
+                    }
+                    // Aggiornamenti → ceoHasUpdate
+                    if (ta.updates && ta.updates.length > 0) {
+                        var lastCeoUpdate = ta.updates[ta.updates.length - 1];
+                        var lastCooResponse = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+                        var ceoIsNewer = !lastCooResponse || new Date(lastCeoUpdate.at) > new Date(lastCooResponse.at);
+                        if (ceoIsNewer && lastCeoUpdate.type === 'update' && !t.ceoHasUpdate) {
+                            t.ceoHasUpdate = true;
+                            t.ceoUpdates = ta.updates;
+                            needSave = true;
+                        }
                     }
                 });
             });
@@ -4199,10 +4330,14 @@ function renderGlobal() {
     const dueTomorrowAll = allTasks.filter(t => t.status !== 'done' && t.status !== 'da_verificare' && t.dueDate && t.dueDate === tomorrowStr);
     const overdueAll = allTasks.filter(t => t.status !== 'done' && t.status !== 'da_verificare' && t.dueDate && t.dueDate < todayStr);
 
+    // Task con aggiornamenti da Alberto
+    const ceoUpdatedTasks = allTasks.filter(t => t.ceoHasUpdate);
+
     // Riga 1: ACTION CARDS — urgenti, visivamente distinte
-    const hasActions = actions.length > 0 || daVerificare.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
+    const hasActions = actions.length > 0 || daVerificare.length > 0 || ceoUpdatedTasks.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
     if (hasActions) {
         html += '<div class="action-bar">';
+        if (ceoUpdatedTasks.length > 0) html += `<div class="action-card" style="border-color:var(--blue)" onclick="showCeoUpdatedTasks()"><span class="action-card-icon" style="color:var(--blue)">&#128172;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--blue)">${ceoUpdatedTasks.length}</span><span class="action-card-label" style="color:var(--blue)">Risposte Alberto</span></div></div>`;
         if (daVerificare.length > 0) html += `<div class="action-card" style="border-color:var(--teal)" onclick="showDaVerificareTasks()"><span class="action-card-icon" style="color:var(--teal)">&#9745;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--teal)">${daVerificare.length}</span><span class="action-card-label" style="color:var(--teal)">Da verificare</span></div></div>`;
         if (actions.length > 0) html += `<div class="action-card danger" onclick="showUnblockPopup()"><span class="action-card-icon">&#9888;</span><div class="action-card-body"><span class="action-card-num">${actions.length}</span><span class="action-card-label">Da sbloccare</span></div></div>`;
         if (overdueAll.length > 0) html += `<div class="action-card danger" onclick="showOverdueTasks()"><span class="action-card-icon">&#128680;</span><div class="action-card-body"><span class="action-card-num">${overdueAll.length}</span><span class="action-card-label">In ritardo</span></div></div>`;
@@ -5423,6 +5558,11 @@ function renderTaskCard(t, p) {
         }
     }
 
+    // Indicatore "Alberto ha aggiornato" (CEO ha mandato update)
+    if (t.ceoHasUpdate) {
+        html += `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;padding:4px 8px;background:var(--blue-bg,#EFF6FF);border:1px solid var(--blue);border-radius:6px;font-size:11px;font-weight:700;color:var(--blue)">&#128172; Alberto ha risposto — richiede tua attenzione</div>`;
+    }
+
     // Quick "Fatto" button
     if (!isDone) {
         html += `<button class="quick-done-btn" onclick="event.stopPropagation();changeTaskStatus('${t.id}','${p.id}','done')" title="Segna come completata">&#10003; Fatto</button>`;
@@ -6161,6 +6301,37 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
         <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Questo testo appare nella dashboard di Alberto come istruzione principale.</div>
     </div>`;
 
+    // Thread conversazione CEO ↔ COO (aggiornamenti + risposte)
+    var allTaskMsgs = [];
+    (task.ceoUpdates || []).forEach(function(u) { allTaskMsgs.push({ from: 'ceo', note: u.note, type: u.type, at: u.at }); });
+    (task.cooResponses || []).forEach(function(r) { allTaskMsgs.push({ from: 'coo', note: r.note, type: 'response', at: r.at }); });
+    allTaskMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+    if (allTaskMsgs.length > 0 || task.ceoHasUpdate) {
+        html += '<div class="modal-field" style="margin-top:14px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase">Conversazione con Alberto</div>';
+        if (allTaskMsgs.length > 0) {
+            allTaskMsgs.forEach(function(msg) {
+                var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                var isCeo = msg.from === 'ceo';
+                var typeLabel = msg.type === 'complete' ? 'Completata' : msg.type === 'update' ? 'Aggiornamento' : 'Risposta';
+                var bgCol = isCeo ? 'var(--blue-bg,#EFF6FF)' : 'var(--accent-soft,#FFF1ED)';
+                var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+                var name = isCeo ? 'Alberto' : 'Tu (COO)';
+                html += '<div style="padding:6px 10px;background:' + bgCol + ';border-radius:8px;margin-bottom:4px;font-size:12px">';
+                html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+                html += ' <span style="font-size:10px;font-weight:600;color:var(--text-muted)">' + typeLabel + ' &middot; ' + mDate + '</span>';
+                if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + esc(msg.note) + '</div>';
+                html += '</div>';
+            });
+        }
+        // Campo risposta rapida
+        html += '<div style="display:flex;gap:6px;margin-top:8px">';
+        html += '<input id="cooTaskReplyInput_' + task.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')">';
+        html += '<button onclick="cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+        html += '</div>';
+        html += '</div>';
+    }
+
     // === SEZIONE AVANZATA (collapsibile) ===
     const hasExtra = (task.tags||[]).length > 0 || (task.dependsOn||[]).length > 0 || task.recurrence;
     html += `<button class="modal-section-toggle" onclick="toggleModalExtra()">
@@ -6603,6 +6774,62 @@ function showDaVerificareTasks() {
     document.getElementById('backupModal').classList.add('open');
 }
 
+function showCeoUpdatedTasks() {
+    var projects = getProjects();
+    var items = [];
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.ceoHasUpdate) items.push({ id: t.id, title: t.title, projectName: p.name, projectId: p.id, ceoUpdates: t.ceoUpdates || [], cooResponses: t.cooResponses || [] });
+        });
+    });
+    if (!items.length) {
+        document.getElementById('backupModal').classList.remove('open');
+        return;
+    }
+    var modal = document.getElementById('backupModalInner');
+    var html = '<div style="font-size:18px;font-weight:700;margin-bottom:6px;color:var(--blue)">Risposte da Alberto (' + items.length + ')</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">Alberto ha inviato aggiornamenti su queste task. Rispondi o apri la task.</div>';
+    items.forEach(function(t) {
+        var lastUpdate = t.ceoUpdates.length > 0 ? t.ceoUpdates[t.ceoUpdates.length - 1] : null;
+        var updateNote = lastUpdate ? lastUpdate.note : '';
+        var updateDate = lastUpdate ? new Date(lastUpdate.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+        html += '<div style="padding:14px 16px;background:var(--blue-bg,#EFF6FF);border:1px solid var(--blue);border-radius:10px;margin-bottom:10px">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + esc(t.projectName) + (updateDate ? ' &middot; ' + updateDate : '') + '</div>';
+        if (updateNote) html += '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--blue)"><strong>Alberto:</strong> ' + esc(updateNote) + '</div>';
+        html += '<div style="display:flex;gap:6px;margin-bottom:8px">';
+        html += '<input id="ceoUpdReply_' + t.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')">';
+        html += '<button onclick="cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+        html += '</div>';
+        html += '<button onclick="document.getElementById(\'backupModal\').classList.remove(\'open\');openTaskModal(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Apri task completa</button>';
+        html += '</div>';
+    });
+    html += '<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')">Chiudi</button></div>';
+    modal.innerHTML = html;
+    document.getElementById('backupModal').classList.add('open');
+}
+
+function cooRespondFromPopup(taskId, projectId) {
+    var input = document.getElementById('ceoUpdReply_' + taskId);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) { _showToast('Progetto non trovato', true); return; }
+    var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
+    if (!t) { _showToast('Task non trovata', true); return; }
+    if (!t.cooResponses) t.cooResponses = [];
+    t.cooResponses.push({ note: note, at: new Date().toISOString() });
+    t.ceoHasUpdate = false;
+    if (!t.activityLog) t.activityLog = [];
+    t.activityLog.push({ date: today(), text: 'Risposta inviata ad Alberto: ' + note });
+    saveProjects(projects);
+    _showToast('Risposta inviata!');
+    document.getElementById('backupModal').classList.remove('open');
+    render();
+}
+
 function confirmTask(taskId, projectId) {
     var projects = getProjects();
     var p = projects.find(function(pr) { return pr.id === projectId; });
@@ -6632,6 +6859,28 @@ function rejectTask(taskId, projectId) {
     document.getElementById('backupModal').classList.remove('open');
     _showToast('Task rimessa in lavorazione');
     render();
+}
+
+function cooRespondToTask(taskId, projectId) {
+    var input = document.getElementById('cooTaskReplyInput_' + taskId);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) { _showToast('Progetto non trovato', true); return; }
+    var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
+    if (!t) { _showToast('Task non trovata', true); return; }
+    if (!t.cooResponses) t.cooResponses = [];
+    t.cooResponses.push({ note: note, at: new Date().toISOString() });
+    t.ceoHasUpdate = false;
+    if (!t.activityLog) t.activityLog = [];
+    t.activityLog.push({ date: today(), text: 'Risposta inviata ad Alberto: ' + note });
+    saveProjects(projects);
+    _showToast('Risposta inviata!');
+    closeTaskModal();
+    render();
+    setTimeout(function() { openTaskModal(taskId, projectId); }, 150);
 }
 
 function showCheckPopup() {
