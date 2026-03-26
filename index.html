@@ -576,8 +576,8 @@
         }
         .status-chip-todo { background: var(--slate-bg); color: var(--slate); }
         .status-chip-todo::before { background: var(--slate); }
-        .status-chip-in_progress { background: var(--blue-bg); color: var(--blue); }
-        .status-chip-in_progress::before { background: var(--blue); }
+        .status-chip-in_progress { background: var(--yellow-bg); color: var(--yellow); }
+        .status-chip-in_progress::before { background: var(--yellow); }
         .status-chip-review { background: var(--purple-bg); color: var(--purple); }
         .status-chip-review::before { background: var(--purple); }
         .status-chip-done { background: var(--green-bg); color: var(--green); }
@@ -1578,7 +1578,7 @@ const TABS_MOBILE = ['Dash', 'Board', 'Lista', 'Cal', 'Team', 'Mie task', 'Recap
 function isMobile() { return window.innerWidth <= 768; }
 const STATUS_LIST = ['todo', 'in_progress', 'blocked', 'da_verificare', 'done'];
 const STATUS_LABELS = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccata', da_verificare: 'Da verificare', done: 'Completata' };
-const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--blue)', blocked: 'var(--red)', da_verificare: 'var(--teal)', done: 'var(--green)' };
+const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--yellow)', blocked: 'var(--red)', da_verificare: 'var(--teal)', done: 'var(--green)' };
 const XP_PER_TASK = 20;
 const PROJECT_STATUSES = ['attivo', 'in-pausa', 'completato'];
 
@@ -3931,7 +3931,7 @@ function renderCEOHome() {
         html += '<div style="margin-top:8px;display:flex;gap:10px;font-size:12px;flex-wrap:wrap">';
         html += '<span style="color:var(--text-muted)">' + done + '/' + total + ' task</span>';
         if (remaining > 0) html += '<span style="color:var(--text-muted)">' + remaining + ' rimaste</span>';
-        if (inProgress > 0) html += '<span style="color:var(--blue);font-weight:600">' + inProgress + ' in corso</span>';
+        if (inProgress > 0) html += '<span style="color:var(--yellow);font-weight:600">' + inProgress + ' in corso</span>';
         if (blocked > 0) html += '<span style="color:var(--red);font-weight:700">' + blocked + ' bloccate</span>';
         if (overdue > 0) html += '<span style="color:var(--red)">' + overdue + ' scadute</span>';
         html += '</div>';
@@ -3999,7 +3999,7 @@ function renderCEOProject(pid) {
     // Progress bar
     html += '<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:24px;display:flex">';
     if (done > 0) html += '<div style="width:' + (done/total*100) + '%;background:var(--green);transition:width 0.3s"></div>';
-    if (inProgress > 0) html += '<div style="width:' + (inProgress/total*100) + '%;background:var(--blue);transition:width 0.3s"></div>';
+    if (inProgress > 0) html += '<div style="width:' + (inProgress/total*100) + '%;background:var(--yellow);transition:width 0.3s"></div>';
     if (blocked > 0) html += '<div style="width:' + (blocked/total*100) + '%;background:var(--red);transition:width 0.3s"></div>';
     if (todo > 0) html += '<div style="width:' + (todo/total*100) + '%;background:var(--border);transition:width 0.3s"></div>';
     html += '</div>';
@@ -4043,7 +4043,7 @@ function renderCEOProject(pid) {
     var statusOrder = ['blocked', 'in_progress', 'todo'];
     var statusStyles = {
         blocked: {label:'Bloccate', color:'var(--red)', bg:'var(--red-bg, #FEF2F2)'},
-        in_progress: {label:'In Corso', color:'var(--blue)', bg:'var(--blue-bg, #EFF6FF)'},
+        in_progress: {label:'In Corso', color:'var(--yellow)', bg:'var(--yellow-bg, #FEFCE8)'},
         todo: {label:'Da Fare', color:'var(--slate)', bg:'var(--bg)'}
     };
 
@@ -5808,7 +5808,7 @@ function renderGlobalCalendar() {
                     html += '<div style="display:flex;gap:6px;font-size:10px;">';
                     html += `<span style="color:var(--text-muted)">${pr.total} task</span>`;
                     html += `<span style="color:var(--green)">${pr.done} &#10003;</span>`;
-                    if (pr.inProgress > 0) html += `<span style="color:var(--blue)">${pr.inProgress} in corso</span>`;
+                    if (pr.inProgress > 0) html += `<span style="color:var(--yellow)">${pr.inProgress} in corso</span>`;
                     if (pr.blocked > 0) html += `<span style="color:var(--red);font-weight:700">${pr.blocked} bloccate</span>`;
                     html += `<span style="color:var(--text-muted);margin-left:auto;">${pr.pct}%</span>`;
                     html += '</div></div>';
@@ -6055,7 +6055,7 @@ function renderProjectDashboard(p) {
     // ── Stats a 2x2 griglia su mobile ──
     html += `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">`;
     html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','todo')"><div class="dash-stat-value" style="color:var(--slate)">${todo}</div><div class="dash-stat-label">Da fare</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--blue)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--yellow)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
     html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','blocked')"><div class="dash-stat-value" style="color:var(--red)">${blocked}</div><div class="dash-stat-label">Bloccate</div></div>`;
     html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','done')"><div class="dash-stat-value" style="color:var(--green)">${done}</div><div class="dash-stat-label">Completate</div></div>`;
     html += `</div>`;
@@ -6063,7 +6063,7 @@ function renderProjectDashboard(p) {
     // ── Progress bar multi-colore (stile CEO) ──
     html += `<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:16px;display:flex">`;
     if (done > 0) html += `<div style="width:${done/total*100}%;background:var(--green);transition:width 0.3s"></div>`;
-    if (inProgress > 0) html += `<div style="width:${inProgress/total*100}%;background:var(--blue);transition:width 0.3s"></div>`;
+    if (inProgress > 0) html += `<div style="width:${inProgress/total*100}%;background:var(--yellow);transition:width 0.3s"></div>`;
     if (blocked > 0) html += `<div style="width:${blocked/total*100}%;background:var(--red);transition:width 0.3s"></div>`;
     if (todo > 0) html += `<div style="width:${todo/total*100}%;background:var(--border);transition:width 0.3s"></div>`;
     html += `</div>`;
@@ -6133,7 +6133,7 @@ function renderProjectDashboard(p) {
     const statusOrder = ['blocked', 'in_progress', 'todo'];
     const statusStyles = {
         blocked: {label:'Bloccate', color:'var(--red)', bg:'var(--red-bg, #FEF2F2)'},
-        in_progress: {label:'In Corso', color:'var(--blue)', bg:'var(--blue-bg, #EFF6FF)'},
+        in_progress: {label:'In Corso', color:'var(--yellow)', bg:'var(--yellow-bg, #FEFCE8)'},
         todo: {label:'Da Fare', color:'var(--slate)', bg:'var(--bg)'}
     };
 
@@ -6787,7 +6787,7 @@ function buildDonut(data, total) {
     data.forEach(d => {
         if (d.count === 0) return;
         const len = (d.count / total) * circumference;
-        const colorMap = { todo: '#6B7280', in_progress: '#3B7DD8', review: '#8B5CF6', done: '#3D9A50', blocked: '#D94F4F' };
+        const colorMap = { todo: '#6B7280', in_progress: '#CA8A04', review: '#8B5CF6', done: '#3D9A50', blocked: '#D94F4F' };
         paths += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colorMap[d.status]}" stroke-width="${strokeW}" stroke-dasharray="${len} ${circumference - len}" stroke-dashoffset="-${offset}" transform="rotate(-90 ${cx} ${cy})" />`;
         offset += len;
     });
@@ -6970,18 +6970,19 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     html += `<div class="modal-field" style="margin-top:14px"><span class="modal-label">Stato</span>
         <div class="chip-row" id="tmStatusRow">
             ${STATUS_LIST.map(s => {
-                const colorMap = { todo:'var(--slate-bg);color:var(--slate)', in_progress:'var(--blue-bg);color:var(--blue)', blocked:'var(--red-bg);color:var(--red)', da_verificare:'var(--teal-bg);color:var(--teal)', done:'var(--green-bg);color:var(--green)' };
+                const colorMap = { todo:'var(--slate-bg);color:var(--slate)', in_progress:'var(--yellow-bg);color:var(--yellow)', blocked:'var(--red-bg);color:var(--red)', da_verificare:'var(--teal-bg);color:var(--teal)', done:'var(--green-bg);color:var(--green)' };
                 const parts = colorMap[s].split(';');
                 return `<span class="chip-option ${task.status===s?'selected':''}" data-val="${s}" style="background:${parts[0]};${parts[1]}" onclick="selectChip(this,'tmStatusRow')">${STATUS_LABELS[s]}</span>`;
             }).join('')}
         </div>
     </div>`;
 
-    // Assegnato a — chip per persona
+    // Assegnato a — dropdown
     html += `<div class="modal-field" style="margin-top:12px"><span class="modal-label">Assegnato a</span>
-        <div class="chip-row" id="tmAssigneeRow">
-            ${team.map(m => `<span class="assignee-chip ${task.assignee===m.name?'selected':''}" data-val="${esc(m.name)}" style="color:${m.color}" onclick="selectChip(this,'tmAssigneeRow')"><span class="avatar-xs" style="background:${m.color}">${initials(m.name)}</span>${esc(m.name)}</span>`).join('')}
-        </div>
+        <select class="modal-select" id="tmAssignee">
+            <option value="">Non assegnata</option>
+            ${team.map(m => `<option value="${esc(m.name)}" ${task.assignee===m.name?'selected':''}>${esc(m.name)}</option>`).join('')}
+        </select>
     </div>`;
 
     // Scadenza + Prossimo check
@@ -7151,7 +7152,7 @@ function saveTask(taskId, projectId, isNew) {
         id: taskId,
         title: title,
         status: (function(){ var el = document.querySelector('#tmStatusRow .selected'); return el && el.dataset ? el.dataset.val : ''; })() || 'todo',
-        assignee: (function(){ var el = document.querySelector('#tmAssigneeRow .selected'); return el && el.dataset ? el.dataset.val : ''; })() || '',
+        assignee: document.getElementById('tmAssignee').value || '',
         dueDate: document.getElementById('tmDue').value,
         estimateHours: parseFloat(document.getElementById('tmHours').value) || 0,
         recurrence: document.getElementById('tmRecurrence').value || null,
@@ -7355,8 +7356,8 @@ function showTasksByStatus(projectId, status) {
     if (!p) return;
     const items = (p.tasks||[]).filter(t => t.status === status);
     if (!items.length) return;
-    const colorMap = { todo:'var(--slate)', in_progress:'var(--blue)', review:'var(--purple)', done:'var(--green)', blocked:'var(--red)' };
-    const bgMap = { todo:'var(--slate-bg)', in_progress:'var(--blue-bg)', review:'var(--purple-bg)', done:'var(--green-bg)', blocked:'var(--red-bg)' };
+    const colorMap = { todo:'var(--slate)', in_progress:'var(--yellow)', review:'var(--purple)', done:'var(--green)', blocked:'var(--red)' };
+    const bgMap = { todo:'var(--slate-bg)', in_progress:'var(--yellow-bg)', review:'var(--purple-bg)', done:'var(--green-bg)', blocked:'var(--red-bg)' };
     const modal = document.getElementById('backupModalInner');
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:${colorMap[status]}">${STATUS_LABELS[status]} (${items.length})</div>`;
     items.forEach(t => {
@@ -8134,46 +8135,8 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
-// ========== AUTO-BACKUP (ogni 3 giorni) ==========
-function checkAutoBackup() {
-    const lastBackup = safeGetItem('pb_last_backup');
-    const now = Date.now();
-    const threeDays = 3 * 86400000;
-    if (lastBackup && (now - parseInt(lastBackup)) < threeDays) return;
-
-    const projects = getProjects();
-    if (projects.length === 0) return;
-
-    // Mostra prompt
-    const days = lastBackup ? Math.round((now - parseInt(lastBackup)) / 86400000) : null;
-    const msg = days ? `Ultimo backup: ${days} giorni fa. Scaricare un backup?` : 'Non hai mai fatto un backup. Scaricare?';
-    if (!confirm(msg)) {
-        // Posticipa di 1 giorno
-        safeSetItem('pb_last_backup', String(now - 2 * 86400000));
-        return;
-    }
-
-    const data = {
-        version: 3,
-        exportedAt: new Date().toISOString(),
-        tasks: [],
-        projects: projects,
-        archive: JSON.parse(safeGetItem('tb_archive')||'[]'),
-        ideas: JSON.parse(safeGetItem('pb_ideas')||'[]')
-    };
-    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'project_board_backup_' + today() + '.json';
-    a.click();
-    URL.revokeObjectURL(url);
-    safeSetItem('pb_last_backup', String(now));
-}
-
 // ========== START ==========
 init();
-if (!CEO_MODE) setTimeout(checkAutoBackup, 2000); // check dopo caricamento (skip in CEO mode)
 
 // ========== AUTO-SYNC ==========
 (function() {
