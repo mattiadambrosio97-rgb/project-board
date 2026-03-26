@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T12:45:53.656Z",
+  "lastUpdate": "2026-03-26T12:46:00.834Z",
   "taskActions": {
     "id_1774522152441_zf0809": {
       "status": "complete",
@@ -8,6 +8,16 @@
           "type": "complete",
           "note": "Fatto contattato e va tutto bene",
           "at": "2026-03-26T12:45:53.656Z"
+        }
+      ]
+    },
+    "id_1774522152441_weslvk": {
+      "status": "update",
+      "updates": [
+        {
+          "type": "update",
+          "note": "Cosa devo fare non ho capito",
+          "at": "2026-03-26T12:46:00.834Z"
         }
       ]
     }
