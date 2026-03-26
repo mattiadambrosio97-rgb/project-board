@@ -2206,6 +2206,7 @@ function saveResource(id, isNew) {
         }
     }
     saveResources(resources);
+    _autoPublishForCEO();
     closeTaskModal();
     render();
 }
@@ -2213,6 +2214,7 @@ function saveResource(id, isNew) {
 function deleteResource(id) {
     if (!confirm('Eliminare questa risorsa?')) return;
     saveResources(getResources().filter(function(r) { return r.id !== id; }));
+    _autoPublishForCEO();
     closeTaskModal();
     render();
 }
@@ -2228,6 +2230,7 @@ function cooReplyToResource(resId) {
     if (!r.cooReplies) r.cooReplies = [];
     r.cooReplies.push({ note: note, at: new Date().toISOString() });
     saveResources(resources);
+    _autoPublishForCEO();
     _showToast('Risposta inviata!');
     openBachecaModal();
 }
@@ -2239,6 +2242,7 @@ function archiveResource(resId) {
     r.archived = true;
     r.archivedAt = new Date().toISOString();
     saveResources(resources);
+    _autoPublishForCEO();
     _showToast('Elemento archiviato');
     openBachecaModal();
 }
@@ -2250,6 +2254,7 @@ function unarchiveResource(resId) {
     r.archived = false;
     r.archivedAt = null;
     saveResources(resources);
+    _autoPublishForCEO();
     _showToast('Elemento ripristinato');
     openBachecaModal();
 }
@@ -2302,6 +2307,7 @@ function saveCeoLink(id, isNew) {
         if (idx >= 0) links[idx] = data;
     }
     saveCeoLinks(links);
+    _autoPublishForCEO();
     closeTaskModal();
     render();
 }
@@ -2309,6 +2315,7 @@ function saveCeoLink(id, isNew) {
 function deleteCeoLink(id) {
     if (!confirm('Eliminare questo link?')) return;
     saveCeoLinks(getCeoLinks().filter(function(l) { return l.id !== id; }));
+    _autoPublishForCEO();
     closeTaskModal();
     render();
 }
@@ -2402,6 +2409,7 @@ function saveLaunch(id, isNew) {
         if (idx >= 0) launches[idx] = data;
     }
     saveLaunches(launches);
+    _autoPublishForCEO();
     closeTaskModal();
     render();
 }
@@ -2733,6 +2741,7 @@ function renderLaunchCalendar(allLaunches, editable) {
                     launches[idx].brand = newBrand;
                 }
                 saveLaunches(launches);
+                _autoPublishForCEO();
                 render();
             }
         } else if (_drag.mode === 'move' && Math.abs(e.clientX - _drag.startX) < 5 && Math.abs(e.clientY - _drag.startY) < 5) {
@@ -2753,6 +2762,7 @@ function renderLaunchCalendar(allLaunches, editable) {
 function deleteLaunch(id) {
     if (!confirm('Eliminare questo lancio?')) return;
     saveLaunches(getLaunches().filter(function(l) { return l.id !== id; }));
+    _autoPublishForCEO();
     closeTaskModal();
     render();
 }
@@ -4548,6 +4558,12 @@ function render() {
             return;
         }
         renderCEOView();
+        // CEO auto-refresh: poll data.json ogni 30s
+        if (!window._ceoAutoRefreshTimer) {
+            window._ceoAutoRefreshTimer = setInterval(function() {
+                loadCEOData(function() { renderCEOView(); }, true);
+            }, 30000);
+        }
         return;
     }
     // Persisti stato calendario
@@ -4567,6 +4583,7 @@ function render() {
         // Dentro un progetto: nascondi header, layout pulito stile CEO
         header.style.display = 'none';
         mc.innerHTML = renderDetail();
+        _cooFetchCeoActions(); // Anche in vista progetto per notifiche CEO
     }
 }
 
