@@ -1946,8 +1946,8 @@ function openResourceModal(resId) {
     var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
     html += '<input class="modal-title-input" id="resTitle" placeholder="Titolo (cosa deve leggere Alberto)..." value="' + esc(res.title) + '">';
 
-    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Link esterno (opzionale)</span>';
-    html += '<input class="modal-input" id="resUrl" placeholder="https://... — lascia vuoto se non serve" value="' + esc(res.url || '') + '"></div>';
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Link (opzionali, uno per riga)</span>';
+    html += '<textarea class="modal-textarea" id="resUrl" rows="3" placeholder="https://esempio.com&#10;https://altro-link.com&#10;commercialisti.html" style="font-size:13px">' + esc(res.url || '') + '</textarea></div>';
 
     html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Nota / Contenuto (opzionale, supporta Markdown)</span>';
     html += '<textarea class="modal-textarea" id="resContent" rows="8" placeholder="Scrivi istruzioni, contesto, o informazioni per Alberto...">' + esc(res.content || '') + '</textarea></div>';
@@ -3000,9 +3000,18 @@ function renderCEOHome() {
             if (res.content && res.content.trim()) {
                 html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content) + '</div>';
             }
-            // Link (sempre visibile se presente)
+            // Link (uno o più, separati da newline)
             if (res.url && res.url.trim()) {
-                html += '<a href="' + esc(res.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">Apri link &#8599;</a>';
+                var links = res.url.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+                if (links.length > 0) {
+                    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">';
+                    links.forEach(function(lnk, i) {
+                        var label = lnk.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('?')[0];
+                        if (label.length > 30) label = label.substring(0, 27) + '...';
+                        html += '<a href="' + esc(lnk) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--accent);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">' + (links.length > 1 ? esc(label) : 'Apri link') + ' &#8599;</a>';
+                    });
+                    html += '</div>';
+                }
             }
 
             // Feedback precedenti
