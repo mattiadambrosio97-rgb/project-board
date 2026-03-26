@@ -1867,14 +1867,16 @@ function restoreNavState() {
 }
 
 function init() {
-    seedData();
-    // Migrate review -> todo (colonna rimossa)
-    const ps = getProjects();
-    let changed = false;
-    ps.forEach(p => (p.tasks||[]).forEach(t => { if (t.status === 'review') { t.status = 'todo'; changed = true; } }));
-    if (changed) saveProjects(ps);
+    if (!CEO_MODE) {
+        seedData();
+        // Migrate review -> todo (colonna rimossa)
+        const ps = getProjects();
+        let changed = false;
+        ps.forEach(p => (p.tasks||[]).forEach(t => { if (t.status === 'review') { t.status = 'todo'; changed = true; } }));
+        if (changed) saveProjects(ps);
+        restoreNavState();
+    }
     if (safeGetItem('pb_theme') === 'dark') document.body.classList.add('dark');
-    restoreNavState();
     render();
 }
 
@@ -5366,7 +5368,7 @@ function checkAutoBackup() {
 
 // ========== START ==========
 init();
-setTimeout(checkAutoBackup, 2000); // check dopo caricamento
+if (!CEO_MODE) setTimeout(checkAutoBackup, 2000); // check dopo caricamento (skip in CEO mode)
 </script>
 </body>
 </html>
