@@ -171,12 +171,12 @@
             font-size: 24px; font-weight: 800; letter-spacing: -0.6px;
             color: var(--text); line-height: 1.2;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 500px;
+            max-width: 50vw;
         }
         .header-desc {
             font-size: 12px; color: var(--text-muted); font-weight: 400;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-            max-width: 400px; margin-top: 1px;
+            max-width: 45vw; margin-top: 1px;
         }
         .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 
@@ -1132,7 +1132,7 @@
             .breadcrumb { font-size: 11px; margin-bottom: 0; }
             .header-right { flex-wrap: wrap; gap: 6px; justify-content: flex-start; flex: 1 1 100%; }
             .header-right .add-btn { padding: 8px 16px; font-size: 13px; min-height: 40px; }
-            .header-right .icon-btn { width: 36px; height: 36px; font-size: 15px; }
+            .header-right .icon-btn { width: 44px; height: 44px; font-size: 16px; }
             .copy-data-btn { font-size: 12px !important; padding: 8px 12px !important; }
 
             /* Global dashboard */
@@ -1167,8 +1167,8 @@
 
             /* Filters bar */
             .filters-bar { padding: 10px 16px; gap: 8px; flex-wrap: wrap; }
-            .filter-input { min-width: 0; width: 100%; flex: 1 1 100%; font-size: 14px; }
-            .filter-select { min-width: 0; flex: 1 1 calc(50% - 4px); font-size: 14px; }
+            .filter-input { min-width: 0; width: 100%; flex: 1 1 100%; font-size: 14px; min-height: 44px; }
+            .filter-select { min-width: 0; flex: 1 1 calc(50% - 4px); font-size: 14px; min-height: 44px; }
 
             /* View content */
             .view-content { padding: 12px 16px; }
@@ -1271,7 +1271,7 @@
             /* Modal — full screen on mobile (COO only, CEO uses inline views) */
             .modal-overlay { padding: 0; }
             .modal-overlay.open { align-items: flex-start; }
-            .modal { width: 100%; max-width: 100%; height: 100vh; max-height: 100vh;
+            .modal { width: 100%; max-width: 100%; height: 100vh; height: 100dvh; max-height: 100vh; max-height: 100dvh;
                 padding: 16px 16px 24px; border-radius: 0; margin: 0;
                 overflow-y: auto; -webkit-overflow-scrolling: touch;
                 overscroll-behavior: contain; }
@@ -1355,7 +1355,8 @@
             .launch-progress-bar { max-width: 100%; }
             .modal { padding: 16px; }
             .modal-title-input { font-size: 16px; }
-            .modal-actions { flex-wrap: wrap; gap: 8px; }
+            .modal-actions { flex-wrap: wrap; gap: 8px; flex-direction: column; }
+            .modal-actions .btn-save, .modal-actions .btn-cancel, .modal-actions .btn-delete { width: 100%; }
 
             /* Calendar year — single column on small phones */
             .cal-year-grid { grid-template-columns: 1fr; }
@@ -4177,20 +4178,61 @@ function _showCooOnboarding(onSuccess) {
     overlay.innerHTML =
         '<div style="background:var(--surface);border-radius:16px;padding:32px;max-width:420px;width:100%;box-shadow:var(--shadow-lg)">' +
         '<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:8px">Connessione GitHub</div>' +
-        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:20px;line-height:1.5">Serve una sola volta. Incolla il Personal Access Token di GitHub.<br><span style="font-size:12px">Crealo su github.com/settings/tokens &rarr; Fine-grained &rarr; repo "project-board" &rarr; Contents: Read and write</span></div>' +
-        '<input id="cooTokenInput" type="text" placeholder="ghp_..." style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;box-sizing:border-box" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.5">Serve una sola volta. Segui questi passaggi:</div>' +
+        // Step 1: Copia codice
+        '<div style="text-align:left;margin-bottom:20px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">1. Clicca su "Copia codice"</div>' +
+        '<button id="cooCopyTokenBtn" onclick="_cooCopyToken()" style="width:100%;padding:14px;background:var(--blue,#2563EB);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px">' +
+        '<span style="font-size:18px">&#128203;</span> Copia codice</button>' +
+        '</div>' +
+        // Step 2: Incolla
+        '<div style="text-align:left;margin-bottom:20px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">2. Incolla qui sotto</div>' +
+        '<input id="cooTokenInput" type="text" placeholder="Incolla qui il codice..." style="width:100%;padding:14px 16px;border:2px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);outline:none;box-sizing:border-box" onfocus="this.style.borderColor=\'var(--accent)\'" onblur="this.style.borderColor=\'var(--border)\'">' +
+        '</div>' +
+        // Step 3: Connetti
+        '<div style="text-align:left;margin-bottom:8px">' +
+        '<div style="font-size:13px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">3. Clicca "Connetti"</div>' +
+        '</div>' +
+        '<button id="cooTokenBtn" onclick="_cooOnboardSubmit()" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Connetti</button>' +
         '<div id="cooTokenErr" style="display:none;font-size:13px;margin-top:8px;padding:8px 12px;border-radius:8px;background:var(--red-bg);color:var(--red);font-weight:600"></div>' +
-        '<button id="cooTokenBtn" onclick="_cooOnboardSubmit()" style="margin-top:16px;width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Connetti</button>' +
         '</div>';
     document.body.appendChild(overlay);
     window._cooOnboardCallback = onSuccess || null;
     setTimeout(function() {
         var inp = document.getElementById('cooTokenInput');
         if (inp) {
-            inp.focus();
             inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') _cooOnboardSubmit(); });
         }
     }, 100);
+}
+
+function _cooCopyToken() {
+    var btn = document.getElementById('cooCopyTokenBtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(CEO_FIXED_TOKEN).then(function() {
+            btn.innerHTML = '<span style="font-size:18px">&#10003;</span> Copiato!';
+            btn.style.background = 'var(--green,#16A34A)';
+            setTimeout(function() {
+                btn.innerHTML = '<span style="font-size:18px">&#128203;</span> Copia codice';
+                btn.style.background = 'var(--blue,#2563EB)';
+            }, 2000);
+        });
+    } else {
+        var ta = document.createElement('textarea');
+        ta.value = CEO_FIXED_TOKEN;
+        ta.style.cssText = 'position:fixed;left:-9999px';
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        btn.innerHTML = '<span style="font-size:18px">&#10003;</span> Copiato!';
+        btn.style.background = 'var(--green,#16A34A)';
+        setTimeout(function() {
+            btn.innerHTML = '<span style="font-size:18px">&#128203;</span> Copia codice';
+            btn.style.background = 'var(--blue,#2563EB)';
+        }, 2000);
+    }
 }
 function _cooOnboardSubmit() {
     var inp = document.getElementById('cooTokenInput');
