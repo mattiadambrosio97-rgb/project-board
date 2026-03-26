@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:17.025Z",
+  "publishedAt": "2026-03-26T21:28:19.267Z",
   "projects": [],
   "team": [
     {
@@ -162,14 +162,6 @@
     }
   ],
   "resources": [
-    {
-      "id": "res_demo_002",
-      "title": "Video reference: come Coach Dave presenta i setup",
-      "type": "link",
-      "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-      "content": "",
-      "createdAt": "2026-03-26T09:30:00.000Z"
-    },
     {
       "id": "res_demo_003",
       "title": "Scaletta webinar aprile — bozza da approvare",
