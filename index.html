@@ -1704,11 +1704,10 @@ function generatePMAnalysis() {
     return analyzed;
 }
 
-// ========== DATA ==========
-function getTeam() {
-    var t = safeGetItem('pb_team');
-    if (t) try { return JSON.parse(t); } catch(e) {}
-    var def = [
+// ========== DATA (GitHub = fonte unica) ==========
+var _appData = {
+    projects: [],
+    team: [
         { name: 'Mattia', role: 'COO / Marketing', hoursPerWeek: 40, color: '#0D9488' },
         { name: 'Kevin', role: 'Grafica & Video', hoursPerWeek: 30, color: '#3B7DD8' },
         { name: 'Mattia FS', role: 'Tech & Sviluppo', hoursPerWeek: 25, color: '#8B5CF6' },
@@ -1716,20 +1715,53 @@ function getTeam() {
         { name: 'Manlio', role: 'Direttore Piloti', hoursPerWeek: 20, color: '#DB2777' },
         { name: 'Max', role: 'Setup & Telemetria', hoursPerWeek: 15, color: '#3D9A50' },
         { name: 'Daniele', role: 'F1 Esports Coach', hoursPerWeek: 15, color: '#6366F1' },
-    ];
-    safeSetItem('pb_team', JSON.stringify(def));
-    return def;
+    ],
+    launches: [],
+    ceoLinks: [],
+    resources: [],
+    _loaded: false
+};
+var _ghPushTimer = null;
+
+function _scheduleGHPush() {
+    if (_ghPushTimer) clearTimeout(_ghPushTimer);
+    _ghPushTimer = setTimeout(function() { _pushDataToGH(); }, 2000);
 }
 
-function getProjects() {
-    var p = safeGetItem('pb_projects');
-    if (p) try { return JSON.parse(p); } catch(e) {}
-    return [];
+function _pushDataToGH() {
+    var token = getGHToken();
+    if (!token) return;
+    var payload = {
+        publishedAt: new Date().toISOString(),
+        projects: _appData.projects,
+        team: _appData.team,
+        launches: _appData.launches,
+        ceoLinks: _appData.ceoLinks,
+        resources: _appData.resources
+    };
+    // Anche cache locale per render veloce al prossimo load
+    safeSetItem('pb_cache', JSON.stringify(payload));
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
+    }).then(function(r) { return r.json(); }).then(function(fileData) {
+        var sha = fileData.sha;
+        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: 'Auto-save ' + new Date().toLocaleTimeString('it-IT'), content: content, sha: sha })
+        });
+    }).then(function(r) {
+        if (r.ok) { _updateSyncIndicator(); }
+        else { console.warn('GH push failed:', r.status); }
+    }).catch(function(err) { console.warn('GH push error:', err); });
 }
 
-function saveProjects(p) {
-    safeSetItem('pb_projects', JSON.stringify(p));
-}
+function getTeam() { return _appData.team; }
+function saveTeam(t) { _appData.team = t; _scheduleGHPush(); }
+
+function getProjects() { return _appData.projects; }
+function saveProjects(p) { _appData.projects = p; _scheduleGHPush(); }
 
 function genId() { return 'id_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); }
 
@@ -1976,17 +2008,10 @@ function restoreNavState() {
 
 // ========== CEO QUICK LINKS ==========
 function getCeoLinks() {
-    try {
-        var d = JSON.parse(safeGetItem('pb_ceo_links') || '[]');
-        if (d.length === 0) return getDefaultCeoLinks();
-        // Migrazione v3: se mancano notebook/chatgpt o c'e analytics, resetta ai nuovi default
-        var hasOld = d.some(function(l) { return l.id === 'lk_analytics'; });
-        var missingNew = !d.some(function(l) { return l.id === 'lk_notebook'; });
-        if (hasOld || missingNew) { safeSetItem('pb_ceo_links', ''); return getDefaultCeoLinks(); }
-        return d;
-    } catch(e) { return getDefaultCeoLinks(); }
+    if (_appData.ceoLinks && _appData.ceoLinks.length > 0) return _appData.ceoLinks;
+    return getDefaultCeoLinks();
 }
-function saveCeoLinks(arr) { safeSetItem('pb_ceo_links', JSON.stringify(arr)); }
+function saveCeoLinks(arr) { _appData.ceoLinks = arr; _scheduleGHPush(); }
 function getDefaultCeoLinks() {
     return [
         { id: 'lk_keap', label: 'Keap CRM', url: 'https://qh917.infusionsoft.com/', icon: '📇', color: '#16A34A' },
@@ -2000,24 +2025,8 @@ function getDefaultCeoLinks() {
 }
 
 // ========== RISORSE CEO (Bacheca) ==========
-function getResources() {
-    try {
-        var res = JSON.parse(safeGetItem('pb_resources') || '[]');
-        // Seed risorse iniziali se vuoto
-        if (res.length === 0 && !safeGetItem('pb_resources_seeded')) {
-            res = [
-                { id: 'res_demo_001', title: 'Analisi competitor SimRacing Academy (Q1 2026)', type: 'note', content: "Ho analizzato i 5 competitor principali nel mercato SimRacing coaching EU.\n\n**Pure Driving School** \u2014 pricing aggressivo, 49\u20ac/mese membership. Puntano tutto su volumi.\n\n**Coach Dave Academy** \u2014 setup-focused, vendono pacchetti setup singoli (15-25\u20ac). No coaching 1-to-1.\n\n**SimGrid** \u2014 community-first, monetizzano con eventi e sponsor. Modello diverso dal nostro.\n\n**Driver61** \u2014 YouTube-first, funnel da contenuti gratuiti a corsi premium (297-497\u20ac). Molto forte su SEO.\n\n**Nessuno** ha un percorso strutturato pilota come il nostro. Questo \u00e8 il vantaggio competitivo da comunicare nelle prossime campagne.\n\nLeggi tutto e dimmi se vuoi che approfondiamo qualcuno di questi.", createdAt: '2026-03-25T14:00:00.000Z' },
-                { id: 'res_demo_002', title: 'Video reference: come Coach Dave presenta i setup', type: 'link', url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', content: '', createdAt: '2026-03-26T09:30:00.000Z' },
-                { id: 'res_demo_003', title: 'Scaletta webinar aprile \u2014 bozza da approvare', type: 'note', content: "Webinar gratuito previsto per met\u00e0 aprile. Obiettivo: lead generation per Setup Pack.\n\n**Titolo proposto:** \"I 3 errori di setup che ti costano 1 secondo al giro (e come correggerli in 15 minuti)\"\n\n**Scaletta:**\n1. Intro + chi siamo (5 min) \u2014 Alberto presenta\n2. Errore #1: bilanciamento freni (10 min) \u2014 Max spiega con telemetria live\n3. Errore #2: rapporti cambio sbagliati (10 min) \u2014 Max\n4. Errore #3: pressioni gomme a caso (10 min) \u2014 Max\n5. Q&A (10 min)\n6. Pitch Setup Pack + offerta webinar-only (5 min) \u2014 Alberto\n\n**Da confermare:** data esatta, piattaforma (Zoom o YouTube Live), se Daniele partecipa.\n\nApprovami la scaletta cos\u00ec procediamo con la landing page.", createdAt: '2026-03-26T10:00:00.000Z' },
-                { id: 'res_commercialisti_001', title: 'Lista commercialisti Palermo \u2014 leggila e dimmi quale preferisci', type: 'link', url: 'commercialisti-palermo.html', content: '', createdAt: '2026-03-26T12:30:00.000Z' }
-            ];
-            safeSetItem('pb_resources', JSON.stringify(res));
-            safeSetItem('pb_resources_seeded', '1');
-        }
-        return res;
-    } catch(e) { return []; }
-}
-function saveResources(arr) { safeSetItem('pb_resources', JSON.stringify(arr)); }
+function getResources() { return _appData.resources || []; }
+function saveResources(arr) { _appData.resources = arr; _scheduleGHPush(); }
 
 function openBachecaModal() {
     var resources = getResources();
@@ -2321,26 +2330,8 @@ function deleteCeoLink(id) {
 }
 
 // ========== LANCI MARKETING ==========
-function getLaunches() {
-    try {
-        var ls = JSON.parse(safeGetItem('pb_launches') || '[]');
-        if (ls.length === 0 && !safeGetItem('pb_launches_seeded')) {
-            ls = [
-                {id:'ln_s1',name:'Lancio ADT Setup Pack F1-26',brand:'ADT',startDate:'2026-03-28',endDate:'2026-03-31',projectId:'',notes:''},
-                {id:'ln_s2',name:'Lancio Database Strategia ADT',brand:'ADT',startDate:'2026-04-03',endDate:'2026-04-07',projectId:'',notes:''},
-                {id:'ln_s3',name:'Lancio ADT Kick Off',brand:'ADT',startDate:'2026-04-12',endDate:'2026-04-16',projectId:'',notes:''},
-                {id:'ln_s4',name:'Lancio Circolo dei Top Drivers Aprile',brand:'ADT',startDate:'2026-04-21',endDate:'2026-04-28',projectId:'',notes:''},
-                {id:'ln_s5',name:'Lancio USR Kick Off',brand:'USR',startDate:'2026-04-12',endDate:'2026-04-16',projectId:'',notes:''},
-                {id:'ln_s6',name:'Lancio USR Setup Pack',brand:'GTF',startDate:'2026-04-08',endDate:'2026-04-11',projectId:'',notes:''},
-                {id:'ln_s7',name:'Lancio Gentleman Driver Lead Magnet',brand:'USR',startDate:'2026-03-31',endDate:'2026-04-05',projectId:'',notes:''}
-            ];
-            safeSetItem('pb_launches', JSON.stringify(ls));
-            safeSetItem('pb_launches_seeded', '1');
-        }
-        return ls;
-    } catch(e) { return []; }
-}
-function saveLaunches(arr) { safeSetItem('pb_launches', JSON.stringify(arr)); }
+function getLaunches() { return _appData.launches || []; }
+function saveLaunches(arr) { _appData.launches = arr; _scheduleGHPush(); }
 
 function getLaunchStatus(l) {
     var t = today();
@@ -2823,26 +2814,74 @@ function toggleLaunchesSection() {
 }
 
 function init() {
-    if (!CEO_MODE) {
-        seedData();
-        // Su GitHub Pages COO: verifica token, poi usa dati locali (COO e' la fonte dati)
-        if (window.location.hostname.indexOf('github.io') !== -1) {
-            var cooToken = getGHToken();
-            if (!cooToken) {
-                _showCooOnboarding(function() { init(); });
-                return;
-            }
-        }
-        // Migrate review -> todo (colonna rimossa)
-        const ps = getProjects();
-        let changed = false;
-        ps.forEach(p => (p.tasks||[]).forEach(t => { if (t.status === 'review') { t.status = 'todo'; changed = true; } }));
-        if (changed) saveProjects(ps);
-        restoreNavState();
-    }
     if (safeGetItem('pb_theme') === 'dark') document.body.classList.add('dark');
     updateThemeIcon();
-    render();
+
+    if (CEO_MODE) {
+        render();
+        return;
+    }
+
+    // COO: verifica token GitHub
+    var cooToken = getGHToken();
+    if (!cooToken && window.location.hostname.indexOf('github.io') !== -1) {
+        _showCooOnboarding(function() { init(); });
+        return;
+    }
+
+    // Mostra loading mentre scarica da GitHub
+    var mc = document.getElementById('mainContent');
+    mc.innerHTML = '<div style="text-align:center;padding:60px 20px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Caricamento...</div><div style="font-size:13px;color:var(--text-muted)">Scarico dati da GitHub</div></div>';
+    document.getElementById('header').style.display = '';
+    renderHeader();
+
+    // Carica da GitHub (fonte unica)
+    _loadAppData(function() {
+        restoreNavState();
+        render();
+    });
+}
+
+function _loadAppData(callback) {
+    var token = getGHToken();
+    if (!token) {
+        // Nessun token: carica da cache locale se esiste
+        _loadFromCache();
+        if (callback) callback();
+        return;
+    }
+    _ghFetchJSON(GH_DATA_FILE, token).then(function(data) {
+        if (data) {
+            if (data.projects) _appData.projects = data.projects;
+            if (data.team && data.team.length > 0) _appData.team = data.team;
+            if (data.launches) _appData.launches = data.launches;
+            if (data.ceoLinks) _appData.ceoLinks = data.ceoLinks;
+            if (data.resources) _appData.resources = data.resources;
+            _appData._loaded = true;
+            // Aggiorna cache locale
+            safeSetItem('pb_cache', JSON.stringify(data));
+        } else {
+            _loadFromCache();
+        }
+        if (callback) callback();
+    }).catch(function() {
+        // Offline: usa cache locale
+        _loadFromCache();
+        if (callback) callback();
+    });
+}
+
+function _loadFromCache() {
+    try {
+        var cached = JSON.parse(safeGetItem('pb_cache') || 'null');
+        if (cached) {
+            if (cached.projects) _appData.projects = cached.projects;
+            if (cached.team && cached.team.length > 0) _appData.team = cached.team;
+            if (cached.launches) _appData.launches = cached.launches;
+            if (cached.ceoLinks) _appData.ceoLinks = cached.ceoLinks;
+            if (cached.resources) _appData.resources = cached.resources;
+        }
+    } catch(e) {}
 }
 
 function toggleTheme() {
@@ -4272,7 +4311,7 @@ function _getCooAcked() { try { return JSON.parse(safeGetItem('pb_coo_acked') ||
 function _setCooAcked(taskId) { var a = _getCooAcked(); a[taskId] = new Date().toISOString(); safeSetItem('pb_coo_acked', JSON.stringify(a)); }
 function _isCooAcked(taskId, ceoLatestAt) { var at = _getCooAcked()[taskId]; if (!at) return false; if (ceoLatestAt && new Date(ceoLatestAt) > new Date(at)) return false; return true; }
 function _clearCooAcked(taskId) { var a = _getCooAcked(); delete a[taskId]; safeSetItem('pb_coo_acked', JSON.stringify(a)); }
-function _autoPublishForCEO() { if (CEO_MODE || _ceoPreview) return; if (!getGHToken()) return; publishForCEO(); }
+function _autoPublishForCEO() { /* No-op: _scheduleGHPush gestisce il push automatico su ogni save */ }
 function openTaskFromPopup(taskId, projectId) { document.getElementById('backupModal').classList.remove('open'); document.getElementById('backupModalInner').innerHTML = ''; setTimeout(function() { openTaskModal(taskId, projectId); }, 350); }
 
 function _showCooOnboarding(onSuccess) {
@@ -8329,13 +8368,16 @@ init();
             }, true); // forceRefresh=true
         }, POLL_CEO);
     } else if (window.location.hostname.indexOf('github.io') !== -1) {
-        // COO su GitHub Pages: fetch solo feedback CEO (il COO e' la fonte dati, non rilegge data.json)
+        // COO su GitHub Pages: pull dati + fetch feedback CEO
         setInterval(function() {
             var cooToken = getGHToken();
             if (!cooToken) return;
-            _cooFetchCeoActions();
-            _cooFetchCeoActionsForBacheca();
-            _updateSyncIndicator();
+            _loadAppData(function() {
+                _cooFetchCeoActions();
+                _cooFetchCeoActionsForBacheca();
+                _updateSyncIndicator();
+                render();
+            });
         }, POLL_COO);
     }
 })();
