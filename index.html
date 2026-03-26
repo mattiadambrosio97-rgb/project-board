@@ -364,15 +364,22 @@
         .launch-item.far::before { background: var(--blue); }
 
         /* My tasks global */
-        .my-global-section { display: flex; flex-direction: column; gap: 8px; }
+        .my-global-section { display: flex; flex-direction: column; gap: 6px; }
         .my-global-task {
-            display: flex; align-items: center; gap: 10px; padding: 10px 16px;
+            display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto;
+            gap: 2px 12px; padding: 10px 14px;
             background: var(--surface); border: 1px solid var(--border);
             border-radius: var(--radius); cursor: pointer; transition: all 0.2s;
         }
         .my-global-task:hover { transform: translateY(-1px); box-shadow: var(--shadow-md); border-color: var(--accent); }
         .my-global-task.overdue-glow { border-left: 3px solid var(--red); background: var(--red-bg); }
         .my-global-task.today-glow { border-left: 3px solid var(--orange); }
+        .mgt-title { font-size: 14px; font-weight: 700; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .mgt-due { font-size: 12px; font-weight: 600; text-align: right; align-self: center; white-space: nowrap; }
+        .mgt-meta { grid-column: 1 / -1; display: flex; align-items: center; gap: 8px; margin-top: 2px; }
+        .mgt-project { font-size: 11px; color: var(--text-muted); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mgt-status { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+        .mgt-done { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; border: 1px solid var(--green); background: var(--green-bg); color: var(--green); cursor: pointer; flex-shrink: 0; margin-left: auto; }
 
         /* This Week */
         .week-section { display: flex; flex-direction: column; gap: 12px; }
@@ -1274,7 +1281,7 @@
             .inbox-task-title { flex: 1 1 100%; font-size: 15px; }
 
             /* My tasks global */
-            .my-global-task { flex-wrap: wrap; gap: 8px; font-size: 14px; }
+            .mgt-title { font-size: 15px; }
 
             /* Launch items */
             .launch-item { flex-wrap: wrap; gap: 10px; padding: 14px 16px; }
@@ -5150,11 +5157,13 @@ function renderGlobal() {
             const cls = isOverdue ? 'overdue-glow' : isToday ? 'today-glow' : '';
             const dc = dateClass(t.dueDate, t.status);
             html += `<div class="my-global-task ${cls}" onclick="openTaskModal('${t.id}','${t.projectId}')">
-                <span style="font-weight:600;flex:1">${esc(t.title)}</span>
-                <span style="font-size:11px;color:var(--text-muted);min-width:120px">${esc(t.projectName)}</span>
-                ${t.dueDate ? `<span class="task-card-due ${dc}" style="font-size:11px;min-width:60px;text-align:right">${smartDate(t.dueDate)}</span>` : ''}
-                <span style="font-size:10px;padding:2px 6px;border-radius:4px;background:${STATUS_COLORS[t.status]}22;color:${STATUS_COLORS[t.status]};font-weight:600">${STATUS_LABELS[t.status]}</span>
-                <button class="quick-done-btn" style="width:auto;margin:0;padding:3px 10px" onclick="event.stopPropagation();changeTaskStatus('${t.id}','${t.projectId}','done')">&#10003; Fatto</button>
+                <span class="mgt-title">${esc(t.title)}</span>
+                ${t.dueDate ? `<span class="mgt-due ${dc}">${smartDate(t.dueDate)}</span>` : '<span></span>'}
+                <div class="mgt-meta">
+                    <span class="mgt-project">${esc(t.projectName)}</span>
+                    <span class="mgt-status" style="background:${STATUS_COLORS[t.status]}22;color:${STATUS_COLORS[t.status]}">${STATUS_LABELS[t.status]}</span>
+                    <button class="mgt-done" onclick="event.stopPropagation();changeTaskStatus('${t.id}','${t.projectId}','done')">&#10003; Fatto</button>
+                </div>
             </div>`;
         });
         html += '</div>';
