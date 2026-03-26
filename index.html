@@ -1884,7 +1884,14 @@ function restoreNavState() {
 
 // ========== CEO QUICK LINKS ==========
 function getCeoLinks() {
-    try { var d = JSON.parse(safeGetItem('pb_ceo_links') || '[]'); return d.length > 0 ? d : getDefaultCeoLinks(); } catch(e) { return getDefaultCeoLinks(); }
+    try {
+        var d = JSON.parse(safeGetItem('pb_ceo_links') || '[]');
+        if (d.length === 0) return getDefaultCeoLinks();
+        // Migrazione v2: se ci sono i vecchi link default (analytics/vendite), resetta
+        var hasOld = d.some(function(l) { return l.id === 'lk_vendite' || l.id === 'lk_analytics'; });
+        if (hasOld) { safeSetItem('pb_ceo_links', ''); return getDefaultCeoLinks(); }
+        return d;
+    } catch(e) { return getDefaultCeoLinks(); }
 }
 function saveCeoLinks(arr) { safeSetItem('pb_ceo_links', JSON.stringify(arr)); }
 function getDefaultCeoLinks() {
@@ -1892,9 +1899,9 @@ function getDefaultCeoLinks() {
         { id: 'lk_keap', label: 'Keap CRM', url: 'https://app.keap.com', icon: '📇', color: '#16A34A' },
         { id: 'lk_drive', label: 'Google Drive', url: 'https://drive.google.com', icon: '📁', color: '#2563EB' },
         { id: 'lk_gmail', label: 'Gmail', url: 'https://mail.google.com', icon: '✉️', color: '#DC2626' },
-        { id: 'lk_coaches', label: 'Gestione Coach', url: '', icon: '🎯', color: '#7C3AED' },
-        { id: 'lk_vendite', label: 'Report Vendite', url: '', icon: '💰', color: '#CA8A04' },
-        { id: 'lk_analytics', label: 'Analytics', url: 'https://analytics.google.com', icon: '📊', color: '#0D9488' }
+        { id: 'lk_coaches', label: 'Programmi Coach e Piloti', url: '', icon: '🎯', color: '#7C3AED' },
+        { id: 'lk_notebook', label: 'NotebookLM', url: 'https://notebooklm.google.com', icon: '📓', color: '#4285F4' },
+        { id: 'lk_chatgpt', label: 'ChatGPT', url: 'https://chat.openai.com', icon: '🤖', color: '#10A37F' }
     ];
 }
 
@@ -2674,6 +2681,78 @@ function renderCEOHome() {
             html += '</a>';
         });
         html += '</div></div>';
+    }
+
+    // ========== LE TUE TASK (CEO) — task assegnate ad Alberto ==========
+    var allCeoTasks = [];
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.assignee === 'Alberto' && t.status !== 'done') {
+                allCeoTasks.push({ task: t, projectName: p.name, projectId: p.id });
+            }
+        });
+    });
+    // Ordina: bloccate prima, poi per scadenza
+    allCeoTasks.sort(function(a, b) {
+        if (a.task.status === 'blocked' && b.task.status !== 'blocked') return -1;
+        if (a.task.status !== 'blocked' && b.task.status === 'blocked') return 1;
+        var aDate = a.task.dueDate || '9999';
+        var bDate = b.task.dueDate || '9999';
+        return aDate.localeCompare(bDate);
+    });
+
+    if (allCeoTasks.length > 0) {
+        html += '<div style="margin-bottom:24px">';
+        html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">';
+        html += '<div style="font-size:15px;font-weight:800;color:var(--text)">Le tue task</div>';
+        html += '<span style="background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:20px;padding:2px 10px">' + allCeoTasks.length + '</span>';
+        html += '</div>';
+
+        allCeoTasks.forEach(function(item) {
+            var t = item.task;
+            var isBlocked = t.status === 'blocked';
+            var isOverdue = t.dueDate && t.dueDate < todayStr;
+            var isDueToday = t.dueDate && t.dueDate === todayStr;
+            var borderColor = isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
+            var bgColor = isBlocked ? 'var(--red-bg, #FEF2F2)' : isOverdue ? 'var(--red-bg, #FEF2F2)' : isDueToday ? 'var(--orange-bg, #FFF7ED)' : 'var(--surface)';
+
+            html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:8px">';
+
+            // Riga 1: titolo + badge status
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">';
+            if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px;flex-shrink:0">BLOCCATA</span>';
+            html += '<div style="font-size:15px;font-weight:700;color:var(--text);flex:1;min-width:0">' + esc(t.title) + '</div>';
+            html += '</div>';
+
+            // Riga 2: progetto + scadenza
+            html += '<div style="display:flex;align-items:center;gap:12px;font-size:12px;margin-bottom:4px">';
+            html += '<span style="color:var(--text-muted)">' + esc(item.projectName) + '</span>';
+            if (t.dueDate) {
+                var dLeft = daysUntil(t.dueDate);
+                var dateFormatted = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                var dateColor = isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--text-muted)';
+                var dateLabel = isOverdue ? dateFormatted + ' (scaduta da ' + Math.abs(dLeft) + 'g)' : isDueToday ? 'OGGI' : dateFormatted + ' (' + dLeft + 'g)';
+                html += '<span style="font-weight:700;color:' + dateColor + '">&#128197; ' + dateLabel + '</span>';
+            }
+            html += '</div>';
+
+            // Riga 3: nota/descrizione (se presente)
+            if (t.note) {
+                html += '<div style="margin-top:8px;padding:10px 12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.5;color:var(--text-secondary)">' + esc(t.note) + '</div>';
+            }
+
+            // Ultimo commento (se presente) — utile per contesto
+            var lastComment = (t.comments || []).slice(-1)[0];
+            if (lastComment && lastComment.text) {
+                html += '<div style="margin-top:6px;font-size:12px;color:var(--text-muted);display:flex;align-items:start;gap:6px">';
+                html += '<span style="flex-shrink:0">&#128172;</span>';
+                html += '<span>' + (lastComment.author ? '<strong>' + esc(lastComment.author) + ':</strong> ' : '') + esc(lastComment.text) + '</span>';
+                html += '</div>';
+            }
+
+            html += '</div>';
+        });
+        html += '</div>';
     }
 
     // ========== LANCI MARKETING (CEO) — calendario Gantt ==========
