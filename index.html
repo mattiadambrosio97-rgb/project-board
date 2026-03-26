@@ -6814,6 +6814,9 @@ function showDaVerificareTasks() {
             <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">${esc(t.title)}</div>
             <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">${esc(t.projectName)}${ceoDate ? ' &middot; Completata: ' + ceoDate : ''}</div>
             ${ceoNote ? '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--teal)"><strong>Alberto:</strong> ' + esc(ceoNote) + '</div>' : ''}
+            <div style="margin-bottom:10px">
+                <input id="daVerificaComment_${t.id}" type="text" placeholder="Feedback per Alberto (opzionale)..." style="width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box">
+            </div>
             <div style="display:flex;gap:8px">
                 <button onclick="confirmTask('${t.id}','${t.projectId}')" style="flex:1;padding:10px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Conferma completata</button>
                 <button onclick="rejectTask('${t.id}','${t.projectId}')" style="flex:1;padding:10px;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Rimetti in lavorazione</button>
@@ -6887,11 +6890,18 @@ function confirmTask(taskId, projectId) {
     if (!p) { _showToast('Progetto non trovato', true); return; }
     var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
     if (!t) { _showToast('Task non trovata', true); return; }
+    // Leggi commento opzionale
+    var commentInput = document.getElementById('daVerificaComment_' + taskId);
+    var comment = commentInput ? commentInput.value.trim() : '';
+    if (comment) {
+        if (!t.cooResponses) t.cooResponses = [];
+        t.cooResponses.push({ note: comment, at: new Date().toISOString() });
+    }
     t.status = 'done';
     t.completedAt = new Date().toISOString();
     _setCooAcked(taskId);
     if (!t.activityLog) t.activityLog = [];
-    t.activityLog.push({ date: today(), text: 'Confermata dal COO (completata da Alberto)' });
+    t.activityLog.push({ date: today(), text: 'Confermata dal COO' + (comment ? ': ' + comment : ' (completata da Alberto)') });
     saveProjects(projects);
     document.getElementById('backupModal').classList.remove('open');
     _showToast('Task confermata!');
@@ -6904,13 +6914,20 @@ function rejectTask(taskId, projectId) {
     if (!p) { _showToast('Progetto non trovato', true); return; }
     var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
     if (!t) { _showToast('Task non trovata', true); return; }
+    // Leggi commento opzionale
+    var commentInput = document.getElementById('daVerificaComment_' + taskId);
+    var comment = commentInput ? commentInput.value.trim() : '';
+    if (comment) {
+        if (!t.cooResponses) t.cooResponses = [];
+        t.cooResponses.push({ note: comment, at: new Date().toISOString() });
+    }
     t.status = 'in_progress';
     _setCooAcked(taskId);
     if (!t.activityLog) t.activityLog = [];
-    t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO (era da verificare)' });
+    t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO' + (comment ? ': ' + comment : '') });
     saveProjects(projects);
     document.getElementById('backupModal').classList.remove('open');
-    _showToast('Task rimessa in lavorazione');
+    _showToast(comment ? 'Rimessa in lavorazione con feedback' : 'Task rimessa in lavorazione');
     render();
 }
 
