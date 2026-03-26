@@ -3648,7 +3648,7 @@ function renderCEOHome() {
     }
     html += '<div style="font-size:20px;font-weight:800;color:var(--text)">' + _greeting + ', Alberto</div>';
     html += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}) + '</div>';
-    html += '<div style="font-size:12px;color:var(--text-muted);margin-top:6px;font-style:italic">' + esc(getDailyQuote()) + '</div>';
+    html += '<div style="font-size:16px;font-weight:700;color:var(--text-muted);margin-top:8px;font-style:italic;text-align:center">«' + esc(getDailyQuote()) + '»</div>';
     if (_ceoData && _ceoData.publishedAt) {
         var pubDate = new Date(_ceoData.publishedAt);
         html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Aggiornato: ' + pubDate.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) + '</div>';
@@ -5113,10 +5113,13 @@ function renderHeader() {
         var _greet = _h < 12 ? 'Buongiorno' : (_h < 18 ? 'Buon pomeriggio' : 'Buonasera');
         bc.innerHTML = '<span>' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}) + '</span>';
         title.innerHTML = _greet + ', Mattia';
-        desc.textContent = getDailyQuote();
+        desc.textContent = '«' + getDailyQuote() + '»';
         desc.style.fontStyle = 'italic';
-        desc.style.fontSize = '13px';
+        desc.style.fontWeight = '700';
+        desc.style.fontSize = '16px';
+        desc.style.textAlign = 'center';
         desc.style.color = 'var(--text-muted)';
+        desc.style.marginTop = '8px';
         addBtns.forEach(function(b) { if (b) b.textContent = '+ Progetto'; });
         taskBtns.forEach(function(b) { if (b) b.style.display = ''; });
     } else {
