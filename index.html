@@ -8,14 +8,6 @@
     <meta http-equiv="Expires" content="0">
     <title>Project Command Center — Mattia D'Ambrosio</title>
     <script>
-    // DEBUG: mostra errori JS su schermo (rimovere dopo fix)
-    window.onerror = function(msg, src, line) {
-        var d = document.createElement('div');
-        d.style.cssText = 'position:fixed;bottom:60px;left:10px;right:10px;z-index:9999;background:#DC2626;color:#fff;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;font-family:system-ui';
-        d.textContent = 'JS ERROR: ' + msg + ' (line ' + line + ')';
-        document.body.appendChild(d);
-        setTimeout(function() { d.remove(); }, 8000);
-    };
     if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()});});}
     if('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0,0);
@@ -6941,10 +6933,9 @@ function cycleProjectStatus(projectId) {
 
 // ========== TASK MODAL ==========
 function openTaskModal(taskId, projectId, unused, defaultStatus) {
-  try {
     const projects = getProjects();
     const p = projects.find(pr => pr.id === projectId);
-    if (!p) { _showToast('DEBUG: progetto non trovato (id=' + projectId + ', tot=' + projects.length + ')', true); return; }
+    if (!p) return;
 
     const isNew = !taskId;
     const task = isNew ? {
@@ -6954,7 +6945,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
         createdAt: Date.now(), completedAt: null, recurrence: null, note: '',
         nextCheck: '', doneWhen: '', dependsLabel: '', activityLog: []
     } : p.tasks.find(t => t.id === taskId);
-    if (!task) { _showToast('DEBUG: task non trovata (id=' + taskId + ')', true); return; }
+    if (!task) return;
 
     const team = getTeam();
     const otherTasks = p.tasks.filter(t => t.id !== task.id);
@@ -6979,7 +6970,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     html += `<div class="modal-field" style="margin-top:14px"><span class="modal-label">Stato</span>
         <div class="chip-row" id="tmStatusRow">
             ${STATUS_LIST.map(s => {
-                const colorMap = { todo:'var(--slate-bg);color:var(--slate)', in_progress:'var(--blue-bg);color:var(--blue)', review:'var(--purple-bg);color:var(--purple)', done:'var(--green-bg);color:var(--green)', blocked:'var(--red-bg);color:var(--red)' };
+                const colorMap = { todo:'var(--slate-bg);color:var(--slate)', in_progress:'var(--blue-bg);color:var(--blue)', blocked:'var(--red-bg);color:var(--red)', da_verificare:'var(--teal-bg);color:var(--teal)', done:'var(--green-bg);color:var(--green)' };
                 const parts = colorMap[s].split(';');
                 return `<span class="chip-option ${task.status===s?'selected':''}" data-val="${s}" style="background:${parts[0]};${parts[1]}" onclick="selectChip(this,'tmStatusRow')">${STATUS_LABELS[s]}</span>`;
             }).join('')}
@@ -7130,7 +7121,6 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     document.getElementById('taskModal').classList.add('open');
     document.getElementById('taskModal').onclick = (e) => { if (e.target === document.getElementById('taskModal')) closeTaskModal(); };
     if (isNew) setTimeout(() => document.getElementById('tmTitle').focus(), 100);
-  } catch(err) { _showToast('DEBUG openTaskModal ERROR: ' + err.message, true); }
 }
 
 function selectChip(el, rowId) {
