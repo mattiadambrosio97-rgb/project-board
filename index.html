@@ -1277,9 +1277,22 @@
             /* XP bar */
             .xp-bar-wrap { flex-wrap: wrap; gap: 6px; }
 
-            /* Main content scroll */
-            .main-content { overflow-y: auto; overflow-x: hidden;
-                -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+            /* Mobile: disable app-shell layout, let body scroll naturally */
+            body {
+                height: auto !important;
+                overflow: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+            .header {
+                position: sticky;
+                top: 0;
+                z-index: 200;
+            }
+            .main-content {
+                overflow: visible !important;
+                flex: none !important;
+                min-height: calc(100vh - 70px);
+            }
 
             /* Touch-friendly: bigger tap targets */
             .quick-done-btn { padding: 8px 16px; font-size: 14px; min-height: 40px; }
@@ -3503,6 +3516,7 @@ function renderCEOHome() {
     html += '<div style="display:flex;align-items:center;gap:8px">';
     html += '<span id="syncIndicatorCeo" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>';
     html += '<button onclick="_manualRefresh()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna dati">&#8635;</button>';
+    html += '<button onclick="location.reload(true)" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna app (ricarica pagina)">&#9889;</button>';
     html += '<button onclick="ceoToggleTheme()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
     html += '</div>';
     html += '</div>';
