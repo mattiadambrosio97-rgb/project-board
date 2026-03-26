@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T19:40:29.293Z",
+  "publishedAt": "2026-03-26T19:43:13.410Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -219,6 +219,61 @@
           "note": "Bloccata in attesa decisione Alberto. Deve rispondere con la data scelta.",
           "ceoNote": "Abbiamo 3 opzioni: 15 aprile, 22 aprile, 30 aprile. Quale preferisci?",
           "createdAt": "2026-03-26T19:39:37.728Z",
+          "tags": [
+            "test-ceo"
+          ],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "In attesa decisione Alberto"
+            }
+          ]
+        },
+        {
+          "id": "test_ceo_1_1774554140410",
+          "title": "🧪 TEST-CEO: Revisione grafica landing",
+          "status": "in_progress",
+          "assignee": "Alberto",
+          "priority": "high",
+          "dueDate": "2026-03-27",
+          "note": "Task di test per simulazione COO↔CEO",
+          "ceoNote": "Alberto, rivedi il layout della landing e dimmi cosa ne pensi",
+          "createdAt": "2026-03-26T19:42:20.410Z",
+          "tags": [
+            "test-ceo"
+          ],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Task creata per test sync"
+            }
+          ]
+        },
+        {
+          "id": "test_ceo_2_1774554140410",
+          "title": "🧪 TEST-CEO: Approvare preventivo fornitore",
+          "status": "todo",
+          "assignee": "Alberto",
+          "priority": "medium",
+          "dueDate": "2026-03-28",
+          "note": "Task di test - Alberto deve segnarla come completata dalla vista CEO",
+          "ceoNote": "Controlla il preventivo e conferma se OK",
+          "createdAt": "2026-03-26T19:42:20.410Z",
+          "tags": [
+            "test-ceo"
+          ],
+          "activityLog": []
+        },
+        {
+          "id": "test_ceo_3_1774554140410",
+          "title": "🧪 TEST-CEO: Decidere data evento",
+          "status": "blocked",
+          "assignee": "Alberto",
+          "priority": "high",
+          "dueDate": "2026-03-27",
+          "note": "Bloccata in attesa decisione Alberto. Deve rispondere con la data scelta.",
+          "ceoNote": "Abbiamo 3 opzioni: 15 aprile, 22 aprile, 30 aprile. Quale preferisci?",
+          "createdAt": "2026-03-26T19:42:20.410Z",
           "tags": [
             "test-ceo"
           ],
