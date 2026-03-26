@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T14:23:56.518Z",
+  "publishedAt": "2026-03-26T14:25:17.613Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -53,7 +53,7 @@
           "id": "task_copy_review",
           "title": "Revisionare copy ads (3 varianti)",
           "assignee": "Alberto",
-          "status": "in_progress",
+          "status": "todo",
           "dueDate": "2026-03-28",
           "ceoNote": "Ho preparato 3 varianti di copy per le ads. Leggile e dimmi quale preferisci o se vuoi modifiche.",
           "tags": [
@@ -63,14 +63,33 @@
           "note": "Le 3 varianti sono nel Google Doc condiviso",
           "comments": [],
           "dependsOn": [],
-          "activityLog": [],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Rimessa in lavorazione dal COO: Vedi anche la variante 4 però"
+            }
+          ],
           "createdAt": 1774534628500,
           "completedAt": null,
           "recurrence": null,
           "nextCheck": "",
           "doneWhen": "Alberto sceglie una variante",
           "dependsLabel": "",
-          "estimateHours": 0
+          "estimateHours": 0,
+          "ceoUpdates": [
+            {
+              "type": "complete",
+              "note": "La variante 2 mi piace",
+              "at": "2026-03-26T14:24:54.228Z"
+            }
+          ],
+          "ceoCompletedAt": "2026-03-26T14:24:54.228Z",
+          "cooResponses": [
+            {
+              "note": "Vedi anche la variante 4 però",
+              "at": "2026-03-26T14:25:17.613Z"
+            }
+          ]
         },
         {
           "id": "task_landing",
