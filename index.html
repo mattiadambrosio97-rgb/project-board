@@ -1331,6 +1331,7 @@
                 overflow: visible !important;
                 flex: none !important;
                 min-height: calc(100vh - 70px);
+                min-height: calc(100dvh - 70px);
             }
 
             /* Touch-friendly: bigger tap targets */
@@ -1509,6 +1510,7 @@
             <button class="copy-data-btn" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
             <span id="syncIndicator" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>
             <button class="icon-btn" title="Refresh dati" onclick="_manualRefresh()" style="font-size:14px">&#8635;</button>
+            <button class="icon-btn" title="Ricarica app (forza aggiornamento)" onclick="_hardReload()" style="font-size:14px">&#9889;</button>
             <button class="theme-toggle" onclick="toggleTheme()"></button>
         </div>
     </div>
@@ -4182,13 +4184,24 @@ function _showCooOnboarding(onSuccess) {
         '</div>';
     document.body.appendChild(overlay);
     window._cooOnboardCallback = onSuccess || null;
-    setTimeout(function() { var inp = document.getElementById('cooTokenInput'); if (inp) inp.focus(); }, 100);
+    setTimeout(function() {
+        var inp = document.getElementById('cooTokenInput');
+        if (inp) {
+            inp.focus();
+            inp.addEventListener('keydown', function(e) { if (e.key === 'Enter') _cooOnboardSubmit(); });
+        }
+    }, 100);
 }
 function _cooOnboardSubmit() {
     var inp = document.getElementById('cooTokenInput');
     var errEl = document.getElementById('cooTokenErr');
     var token = (inp ? inp.value : '').trim();
     if (!token) { if (errEl) { errEl.textContent = 'Incolla il token.'; errEl.style.display = 'block'; } return; }
+    // Chiudi tastiera iOS
+    inp.blur();
+    if (document.activeElement) document.activeElement.blur();
+    window.scrollTo(0, 0);
+    setTimeout(function() { window.scrollTo(0, 0); }, 100);
     if (errEl) { errEl.textContent = 'Verifica in corso...'; errEl.style.display = 'block'; errEl.style.color = 'var(--text-muted)'; errEl.style.background = 'var(--bg)'; }
     fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
         headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
