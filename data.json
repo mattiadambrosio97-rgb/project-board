@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T22:03:47.204Z",
+  "publishedAt": "2026-03-26T22:26:02.122Z",
   "projects": [
     {
       "id": "id_1774561315044_2num0g",
@@ -11,7 +11,7 @@
         {
           "id": "id_1774561331895_ggv8s3",
           "title": "wegewg",
-          "status": "todo",
+          "status": "in_progress",
           "assignee": "Mattia",
           "dueDate": "2026-03-29",
           "estimateHours": 0,
@@ -25,6 +25,31 @@
           "dependsOn": [],
           "comments": [],
           "createdAt": 1774561335996,
+          "completedAt": null,
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Stato cambiato in: In corso"
+            }
+          ]
+        },
+        {
+          "id": "id_1774563936965_mkwuon",
+          "title": "Landing page",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-03-29",
+          "estimateHours": 0,
+          "recurrence": null,
+          "note": "",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "",
+          "dependsLabel": "",
+          "tags": [],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774563947933,
           "completedAt": null,
           "activityLog": []
         }
