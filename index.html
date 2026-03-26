@@ -1882,6 +1882,154 @@ function restoreNavState() {
     } catch(e) {}
 }
 
+// ========== CEO QUICK LINKS ==========
+function getCeoLinks() {
+    try { var d = JSON.parse(safeGetItem('pb_ceo_links') || '[]'); return d.length > 0 ? d : getDefaultCeoLinks(); } catch(e) { return getDefaultCeoLinks(); }
+}
+function saveCeoLinks(arr) { safeSetItem('pb_ceo_links', JSON.stringify(arr)); }
+function getDefaultCeoLinks() {
+    return [
+        { id: 'lk_keap', label: 'Keap CRM', url: 'https://app.keap.com', icon: '📇', color: '#16A34A' },
+        { id: 'lk_drive', label: 'Google Drive', url: 'https://drive.google.com', icon: '📁', color: '#2563EB' },
+        { id: 'lk_gmail', label: 'Gmail', url: 'https://mail.google.com', icon: '✉️', color: '#DC2626' },
+        { id: 'lk_coaches', label: 'Gestione Coach', url: '', icon: '🎯', color: '#7C3AED' },
+        { id: 'lk_vendite', label: 'Report Vendite', url: '', icon: '💰', color: '#CA8A04' },
+        { id: 'lk_analytics', label: 'Analytics', url: 'https://analytics.google.com', icon: '📊', color: '#0D9488' }
+    ];
+}
+
+// ========== RISORSE CEO (Bacheca) ==========
+function getResources() {
+    try { return JSON.parse(safeGetItem('pb_resources') || '[]'); } catch(e) { return []; }
+}
+function saveResources(arr) { safeSetItem('pb_resources', JSON.stringify(arr)); }
+
+function openResourceModal(resId) {
+    var resources = getResources();
+    var isNew = !resId;
+    var res = isNew ? { id: 'res_' + Date.now() + '_' + Math.random().toString(36).slice(2,6), title: '', type: 'note', url: '', content: '', createdAt: new Date().toISOString() } : resources.find(function(r) { return r.id === resId; });
+    if (!res) return;
+
+    var modal = document.getElementById('taskModalInner');
+    var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
+    html += '<input class="modal-title-input" id="resTitle" placeholder="Titolo risorsa..." value="' + esc(res.title) + '">';
+
+    html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Tipo</span>';
+    html += '<select class="modal-select" id="resType" onchange="toggleResFields()">';
+    html += '<option value="note"' + (res.type === 'note' ? ' selected' : '') + '>Nota / Markdown</option>';
+    html += '<option value="link"' + (res.type === 'link' ? ' selected' : '') + '>Link esterno</option>';
+    html += '<option value="html"' + (res.type === 'html' ? ' selected' : '') + '>HTML</option>';
+    html += '</select></div>';
+
+    html += '<div class="modal-field" id="resUrlField" style="margin-top:12px;display:' + (res.type === 'link' ? 'block' : 'none') + '"><span class="modal-label">URL</span>';
+    html += '<input class="modal-input" id="resUrl" placeholder="https://..." value="' + esc(res.url || '') + '"></div>';
+
+    html += '<div class="modal-field" id="resContentField" style="margin-top:12px;display:' + (res.type !== 'link' ? 'block' : 'none') + '"><span class="modal-label">Contenuto</span>';
+    html += '<textarea class="modal-textarea" id="resContent" rows="10" placeholder="Scrivi qui... (supporta Markdown per le note)">' + esc(res.content || '') + '</textarea></div>';
+
+    html += '<div class="modal-actions" style="margin-top:16px">';
+    html += isNew ? '<div></div>' : '<button class="btn-delete" onclick="deleteResource(\'' + res.id + '\')">Elimina</button>';
+    html += '<div class="modal-actions-right">';
+    html += '<button class="btn-cancel" onclick="closeTaskModal()">Annulla</button>';
+    html += '<button class="btn-save" onclick="saveResource(\'' + res.id + '\',' + isNew + ')">Salva</button>';
+    html += '</div></div>';
+
+    modal.innerHTML = html;
+    document.getElementById('taskModal').classList.add('open');
+}
+
+function toggleResFields() {
+    var type = document.getElementById('resType').value;
+    document.getElementById('resUrlField').style.display = type === 'link' ? 'block' : 'none';
+    document.getElementById('resContentField').style.display = type !== 'link' ? 'block' : 'none';
+}
+
+function saveResource(id, isNew) {
+    var resources = getResources();
+    var data = {
+        id: id,
+        title: document.getElementById('resTitle').value.trim(),
+        type: document.getElementById('resType').value,
+        url: document.getElementById('resUrl').value.trim(),
+        content: document.getElementById('resContent').value,
+        createdAt: isNew ? new Date().toISOString() : (resources.find(function(r) { return r.id === id; }) || {}).createdAt || new Date().toISOString()
+    };
+    if (!data.title) { alert('Inserisci un titolo'); return; }
+    if (isNew) { resources.unshift(data); } else {
+        var idx = resources.findIndex(function(r) { return r.id === id; });
+        if (idx >= 0) resources[idx] = data;
+    }
+    saveResources(resources);
+    closeTaskModal();
+    render();
+}
+
+function deleteResource(id) {
+    if (!confirm('Eliminare questa risorsa?')) return;
+    saveResources(getResources().filter(function(r) { return r.id !== id; }));
+    closeTaskModal();
+    render();
+}
+
+function simpleMarkdown(text) {
+    if (!text) return '';
+    return text
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/^### (.+)$/gm, '<h4 style="margin:8px 0 4px;font-size:14px;font-weight:700">$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3 style="margin:10px 0 4px;font-size:16px;font-weight:700">$1</h3>')
+        .replace(/^# (.+)$/gm, '<h2 style="margin:12px 0 6px;font-size:18px;font-weight:800">$1</h2>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.+?)\*/g, '<em>$1</em>')
+        .replace(/^- (.+)$/gm, '<li style="margin-left:16px">$1</li>')
+        .replace(/\n/g, '<br>');
+}
+
+function openCeoLinkModal(linkId) {
+    var links = getCeoLinks();
+    var isNew = !linkId;
+    var link = isNew ? { id: 'lk_' + Date.now(), label: '', url: '', icon: '🔗', color: '#78716C' } : links.find(function(l) { return l.id === linkId; });
+    if (!link) return;
+
+    var modal = document.getElementById('taskModalInner');
+    var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
+    html += '<div style="font-size:16px;font-weight:700;margin-bottom:12px">' + (isNew ? 'Nuovo Quick Link' : 'Modifica Quick Link') + '</div>';
+    html += '<div class="modal-field"><span class="modal-label">Etichetta</span><input class="modal-input" id="lkLabel" value="' + esc(link.label) + '"></div>';
+    html += '<div class="modal-field" style="margin-top:10px"><span class="modal-label">URL</span><input class="modal-input" id="lkUrl" placeholder="https://..." value="' + esc(link.url) + '"></div>';
+    html += '<div class="modal-row" style="margin-top:10px">';
+    html += '<div class="modal-field"><span class="modal-label">Icona (emoji)</span><input class="modal-input" id="lkIcon" value="' + esc(link.icon) + '" style="width:60px;text-align:center;font-size:20px"></div>';
+    html += '<div class="modal-field"><span class="modal-label">Colore</span><input class="modal-input" type="color" id="lkColor" value="' + (link.color || '#78716C') + '" style="width:60px;height:36px;padding:2px"></div>';
+    html += '</div>';
+    html += '<div class="modal-actions" style="margin-top:16px">';
+    html += isNew ? '<div></div>' : '<button class="btn-delete" onclick="deleteCeoLink(\'' + link.id + '\')">Elimina</button>';
+    html += '<div class="modal-actions-right">';
+    html += '<button class="btn-cancel" onclick="closeTaskModal()">Annulla</button>';
+    html += '<button class="btn-save" onclick="saveCeoLink(\'' + link.id + '\',' + isNew + ')">Salva</button>';
+    html += '</div></div>';
+
+    modal.innerHTML = html;
+    document.getElementById('taskModal').classList.add('open');
+}
+
+function saveCeoLink(id, isNew) {
+    var links = getCeoLinks();
+    var data = { id: id, label: document.getElementById('lkLabel').value.trim(), url: document.getElementById('lkUrl').value.trim(), icon: document.getElementById('lkIcon').value || '🔗', color: document.getElementById('lkColor').value };
+    if (!data.label) { alert('Inserisci un\'etichetta'); return; }
+    if (isNew) { links.push(data); } else {
+        var idx = links.findIndex(function(l) { return l.id === id; });
+        if (idx >= 0) links[idx] = data;
+    }
+    saveCeoLinks(links);
+    closeTaskModal();
+    render();
+}
+
+function deleteCeoLink(id) {
+    if (!confirm('Eliminare questo link?')) return;
+    saveCeoLinks(getCeoLinks().filter(function(l) { return l.id !== id; }));
+    closeTaskModal();
+    render();
+}
+
 // ========== LANCI MARKETING ==========
 function getLaunches() {
     try { return JSON.parse(safeGetItem('pb_launches') || '[]'); } catch(e) { return []; }
@@ -2127,7 +2275,7 @@ function renderLaunchCalendar(allLaunches, editable) {
                 var st = getLaunchStatus(l);
                 var isLive = st === 'live';
                 var borderStyle = isLive ? '2px solid ' + bColor : '1px solid ' + bColor + '80';
-                var cursor = editable ? 'cursor:grab;' : '';
+                var cursor = editable ? 'cursor:grab;' : 'pointer-events:none;';
                 var cleanName = l.name;
 
                 html += '<div class="gantt-bar" data-launch-id="' + l.id + '" style="position:absolute;left:' + barL + 'px;width:' + barW + 'px;top:5px;bottom:5px;background:' + bBg + ';border:' + borderStyle + ';border-radius:6px;display:flex;align-items:center;overflow:hidden;z-index:1;' + cursor + 'user-select:none;touch-action:none">';
@@ -2296,6 +2444,7 @@ function renderLaunchCalendar(allLaunches, editable) {
     }
 
     document.addEventListener('pointerdown', function(e) {
+        if (CEO_MODE || _ceoPreview) return; // CEO: no drag/resize
         if (e.target.closest('.gantt-bar') || e.target.closest('.gantt-handle')) ganttPointerDown(e);
     });
     document.addEventListener('pointermove', ganttPointerMove);
@@ -2432,7 +2581,7 @@ var _ceoPreview = false; // preview mode from COO
 function previewCEO() {
     _ceoPreview = true;
     // In preview, use local data directly
-    _ceoData = { publishedAt: new Date().toISOString(), projects: _origGetProjects(), team: _origGetTeam(), launches: getLaunches() };
+    _ceoData = { publishedAt: new Date().toISOString(), projects: _origGetProjects(), team: _origGetTeam(), launches: getLaunches(), ceoLinks: getCeoLinks(), resources: getResources() };
     document.getElementById('header').style.display = 'none';
     renderCEOView();
 }
@@ -2449,6 +2598,15 @@ function ceoGoHome() { _ceoOpenProject = null; renderCEOView(); }
 function ceoOpenProject(pid) { _ceoOpenProject = pid; renderCEOView(); }
 function renderCEOView() {
     document.getElementById('mainContent').innerHTML = _ceoOpenProject ? renderCEOProject(_ceoOpenProject) : renderCEOHome();
+}
+
+function ceoToggleResource(resId) {
+    var body = document.getElementById('resBody_' + resId);
+    var chevron = document.getElementById('resChevron_' + resId);
+    if (!body) return;
+    var open = body.style.display === 'none';
+    body.style.display = open ? 'block' : 'none';
+    if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
 }
 
 function ceoToggleTheme() {
@@ -2500,6 +2658,23 @@ function renderCEOHome() {
     if (blockedCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Bloccate</div></div>';
     if (overdueCount > 0) html += '<div style="flex:1;background:var(--red-bg, #FEF2F2);border:1px solid var(--red);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueCount + '</div><div style="font-size:11px;color:var(--red);font-weight:600">Scadute</div></div>';
     html += '</div>';
+
+    // ========== CEO QUICK LINKS (griglia shortcut) ==========
+    var ceoLinks = getCeoLinks();
+    if (ceoLinks.length > 0) {
+        html += '<div style="margin-bottom:24px">';
+        html += '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:10px">Accesso Rapido</div>';
+        html += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:10px">';
+        ceoLinks.forEach(function(lk) {
+            var hasUrl = lk.url && lk.url.trim();
+            html += '<a ' + (hasUrl ? 'href="' + esc(lk.url) + '" target="_blank" rel="noopener"' : 'href="javascript:void(0)"') + ' style="text-decoration:none;display:flex;flex-direction:column;align-items:center;gap:6px;padding:16px 8px;background:var(--surface);border:1px solid var(--border);border-radius:14px;transition:all 0.15s;cursor:' + (hasUrl ? 'pointer' : 'default') + '"' + (hasUrl ? ' onmouseenter="this.style.borderColor=\'' + lk.color + '\';this.style.transform=\'translateY(-2px)\';this.style.boxShadow=\'0 4px 12px ' + lk.color + '22\'" onmouseleave="this.style.borderColor=\'\';this.style.transform=\'\';this.style.boxShadow=\'\'"' : '') + '>';
+            html += '<div style="width:48px;height:48px;border-radius:14px;background:' + lk.color + '18;display:flex;align-items:center;justify-content:center;font-size:24px">' + lk.icon + '</div>';
+            html += '<span style="font-size:12px;font-weight:700;color:var(--text);text-align:center;line-height:1.2">' + esc(lk.label) + '</span>';
+            if (!hasUrl) html += '<span style="font-size:9px;color:var(--text-muted);font-style:italic">Coming soon</span>';
+            html += '</a>';
+        });
+        html += '</div></div>';
+    }
 
     // ========== LANCI MARKETING (CEO) — calendario Gantt ==========
     var launches = getLaunches();
@@ -2601,6 +2776,42 @@ function renderCEOHome() {
 
     if (projects.length === 0) {
         html += '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:15px">Nessun progetto attivo</div>';
+    }
+
+    // ========== BACHECA RISORSE (CEO) ==========
+    var resources = getResources();
+    if (resources.length > 0) {
+        html += '<div style="margin-top:32px">';
+        html += '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px">Bacheca Risorse</div>';
+        html += '<div style="display:grid;gap:10px">';
+        resources.forEach(function(res) {
+            var typeIcon = res.type === 'link' ? '&#128279;' : res.type === 'html' ? '&#128196;' : '&#128221;';
+            var typeLabel = res.type === 'link' ? 'Link' : res.type === 'html' ? 'HTML' : 'Nota';
+            var dateStr = res.createdAt ? new Date(res.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short'}) : '';
+
+            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden">';
+            html += '<div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="ceoToggleResource(\'' + res.id + '\')">';
+            html += '<span style="font-size:20px">' + typeIcon + '</span>';
+            html += '<div style="flex:1;min-width:0">';
+            html += '<div style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(res.title) + '</div>';
+            html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">' + typeLabel + (dateStr ? ' &middot; ' + dateStr : '') + '</div>';
+            html += '</div>';
+            html += '<span id="resChevron_' + res.id + '" style="font-size:18px;color:var(--text-muted);transition:transform 0.2s">&#9660;</span>';
+            html += '</div>';
+
+            // Contenuto espandibile
+            html += '<div id="resBody_' + res.id + '" style="display:none;padding:0 16px 14px;border-top:1px solid var(--border-light)">';
+            if (res.type === 'link' && res.url) {
+                html += '<a href="' + esc(res.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">Apri &#8599;</a>';
+            } else if (res.type === 'html') {
+                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + (res.content || '') + '</div>';
+            } else {
+                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content || '') + '</div>';
+            }
+            html += '</div>';
+            html += '</div>';
+        });
+        html += '</div></div>';
     }
 
     html += '</div>';
@@ -2722,7 +2933,9 @@ function publishForCEO() {
         publishedAt: new Date().toISOString(),
         projects: getProjects(),
         team: getTeam(),
-        launches: getLaunches()
+        launches: getLaunches(),
+        ceoLinks: getCeoLinks(),
+        resources: getResources()
     };
     var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
@@ -2781,10 +2994,14 @@ function loadCEOData(callback) {
 // Override getProjects/getTeam in CEO mode to use remote data
 var _origGetProjects = getProjects;
 var _origGetTeam = getTeam;
+var _origGetCeoLinks = getCeoLinks;
+var _origGetResources = getResources;
 if (CEO_MODE) {
     getProjects = function() { return (_ceoData && _ceoData.projects) || []; };
     getTeam = function() { return (_ceoData && _ceoData.team) || []; };
     getLaunches = function() { return (_ceoData && _ceoData.launches) || []; };
+    getCeoLinks = function() { return (_ceoData && _ceoData.ceoLinks) || _origGetCeoLinks(); };
+    getResources = function() { return (_ceoData && _ceoData.resources) || []; };
 }
 
 // ========== RENDER ==========
@@ -3317,6 +3534,54 @@ function renderGlobal() {
         });
         html += '</div>';
     }
+
+    // ========== CEO TOOLS (Quick Links + Risorse) — gestione COO ==========
+    html += '<div style="border-top:2px solid var(--border);padding-top:20px;margin-top:8px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
+    html += '<div style="font-size:15px;font-weight:800;color:var(--text)">Pannello CEO</div>';
+    html += '<div style="font-size:11px;color:var(--text-muted)">Configurazioni visibili al CEO</div>';
+    html += '</div>';
+
+    // Quick Links management
+    html += '<div style="margin-bottom:18px">';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html += '<span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Quick Links</span>';
+    html += '<button onclick="openCeoLinkModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuovo</button>';
+    html += '</div>';
+    var cLinks = getCeoLinks();
+    html += '<div style="display:flex;flex-wrap:wrap;gap:6px">';
+    cLinks.forEach(function(lk) {
+        html += '<div onclick="openCeoLinkModal(\'' + lk.id + '\')" style="display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px" title="Clicca per modificare">';
+        html += '<span>' + lk.icon + '</span>';
+        html += '<span style="font-weight:600;color:var(--text)">' + esc(lk.label) + '</span>';
+        if (!lk.url || !lk.url.trim()) html += '<span style="color:var(--red);font-size:10px">no url</span>';
+        html += '</div>';
+    });
+    html += '</div></div>';
+
+    // Resources management
+    html += '<div>';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    html += '<span style="font-size:13px;font-weight:700;color:var(--text-secondary)">Bacheca Risorse</span>';
+    html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
+    html += '</div>';
+    var ress = getResources();
+    if (ress.length === 0) {
+        html += '<div style="font-size:12px;color:var(--text-muted);font-style:italic;padding:8px 0">Nessuna risorsa. Aggiungi note, link o HTML che il CEO potra consultare.</div>';
+    } else {
+        html += '<div style="display:flex;flex-direction:column;gap:4px">';
+        ress.forEach(function(r) {
+            var typeIcon = r.type === 'link' ? '&#128279;' : r.type === 'html' ? '&#128196;' : '&#128221;';
+            html += '<div onclick="openResourceModal(\'' + r.id + '\')" style="display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--surface);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:12px" title="Clicca per modificare">';
+            html += '<span>' + typeIcon + '</span>';
+            html += '<span style="font-weight:600;color:var(--text);flex:1">' + esc(r.title) + '</span>';
+            html += '<span style="font-size:10px;color:var(--text-muted)">' + (r.type === 'link' ? 'Link' : r.type === 'html' ? 'HTML' : 'Nota') + '</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+    html += '</div>';
+    html += '</div>'; // close CEO tools section
 
     html += '</div>';
     return html;
