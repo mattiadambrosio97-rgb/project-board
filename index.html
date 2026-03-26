@@ -2618,6 +2618,15 @@ function renderCEOView() {
     document.getElementById('mainContent').innerHTML = _ceoOpenProject ? renderCEOProject(_ceoOpenProject) : renderCEOHome();
 }
 
+function ceoToggleInbox() {
+    var panel = document.getElementById('ceoInboxPanel');
+    var chevron = document.getElementById('ceoInboxChevron');
+    if (!panel) return;
+    var open = panel.style.display === 'none';
+    panel.style.display = open ? 'block' : 'none';
+    if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
+}
+
 function ceoToggleResource(resId) {
     var body = document.getElementById('resBody_' + resId);
     var chevron = document.getElementById('resChevron_' + resId);
@@ -2857,6 +2866,92 @@ function renderCEOHome() {
     html += '<button onclick="ceoToggleTheme()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:42px;height:42px;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
     html += '</div>';
 
+    // ========== NOTIFICHE / BACHECA RISORSE — widget in alto ==========
+    var resources = getResources();
+    var unreadRes = resources.filter(function(r) { return !r.ceoRead; });
+    if (resources.length > 0) {
+        var hasUnread = unreadRes.length > 0;
+        html += '<div id="ceoInboxWidget" style="margin-bottom:14px">';
+        // Bottone notifica
+        html += '<div onclick="ceoToggleInbox()" style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:12px 16px;background:' + (hasUnread ? 'var(--accent-soft,#FFF1ED)' : 'var(--surface)') + ';border:1px solid ' + (hasUnread ? 'var(--accent)' : 'var(--border)') + ';border-radius:12px;transition:all 0.15s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+        html += '<span style="font-size:22px">&#128232;</span>';
+        html += '<div style="flex:1">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--text)">Dal team operativo</div>';
+        if (hasUnread) {
+            html += '<div style="font-size:12px;color:var(--accent);font-weight:600">' + unreadRes.length + ' element' + (unreadRes.length === 1 ? 'o' : 'i') + ' da leggere</div>';
+        } else {
+            html += '<div style="font-size:12px;color:var(--text-muted)">Tutto letto</div>';
+        }
+        html += '</div>';
+        if (hasUnread) html += '<span style="background:var(--accent);color:#fff;font-size:13px;font-weight:800;min-width:26px;height:26px;border-radius:13px;display:flex;align-items:center;justify-content:center">' + unreadRes.length + '</span>';
+        html += '<span id="ceoInboxChevron" style="font-size:16px;color:var(--text-muted);transition:transform 0.2s">&#9660;</span>';
+        html += '</div>';
+
+        // Pannello espandibile
+        html += '<div id="ceoInboxPanel" style="display:none;margin-top:8px;display:none">';
+        // Non lette prima
+        var sortedRes = resources.slice().sort(function(a,b) { return (a.ceoRead ? 1 : 0) - (b.ceoRead ? 1 : 0); });
+        sortedRes.forEach(function(res) {
+            var typeIcon = res.type === 'link' ? '&#128279;' : res.type === 'html' ? '&#128196;' : '&#128221;';
+            var typeLabel = res.type === 'link' ? 'Link' : res.type === 'html' ? 'HTML' : 'Nota';
+            var dateStr = res.createdAt ? new Date(res.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short'}) : '';
+            var isRead = res.ceoRead;
+
+            html += '<div style="background:' + (isRead ? 'var(--surface)' : 'var(--accent-soft,#FFF1ED)') + ';border:1px solid ' + (isRead ? 'var(--border)' : 'var(--accent)') + ';border-radius:10px;margin-bottom:8px;overflow:hidden;opacity:' + (isRead ? '0.7' : '1') + '">';
+
+            // Header cliccabile
+            html += '<div style="padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="ceoToggleResource(\'' + res.id + '\')">';
+            html += '<span style="font-size:18px">' + typeIcon + '</span>';
+            html += '<div style="flex:1;min-width:0">';
+            html += '<div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(res.title);
+            if (!isRead) html += ' <span style="font-size:9px;font-weight:800;color:#fff;background:var(--accent);border-radius:3px;padding:1px 5px;margin-left:4px;vertical-align:middle">NUOVO</span>';
+            html += '</div>';
+            html += '<div style="font-size:10px;color:var(--text-muted);margin-top:1px">' + typeLabel + (dateStr ? ' &middot; ' + dateStr : '');
+            if (isRead) html += ' &middot; <span style="color:var(--green);font-weight:600">Letto</span>';
+            html += '</div>';
+            html += '</div>';
+            html += '<span id="resChevron_' + res.id + '" style="font-size:14px;color:var(--text-muted);transition:transform 0.2s">&#9660;</span>';
+            html += '</div>';
+
+            // Contenuto espandibile
+            html += '<div id="resBody_' + res.id + '" style="display:none;padding:0 14px 12px;border-top:1px solid var(--border-light)">';
+            if (res.type === 'link' && res.url) {
+                html += '<a href="' + esc(res.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">Apri &#8599;</a>';
+            } else if (res.type === 'html') {
+                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + (res.content || '') + '</div>';
+            } else {
+                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content || '') + '</div>';
+            }
+
+            // Feedback precedenti
+            var ceoFeedback = res.ceoFeedback || [];
+            if (ceoFeedback.length > 0) {
+                html += '<div style="margin-top:10px">';
+                ceoFeedback.slice().reverse().forEach(function(fb) {
+                    var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                    html += '<div style="padding:5px 8px;background:var(--surface);border-radius:6px;margin-bottom:3px;font-size:11px">';
+                    html += '<span style="font-weight:700;color:var(--blue)">Tu</span> <span style="color:var(--text-muted);margin-left:4px">' + fDate + '</span>';
+                    html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(fb.note) + '</div>';
+                    html += '</div>';
+                });
+                html += '</div>';
+            }
+
+            // Azioni
+            html += '<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">';
+            if (!isRead) {
+                html += '<button onclick="event.stopPropagation();ceoMarkResource(\'' + res.id + '\',\'read\')" style="flex:1;min-width:90px;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Segna come letto</button>';
+            }
+            html += '<button onclick="event.stopPropagation();ceoResourceFeedback(\'' + res.id + '\')" style="flex:1;min-width:90px;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Rispondi al COO</button>';
+            html += '</div>';
+
+            html += '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+        html += '</div>';
+    }
+
     // ========== CEO QUICK LINKS — rettangolini orizzontali, prima di tutto ==========
     var ceoLinks = getCeoLinks();
     if (ceoLinks.length > 0) {
@@ -3051,76 +3146,7 @@ function renderCEOHome() {
         html += '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:15px">Nessun progetto attivo</div>';
     }
 
-    // ========== BACHECA RISORSE (CEO) ==========
-    var resources = getResources();
-    var unreadCount = resources.filter(function(r) { return !r.ceoRead; }).length;
-    if (resources.length > 0) {
-        html += '<div style="margin-top:32px">';
-        html += '<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:12px">&#128218; Bacheca Risorse';
-        if (unreadCount > 0) html += ' <span style="font-size:12px;font-weight:700;color:#fff;background:var(--accent);border-radius:12px;padding:2px 8px;margin-left:6px">' + unreadCount + ' nuov' + (unreadCount === 1 ? 'a' : 'e') + '</span>';
-        html += '</div>';
-        html += '<div style="display:grid;gap:10px">';
-        // Non lette prima, poi lette
-        var sortedRes = resources.slice().sort(function(a,b) { return (a.ceoRead ? 1 : 0) - (b.ceoRead ? 1 : 0); });
-        sortedRes.forEach(function(res) {
-            var typeIcon = res.type === 'link' ? '&#128279;' : res.type === 'html' ? '&#128196;' : '&#128221;';
-            var typeLabel = res.type === 'link' ? 'Link' : res.type === 'html' ? 'HTML' : 'Nota';
-            var dateStr = res.createdAt ? new Date(res.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short'}) : '';
-            var isRead = res.ceoRead;
-            var borderStyle = isRead ? 'var(--border)' : 'var(--accent)';
-            var bgStyle = isRead ? 'var(--surface)' : 'var(--accent-soft, #FFF1ED)';
-
-            html += '<div style="background:' + bgStyle + ';border:1px solid ' + borderStyle + ';border-radius:12px;overflow:hidden;opacity:' + (isRead ? '0.75' : '1') + '">';
-            html += '<div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="ceoToggleResource(\'' + res.id + '\')">';
-            html += '<span style="font-size:20px">' + typeIcon + '</span>';
-            html += '<div style="flex:1;min-width:0">';
-            html += '<div style="font-size:14px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(res.title);
-            if (!isRead) html += ' <span style="font-size:10px;font-weight:800;color:var(--accent);background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:4px;padding:1px 5px;margin-left:4px;vertical-align:middle">NUOVO</span>';
-            html += '</div>';
-            html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">' + typeLabel + (dateStr ? ' &middot; ' + dateStr : '');
-            if (isRead) html += ' &middot; <span style="color:var(--green);font-weight:600">Letto</span>';
-            html += '</div>';
-            html += '</div>';
-            html += '<span id="resChevron_' + res.id + '" style="font-size:18px;color:var(--text-muted);transition:transform 0.2s">&#9660;</span>';
-            html += '</div>';
-
-            // Contenuto espandibile
-            html += '<div id="resBody_' + res.id + '" style="display:none;padding:0 16px 14px;border-top:1px solid var(--border-light)">';
-            if (res.type === 'link' && res.url) {
-                html += '<a href="' + esc(res.url) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 16px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">Apri &#8599;</a>';
-            } else if (res.type === 'html') {
-                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + (res.content || '') + '</div>';
-            } else {
-                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content || '') + '</div>';
-            }
-
-            // Feedback CEO
-            var ceoFeedback = res.ceoFeedback || [];
-            if (ceoFeedback.length > 0) {
-                html += '<div style="margin-top:10px">';
-                ceoFeedback.slice().reverse().forEach(function(fb) {
-                    var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    html += '<div style="padding:6px 10px;background:var(--surface);border-radius:6px;margin-bottom:4px;font-size:12px">';
-                    html += '<span style="font-weight:700;color:var(--blue)">Tu</span> <span style="color:var(--text-muted);margin-left:4px">' + fDate + '</span>';
-                    html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(fb.note) + '</div>';
-                    html += '</div>';
-                });
-                html += '</div>';
-            }
-
-            // Azioni CEO
-            html += '<div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">';
-            if (!isRead) {
-                html += '<button onclick="ceoMarkResource(\'' + res.id + '\',\'read\')" style="flex:1;min-width:100px;padding:10px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Segna come letto</button>';
-            }
-            html += '<button onclick="ceoResourceFeedback(\'' + res.id + '\')" style="flex:1;min-width:100px;padding:10px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Rispondi al COO</button>';
-            html += '</div>';
-
-            html += '</div>';
-            html += '</div>';
-        });
-        html += '</div></div>';
-    }
+    // Bacheca Risorse rimossa dal fondo — ora è il widget notifica in alto
 
     html += '</div>';
     return html;
