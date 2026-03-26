@@ -5173,15 +5173,16 @@ function _cooFetchTeamActions() {
                             t.teamCompletedBy = memberName;
                             needSave = true;
                         } else if (ta.status === 'in_progress' && t.status === 'todo') {
-                            t.status = 'in-progress';
+                            t.status = 'in_progress';
                             needSave = true;
                         } else if (ta.status === 'blocked' && t.status !== 'blocked') {
                             t.status = 'blocked';
                             needSave = true;
                         }
 
-                        // Flag per notifica
-                        if (!t.teamHasUpdate || t._teamLastUpdateAt !== lastTeamUpdate.at) {
+                        // Flag per notifica — solo se c'è un commento testuale
+                        var hasTextNote = lastTeamUpdate.note && lastTeamUpdate.note.trim();
+                        if (hasTextNote && (!t.teamHasUpdate || t._teamLastUpdateAt !== lastTeamUpdate.at)) {
                             t.teamHasUpdate = true;
                             t._teamLastUpdateAt = lastTeamUpdate.at;
                             t._teamLastUpdateBy = memberName;
