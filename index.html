@@ -2738,24 +2738,12 @@ function toggleLaunchesSection() {
 function init() {
     if (!CEO_MODE) {
         seedData();
-        // Su GitHub Pages COO: SEMPRE carica dati freschi da API GitHub
+        // Su GitHub Pages COO: verifica token, poi usa dati locali (COO e' la fonte dati)
         if (window.location.hostname.indexOf('github.io') !== -1) {
             var cooToken = getGHToken();
             if (!cooToken) {
                 _showCooOnboarding(function() { init(); });
                 return;
-            }
-            if (cooToken) {
-                _ghFetchJSON(GH_DATA_FILE, cooToken).then(function(data) {
-                    if (!data) return;
-                    var changed = false;
-                    if (data.launches) { saveLaunches(data.launches); changed = true; }
-                    if (data.projects && data.projects.length > 0) { saveProjects(data.projects); changed = true; }
-                    if (data.team && data.team.length > 0) { safeSetItem('pb_team', JSON.stringify(data.team)); changed = true; }
-                    if (data.resources) { safeSetItem('pb_resources', JSON.stringify(data.resources)); changed = true; }
-                    if (data.ceoLinks) { safeSetItem('pb_ceoLinks', JSON.stringify(data.ceoLinks)); changed = true; }
-                    if (changed) { window._lastCooSync = Date.now(); render(); }
-                }).catch(function() {});
             }
         }
         // Migrate review -> todo (colonna rimossa)
