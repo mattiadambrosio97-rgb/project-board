@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:43:00.231Z",
+  "publishedAt": "2026-03-26T10:45:36.368Z",
   "projects": [
     {
       "id": "id_1774513635614_94lnp5",
@@ -437,6 +437,31 @@
           "completedAt": null,
           "recurrence": null,
           "note": ""
+        },
+        {
+          "id": "id_alb_1774521936367_1412",
+          "title": "Approvare budget Ads Q2 (3000/mese)",
+          "assignee": "Alberto",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-27",
+          "estimateHours": 1,
+          "tags": [
+            "budget",
+            "decisione"
+          ],
+          "comments": [
+            {
+              "text": "Report Q1 inviato con proiezioni Q2",
+              "author": "Mattia",
+              "createdAt": 1774435536367
+            }
+          ],
+          "createdAt": 1774089936367,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Mattia ha preparato il report con ROAS Q1 (2.8x). Serve tua approvazione per confermare 3000 EUR/mese su Meta. Vedi report allegato in Bacheca Risorse."
         }
       ]
     },
@@ -620,6 +645,31 @@
           "completedAt": null,
           "recurrence": null,
           "note": ""
+        },
+        {
+          "id": "id_alb_1774521936367_jg42",
+          "title": "Decidere pricing nuovo funnel USR",
+          "assignee": "Alberto",
+          "status": "todo",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-26",
+          "estimateHours": 1,
+          "tags": [
+            "pricing",
+            "decisione"
+          ],
+          "comments": [
+            {
+              "text": "Proposte: 297 EUR (base), 497 EUR (premium), 997 EUR (VIP)",
+              "author": "Mattia",
+              "createdAt": 1774349136367
+            }
+          ],
+          "createdAt": 1774003536367,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Mattia ha preparato 3 opzioni di prezzo con margini e proiezioni. Scegli quale struttura adottare per il nuovo funnel USR. Vedi doc condiviso su Drive."
         }
       ]
     },
@@ -845,6 +895,50 @@
           "completedAt": null,
           "recurrence": null,
           "note": ""
+        },
+        {
+          "id": "id_alb_1774521936367_3d33",
+          "title": "Registrare video intro corso",
+          "assignee": "Alberto",
+          "status": "in_progress",
+          "priority": "p0",
+          "dependsOn": [],
+          "dueDate": "2026-03-30",
+          "estimateHours": 2,
+          "tags": [
+            "video",
+            "contenuto"
+          ],
+          "comments": [
+            {
+              "text": "Script gia pronto, Kevin puo montarlo appena ce l hai",
+              "author": "Mattia",
+              "createdAt": 1774435536367
+            }
+          ],
+          "createdAt": 1773830736367,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Registra il video introduttivo del corso (3-5 minuti). Lo script e nella cartella Drive condivisa. Kevin fara il montaggio. Serve entro venerdi per restare nei tempi."
+        },
+        {
+          "id": "id_alb_1774521936367_rsdl",
+          "title": "Revisione contenuti modulo 1-3",
+          "assignee": "Alberto",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-04-02",
+          "estimateHours": 2,
+          "tags": [
+            "revisione",
+            "contenuto"
+          ],
+          "comments": [],
+          "createdAt": 1774089936367,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Daniele ha completato i moduli 1-3. Guardali e conferma che il livello tecnico sia ok per il target. Segnala correzioni su Drive."
         }
       ]
     },
@@ -989,6 +1083,31 @@
           "completedAt": null,
           "recurrence": null,
           "note": ""
+        },
+        {
+          "id": "id_alb_1774521936367_e08k",
+          "title": "Chiamata con Luigi Mazzola per partnership referral",
+          "assignee": "Alberto",
+          "status": "todo",
+          "priority": "p1",
+          "dependsOn": [],
+          "dueDate": "2026-03-31",
+          "estimateHours": 1,
+          "tags": [
+            "meeting",
+            "partnership"
+          ],
+          "comments": [
+            {
+              "text": "Luigi e disponibile giovedi o venerdi pomeriggio",
+              "author": "Manlio",
+              "createdAt": 1774349136367
+            }
+          ],
+          "createdAt": 1774176336367,
+          "completedAt": null,
+          "recurrence": null,
+          "note": "Parlare con Luigi della possibilita che promuova il programma referral ai suoi contatti. Manlio ha gia sondato la disponibilita. Fissa la call e allineati con lui."
         }
       ]
     },
