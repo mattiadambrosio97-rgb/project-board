@@ -1,6 +1,122 @@
 {
-  "publishedAt": "2026-03-26T23:00:00.000Z",
+  "publishedAt": "2026-03-26T23:12:26.390Z",
   "projects": [
+    {
+      "id": "proj_test_rebrand",
+      "name": "Rebranding ADT 2026",
+      "description": "Nuovo logo, palette colori, brand guidelines",
+      "status": "attivo",
+      "launchDate": "2026-04-15",
+      "tasks": [
+        {
+          "id": "task_t1_logo",
+          "title": "Nuove proposte logo ADT",
+          "status": "in_progress",
+          "assignee": "Kevin",
+          "dueDate": "2026-03-28",
+          "estimateHours": 8,
+          "recurrence": null,
+          "note": "3 proposte diverse: moderna, classica, minimal. Formato AI + PNG.",
+          "ceoNote": "Alberto vuole qualcosa di pulito, niente effetti 3D",
+          "nextCheck": "2026-03-27",
+          "doneWhen": "3 proposte approvate da Alberto",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "branding"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774310800000,
+          "completedAt": null,
+          "activityLog": [
+            {
+              "date": "2026-03-24",
+              "text": "Stato cambiato in: In corso"
+            }
+          ]
+        },
+        {
+          "id": "task_t2_palette",
+          "title": "Palette colori + tipografia",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-02",
+          "estimateHours": 4,
+          "recurrence": null,
+          "note": "Definire palette primaria (3 colori) + font heading e body. Consegnare su Figma.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "File Figma con palette e font completo",
+          "dependsLabel": "Dopo approvazione logo",
+          "tags": [
+            "design"
+          ],
+          "dependsOn": [
+            "task_t1_logo"
+          ],
+          "comments": [],
+          "createdAt": 1774310800000,
+          "completedAt": null,
+          "activityLog": []
+        }
+      ]
+    },
+    {
+      "id": "proj_test_evento",
+      "name": "Evento Track Day Aprile",
+      "description": "Materiale grafico per track day 19 aprile",
+      "status": "attivo",
+      "launchDate": "2026-04-19",
+      "tasks": [
+        {
+          "id": "task_t6_locandina",
+          "title": "Locandina evento + post social",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-01",
+          "estimateHours": 4,
+          "recurrence": null,
+          "note": "Locandina A3 per stampa + versione social (1080x1080 e 1080x1920). Data: 19 aprile, Misano.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "Locandina approvata da Mattia",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "evento"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774483600000,
+          "completedAt": null,
+          "activityLog": []
+        },
+        {
+          "id": "task_t7_badge",
+          "title": "Badge partecipanti + pass paddock",
+          "status": "todo",
+          "assignee": "Kevin",
+          "dueDate": "2026-04-10",
+          "estimateHours": 3,
+          "recurrence": null,
+          "note": "Badge nominativo con QR code. Template editabile per stampare in loco.",
+          "ceoNote": "",
+          "nextCheck": "",
+          "doneWhen": "Template badge funzionante",
+          "dependsLabel": "",
+          "tags": [
+            "design",
+            "evento"
+          ],
+          "dependsOn": [],
+          "comments": [],
+          "createdAt": 1774483600000,
+          "completedAt": null,
+          "activityLog": []
+        }
+      ]
+    },
     {
       "id": "id_1774561315044_2num0g",
       "name": "fwef",
@@ -129,67 +245,6 @@
       ]
     },
     {
-      "id": "proj_test_rebrand",
-      "name": "Rebranding ADT 2026",
-      "description": "Nuovo logo, palette colori, brand guidelines",
-      "status": "attivo",
-      "launchDate": "2026-04-15",
-      "tasks": [
-        {
-          "id": "task_t1_logo",
-          "title": "Nuove proposte logo ADT",
-          "status": "in_progress",
-          "assignee": "Kevin",
-          "dueDate": "2026-03-28",
-          "estimateHours": 8,
-          "recurrence": null,
-          "note": "3 proposte diverse: moderna, classica, minimal. Formato AI + PNG.",
-          "ceoNote": "Alberto vuole qualcosa di pulito, niente effetti 3D",
-          "nextCheck": "2026-03-27",
-          "doneWhen": "3 proposte approvate da Alberto",
-          "dependsLabel": "",
-          "tags": [
-            "design",
-            "branding"
-          ],
-          "dependsOn": [],
-          "comments": [],
-          "createdAt": 1774310800000,
-          "completedAt": null,
-          "activityLog": [
-            {
-              "date": "2026-03-24",
-              "text": "Stato cambiato in: In corso"
-            }
-          ]
-        },
-        {
-          "id": "task_t2_palette",
-          "title": "Palette colori + tipografia",
-          "status": "todo",
-          "assignee": "Kevin",
-          "dueDate": "2026-04-02",
-          "estimateHours": 4,
-          "recurrence": null,
-          "note": "Definire palette primaria (3 colori) + font heading e body. Consegnare su Figma.",
-          "ceoNote": "",
-          "nextCheck": "",
-          "doneWhen": "File Figma con palette e font completo",
-          "dependsLabel": "Dopo approvazione logo",
-          "tags": [
-            "design"
-          ],
-          "dependsOn": [
-            "task_t1_logo"
-          ],
-          "comments": [],
-          "createdAt": 1774310800000,
-          "completedAt": null,
-          "activityLog": []
-        }
-      ]
-    },
-    {
       "id": "proj_test_social",
       "name": "Contenuti Social Aprile",
       "description": "Piano editoriale e grafiche per Instagram/TikTok",
@@ -245,7 +300,24 @@
           "comments": [],
           "createdAt": 1774397200000,
           "completedAt": null,
-          "activityLog": []
+          "activityLog": [],
+          "teamHasUpdate": false,
+          "_teamLastUpdateAt": "2026-03-26T23:12:05.092Z",
+          "_teamLastUpdateBy": "Kevin",
+          "_teamLastUpdateNote": "che devo fare?",
+          "teamUpdates": [
+            {
+              "from": "Kevin",
+              "note": "che devo fare?",
+              "at": "2026-03-26T23:12:05.092Z"
+            }
+          ],
+          "cooResponses": [
+            {
+              "note": "schifo",
+              "at": "2026-03-26T23:12:24.606Z"
+            }
+          ]
         },
         {
           "id": "task_t5_stories",
@@ -278,61 +350,6 @@
               "text": "Stato cambiato in: Da verificare"
             }
           ]
-        }
-      ]
-    },
-    {
-      "id": "proj_test_evento",
-      "name": "Evento Track Day Aprile",
-      "description": "Materiale grafico per track day 19 aprile",
-      "status": "attivo",
-      "launchDate": "2026-04-19",
-      "tasks": [
-        {
-          "id": "task_t6_locandina",
-          "title": "Locandina evento + post social",
-          "status": "todo",
-          "assignee": "Kevin",
-          "dueDate": "2026-04-01",
-          "estimateHours": 4,
-          "recurrence": null,
-          "note": "Locandina A3 per stampa + versione social (1080x1080 e 1080x1920). Data: 19 aprile, Misano.",
-          "ceoNote": "",
-          "nextCheck": "",
-          "doneWhen": "Locandina approvata da Mattia",
-          "dependsLabel": "",
-          "tags": [
-            "design",
-            "evento"
-          ],
-          "dependsOn": [],
-          "comments": [],
-          "createdAt": 1774483600000,
-          "completedAt": null,
-          "activityLog": []
-        },
-        {
-          "id": "task_t7_badge",
-          "title": "Badge partecipanti + pass paddock",
-          "status": "todo",
-          "assignee": "Kevin",
-          "dueDate": "2026-04-10",
-          "estimateHours": 3,
-          "recurrence": null,
-          "note": "Badge nominativo con QR code. Template editabile per stampare in loco.",
-          "ceoNote": "",
-          "nextCheck": "",
-          "doneWhen": "Template badge funzionante",
-          "dependsLabel": "",
-          "tags": [
-            "design",
-            "evento"
-          ],
-          "dependsOn": [],
-          "comments": [],
-          "createdAt": 1774483600000,
-          "completedAt": null,
-          "activityLog": []
         }
       ]
     }
