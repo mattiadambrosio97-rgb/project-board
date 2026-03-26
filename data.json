@@ -1861,10 +1861,65 @@
   ],
   "launches": [
     {
-      "id": "ln_1774515706156_y075",
-      "name": "Lancio ADT Setup Pack F1 26 su CRM",
-      "startDate": "2026-03-27",
+      "id": "ln_1774517452235_w5c4os",
+      "name": "Lancio ADT Setup Pack F1-26",
+      "brand": "ADT",
+      "startDate": "2026-03-28",
       "endDate": "2026-03-31",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774517452235_9l0xkr",
+      "name": "Lancio Database Strategia ADT",
+      "brand": "ADT",
+      "startDate": "2026-04-03",
+      "endDate": "2026-04-07",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774517452235_25xp4s",
+      "name": "Lancio ADT Kick Off",
+      "brand": "ADT",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774517452235_mnlj0s",
+      "name": "Lancio Circolo dei Top Drivers Aprile",
+      "brand": "ADT",
+      "startDate": "2026-04-21",
+      "endDate": "2026-04-28",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774517452235_68dkmm",
+      "name": "Lancio USR Kick Off",
+      "brand": "USR",
+      "startDate": "2026-04-12",
+      "endDate": "2026-04-16",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774517452235_d96lxq",
+      "name": "Lancio USR Setup Pack",
+      "brand": "USR",
+      "startDate": "2026-04-06",
+      "endDate": "2026-04-09",
+      "projectId": "",
+      "notes": ""
+    },
+    {
+      "id": "ln_1774517452235_bvio0r",
+      "name": "Lancio Gentleman Driver Lead Magnet",
+      "brand": "GTF",
+      "startDate": "2026-03-31",
+      "endDate": "2026-04-05",
       "projectId": "",
       "notes": ""
     }

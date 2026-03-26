@@ -1903,7 +1903,7 @@ function openLaunchModal(launchId) {
     var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
     html += '<input class="modal-title-input" id="lnName" placeholder="Nome lancio..." value="' + esc(launch.name) + '">';
 
-    var LAUNCH_BRANDS = ['ADT', 'USR', 'ComeUnaVolta', 'Camp'];
+    var LAUNCH_BRANDS = ['ADT', 'USR', 'GTF', 'ADM'];
     html += '<div class="modal-field" style="margin-top:12px"><span class="modal-label">Brand</span>';
     html += '<select class="modal-select" id="lnBrand">';
     html += '<option value="">— Seleziona brand —</option>';
@@ -1960,10 +1960,10 @@ function saveLaunch(id, isNew) {
 function renderLaunchCalendar(allLaunches, editable) {
     if (allLaunches.length === 0) return '';
 
-    var brandOrder = ['ADT', 'USR', 'ComeUnaVolta', 'Camp'];
-    var brandHex = { ADT: '#F06543', USR: '#2563EB', ComeUnaVolta: '#7C3AED', Camp: '#0D9488' };
-    var brandBgHex = { ADT: '#FFF1ED', USR: '#EFF6FF', ComeUnaVolta: '#F5F3FF', Camp: '#F0FDFA' };
-    var darkBrandBg = { ADT: '#1A0F0A', USR: '#0A0F1A', ComeUnaVolta: '#120A1A', Camp: '#0A1A18' };
+    var brandOrder = ['ADT', 'USR', 'GTF', 'ADM'];
+    var brandHex = { ADT: '#DC2626', USR: '#CA8A04', GTF: '#38BDF8', ADM: '#7C3AED' };
+    var brandBgHex = { ADT: '#FEF2F2', USR: '#FEFCE8', GTF: '#F0F9FF', ADM: '#F5F3FF' };
+    var darkBrandBg = { ADT: '#1A0A0A', USR: '#1A1608', GTF: '#0A1420', ADM: '#120A1A' };
 
     // Date range
     var allDates = [];
