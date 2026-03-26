@@ -1913,14 +1913,21 @@ function handleAdd() {
 // ========== CEO MODE ==========
 var CEO_MODE = new URLSearchParams(window.location.search).get('ceo') === '1';
 
-function renderCEO() {
+var _ceoOpenProject = null; // project ID aperto in CEO view
+
+function ceoGoHome() { _ceoOpenProject = null; renderCEOView(); }
+function ceoOpenProject(pid) { _ceoOpenProject = pid; renderCEOView(); }
+function renderCEOView() {
+    document.getElementById('mainContent').innerHTML = _ceoOpenProject ? renderCEOProject(_ceoOpenProject) : renderCEOHome();
+}
+
+function renderCEOHome() {
     var projects = getProjects().filter(function(p) { return p.status !== 'completato'; });
     var allTasks = projects.flatMap(function(p) { return (p.tasks||[]).map(function(t) { return Object.assign({}, t, {projectName: p.name}); }); });
     var todayStr = today();
     var weekAhead = new Date(); weekAhead.setDate(weekAhead.getDate() + 7);
     var weekStr = weekAhead.toISOString().split('T')[0];
 
-    // Stats
     var totalTasks = allTasks.length;
     var doneTasks = allTasks.filter(function(t) { return t.status === 'done'; }).length;
     var blockedTasks = allTasks.filter(function(t) { return t.status === 'blocked'; });
@@ -1930,63 +1937,85 @@ function renderCEO() {
 
     var html = '<div style="padding:20px 16px;max-width:600px;margin:0 auto">';
 
-    // Title
+    // Header
     html += '<div style="margin-bottom:20px">';
     html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.5px">CEO Dashboard</div>';
     html += '<div style="font-size:22px;font-weight:800;color:var(--text);margin-top:2px">ADT Esports</div>';
     html += '<div style="font-size:12px;color:var(--text-muted);margin-top:4px">' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long', year:'numeric'}) + '</div>';
+    if (_ceoData && _ceoData.publishedAt) {
+        var pubDate = new Date(_ceoData.publishedAt);
+        html += '<div style="font-size:11px;color:var(--text-muted);margin-top:2px">Aggiornato: ' + pubDate.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) + '</div>';
+    }
     html += '</div>';
 
-    // Big stats
+    // Stats
     html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">';
     html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:28px;font-weight:800;color:var(--accent)">' + pct + '%</div><div style="font-size:12px;color:var(--text-muted);font-weight:600">Completamento</div></div>';
     html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:28px;font-weight:800;color:' + (blockedTasks.length > 0 ? 'var(--red)' : 'var(--green)') + '">' + blockedTasks.length + '</div><div style="font-size:12px;color:var(--text-muted);font-weight:600">Bloccate</div></div>';
     html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;text-align:center"><div style="font-size:28px;font-weight:800;color:' + (overdueTasks.length > 0 ? 'var(--red)' : 'var(--green)') + '">' + overdueTasks.length + '</div><div style="font-size:12px;color:var(--text-muted);font-weight:600">Scadute</div></div>';
     html += '</div>';
 
-    // Project health
+    // Upcoming deadlines timeline (prossimi 7 giorni)
+    if (upcomingTasks.length > 0) {
+        html += '<div style="margin-bottom:20px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Scadenze prossimi 7 giorni</div>';
+        upcomingTasks.sort(function(a,b) { return (a.dueDate||'').localeCompare(b.dueDate||''); });
+        upcomingTasks.forEach(function(t) {
+            var dc = dateClass(t.dueDate, t.status);
+            html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border-light)">';
+            html += '<span class="task-card-due ' + dc + '" style="font-size:12px;min-width:60px;flex-shrink:0">' + smartDate(t.dueDate) + '</span>';
+            html += '<span style="font-size:13px;font-weight:600;color:var(--text);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(t.title) + '</span>';
+            html += '<span style="font-size:11px;color:var(--text-muted);flex-shrink:0">' + esc(t.projectName).split(' ').slice(0,2).join(' ') + '</span>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Project cards (clickable)
     html += '<div style="margin-bottom:20px">';
-    html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Stato Progetti</div>';
+    html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">Progetti</div>';
     projects.forEach(function(p) {
         var tasks = p.tasks || [];
         var total = tasks.length;
         var done = tasks.filter(function(t) { return t.status === 'done'; }).length;
+        var inProgress = tasks.filter(function(t) { return t.status === 'in_progress'; }).length;
         var blocked = tasks.filter(function(t) { return t.status === 'blocked'; }).length;
         var overdue = tasks.filter(function(t) { return t.dueDate && t.dueDate < todayStr && t.status !== 'done'; }).length;
         var ppct = total > 0 ? Math.round(done / total * 100) : 0;
 
-        // Semaforo
         var light = 'var(--green)';
-        var lightLabel = 'OK';
-        if (blocked > 0 || overdue > 2) { light = 'var(--red)'; lightLabel = 'Critico'; }
-        else if (overdue > 0) { light = 'var(--yellow, #EAB308)'; lightLabel = 'Attenzione'; }
+        if (blocked > 0 || overdue > 2) light = 'var(--red)';
+        else if (overdue > 0) light = 'var(--yellow, #EAB308)';
 
-        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px">';
+        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:8px;cursor:pointer" onclick="ceoOpenProject(\'' + p.id + '\')">';
         html += '<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">';
         html += '<div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">';
         html += '<span style="width:12px;height:12px;border-radius:50%;background:' + light + ';flex-shrink:0"></span>';
         html += '<span style="font-size:15px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc(p.name) + '</span>';
         html += '</div>';
-        html += '<span style="font-size:14px;font-weight:800;color:var(--text-muted);flex-shrink:0">' + ppct + '%</span>';
+        html += '<span style="font-size:20px;color:var(--text-muted)">&#8250;</span>';
         html += '</div>';
         // Progress bar
         html += '<div style="margin-top:8px;height:6px;background:var(--border);border-radius:3px;overflow:hidden">';
         html += '<div style="height:100%;width:' + ppct + '%;background:' + light + ';border-radius:3px;transition:width 0.3s"></div>';
         html += '</div>';
-        // Detail line
-        var details = [];
-        if (blocked > 0) details.push('<span style="color:var(--red);font-weight:700">' + blocked + ' bloccate</span>');
-        if (overdue > 0) details.push('<span style="color:var(--red)">' + overdue + ' scadute</span>');
-        details.push(done + '/' + total + ' task');
-        html += '<div style="margin-top:6px;font-size:12px;color:var(--text-muted)">' + details.join(' &middot; ') + '</div>';
+        // Stats row
+        html += '<div style="margin-top:8px;display:flex;gap:12px;font-size:12px;color:var(--text-muted)">';
+        html += '<span style="font-weight:700">' + ppct + '%</span>';
+        if (inProgress > 0) html += '<span style="color:var(--blue)">' + inProgress + ' in corso</span>';
+        if (blocked > 0) html += '<span style="color:var(--red);font-weight:700">' + blocked + ' bloccate</span>';
+        if (overdue > 0) html += '<span style="color:var(--red)">' + overdue + ' scadute</span>';
+        html += '<span>' + done + '/' + total + '</span>';
+        if (p.launchDate) html += '<span>Lancio: ' + smartDate(p.launchDate) + '</span>';
+        html += '</div>';
         html += '</div>';
     });
     html += '</div>';
 
-    // Blocked tasks
+    // Blocked tasks (global)
     if (blockedTasks.length > 0) {
         html += '<div style="margin-bottom:20px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:10px">Bloccate</div>';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:10px">Task Bloccate</div>';
         blockedTasks.forEach(function(t) {
             html += '<div style="background:var(--red-bg, #FEF2F2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px">';
             html += '<div style="font-size:14px;font-weight:600;color:var(--text)">' + esc(t.title) + '</div>';
@@ -1997,26 +2026,10 @@ function renderCEO() {
         html += '</div>';
     }
 
-    // Upcoming this week
-    if (upcomingTasks.length > 0) {
-        html += '<div style="margin-bottom:20px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px">In scadenza questa settimana</div>';
-        upcomingTasks.sort(function(a,b) { return (a.dueDate||'').localeCompare(b.dueDate||''); });
-        upcomingTasks.forEach(function(t) {
-            var dc = dateClass(t.dueDate, t.status);
-            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">';
-            html += '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:600;color:var(--text)">' + esc(t.title) + '</div>';
-            html += '<div style="font-size:12px;color:var(--text-muted);margin-top:2px">' + esc(t.projectName) + '</div></div>';
-            html += '<span class="task-card-due ' + dc + '" style="font-size:13px;flex-shrink:0;margin-left:8px">' + smartDate(t.dueDate) + '</span>';
-            html += '</div>';
-        });
-        html += '</div>';
-    }
-
     // Overdue
     if (overdueTasks.length > 0) {
         html += '<div style="margin-bottom:20px">';
-        html += '<div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:10px">Scadute</div>';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:10px">Task Scadute</div>';
         overdueTasks.sort(function(a,b) { return (a.dueDate||'').localeCompare(b.dueDate||''); });
         overdueTasks.forEach(function(t) {
             html += '<div style="background:var(--red-bg, #FEF2F2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px;display:flex;align-items:center;justify-content:space-between">';
@@ -2033,6 +2046,87 @@ function renderCEO() {
     if (projects.length === 0) {
         html += '<div style="text-align:center;padding:40px;color:var(--text-muted);font-size:15px">Nessun progetto attivo</div>';
     }
+
+    html += '</div>';
+    return html;
+}
+
+// CEO project detail view
+function renderCEOProject(pid) {
+    var p = getProjects().find(function(pr) { return pr.id === pid; });
+    if (!p) return renderCEOHome();
+    var tasks = p.tasks || [];
+    var todayStr = today();
+    var total = tasks.length;
+    var done = tasks.filter(function(t) { return t.status === 'done'; }).length;
+    var ppct = total > 0 ? Math.round(done / total * 100) : 0;
+
+    var html = '<div style="padding:20px 16px;max-width:600px;margin:0 auto">';
+
+    // Back + title
+    html += '<div style="margin-bottom:16px">';
+    html += '<button onclick="ceoGoHome()" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;padding:0;font-family:var(--font);margin-bottom:8px">&#8592; Tutti i progetti</button>';
+    html += '<div style="font-size:20px;font-weight:800;color:var(--text)">' + esc(p.name) + '</div>';
+    if (p.description) html += '<div style="font-size:13px;color:var(--text-muted);margin-top:4px">' + esc(p.description) + '</div>';
+    html += '</div>';
+
+    // Stats row
+    html += '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">';
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--accent)">' + ppct + '%</div><div style="font-size:11px;color:var(--text-muted)">Completo</div></div>';
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:24px;font-weight:800;color:var(--text)">' + done + '/' + total + '</div><div style="font-size:11px;color:var(--text-muted)">Task</div></div>';
+    if (p.launchDate) {
+        var dc = dateClass(p.launchDate, p.status === 'completato' ? 'done' : 'todo');
+        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div class="task-card-due ' + dc + '" style="font-size:16px;font-weight:800">' + smartDate(p.launchDate) + '</div><div style="font-size:11px;color:var(--text-muted)">Lancio</div></div>';
+    } else {
+        html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;text-align:center"><div style="font-size:16px;color:var(--text-muted)">—</div><div style="font-size:11px;color:var(--text-muted)">Lancio</div></div>';
+    }
+    html += '</div>';
+
+    // Progress bar
+    html += '<div style="height:8px;background:var(--border);border-radius:4px;overflow:hidden;margin-bottom:20px">';
+    html += '<div style="height:100%;width:' + ppct + '%;background:var(--accent);border-radius:4px"></div>';
+    html += '</div>';
+
+    // Tasks grouped by status
+    var statusOrder = ['blocked', 'in_progress', 'todo', 'done'];
+    var statusStyles = {
+        blocked: {label:'Bloccate', color:'var(--red)', bg:'var(--red-bg, #FEF2F2)'},
+        in_progress: {label:'In Corso', color:'var(--blue)', bg:'var(--blue-bg, #EFF6FF)'},
+        todo: {label:'Da Fare', color:'var(--slate)', bg:'var(--bg)'},
+        done: {label:'Completate', color:'var(--green)', bg:'var(--green-bg, #F0FDF4)'}
+    };
+
+    statusOrder.forEach(function(status) {
+        var sTasks = tasks.filter(function(t) { return t.status === status; });
+        if (sTasks.length === 0) return;
+        var style = statusStyles[status];
+
+        html += '<div style="margin-bottom:16px">';
+        html += '<div style="font-size:13px;font-weight:700;color:' + style.color + ';margin-bottom:8px;display:flex;align-items:center;gap:6px">';
+        html += '<span style="width:8px;height:8px;border-radius:50%;background:' + style.color + '"></span>';
+        html += style.label + ' <span style="font-weight:400;color:var(--text-muted)">(' + sTasks.length + ')</span>';
+        html += '</div>';
+
+        sTasks.forEach(function(t) {
+            html += '<div style="background:' + style.bg + ';border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:6px">';
+            html += '<div style="font-size:14px;font-weight:600;color:var(--text)">' + esc(t.title) + '</div>';
+            var meta = [];
+            if (t.assignee) meta.push(esc(t.assignee));
+            if (t.dueDate) {
+                var dc = dateClass(t.dueDate, t.status);
+                meta.push('<span class="task-card-due ' + dc + '">' + smartDate(t.dueDate) + '</span>');
+            }
+            if (t.estimateHours) meta.push(t.estimateHours + 'h');
+            if (meta.length > 0) {
+                html += '<div style="font-size:12px;color:var(--text-muted);margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">' + meta.join(' &middot; ') + '</div>';
+            }
+            if (t.note) {
+                html += '<div style="font-size:12px;color:var(--text-muted);margin-top:4px;font-style:italic">' + esc(t.note.slice(0, 80)) + (t.note.length > 80 ? '...' : '') + '</div>';
+            }
+            html += '</div>';
+        });
+        html += '</div>';
+    });
 
     html += '</div>';
     return html;
@@ -2099,14 +2193,16 @@ function publishForCEO() {
 var _ceoData = null;
 function loadCEOData(callback) {
     if (_ceoData) { callback(_ceoData); return; }
-    fetch('data.json?t=' + Date.now()).then(function(r) {
-        if (!r.ok) throw new Error('No data');
+    var baseUrl = window.location.href.split('?')[0].replace(/\/[^\/]*$/, '/');
+    if (!baseUrl.endsWith('/')) baseUrl += '/';
+    fetch(baseUrl + 'data.json?t=' + Date.now()).then(function(r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
     }).then(function(d) {
         _ceoData = d;
         callback(d);
-    }).catch(function() {
-        document.getElementById('mainContent').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-size:16px">Nessun dato pubblicato ancora.<br>Il COO deve prima pubblicare i dati.</div>';
+    }).catch(function(err) {
+        document.getElementById('mainContent').innerHTML = '<div style="text-align:center;padding:60px 20px;color:var(--text-muted);font-size:16px">Nessun dato pubblicato ancora.<br>Il COO deve prima pubblicare i dati.<br><small style="color:var(--red)">' + err.message + '</small></div>';
     });
 }
 
@@ -2127,7 +2223,7 @@ function render() {
             loadCEOData(function() { render(); });
             return;
         }
-        document.getElementById('mainContent').innerHTML = renderCEO();
+        renderCEOView();
         return;
     }
     // Persisti stato calendario
