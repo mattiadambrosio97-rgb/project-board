@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T19:47:25.504Z",
+  "publishedAt": "2026-03-26T19:47:57.458Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -236,7 +236,7 @@
         {
           "id": "test_ceo_1_1774554140410",
           "title": "🧪 TEST-CEO: Revisione grafica landing",
-          "status": "da_verificare",
+          "status": "done",
           "assignee": "Alberto",
           "priority": "high",
           "dueDate": "2026-03-27",
@@ -250,6 +250,10 @@
             {
               "date": "2026-03-26",
               "text": "Task creata per test sync"
+            },
+            {
+              "date": "2026-03-26",
+              "text": "Confermata dal COO (completata da Alberto)"
             }
           ],
           "ceoUpdates": [
@@ -259,7 +263,14 @@
               "at": "2026-03-26T19:45:22.548Z"
             }
           ],
-          "ceoCompletedAt": "2026-03-26T19:45:22.548Z"
+          "ceoCompletedAt": "2026-03-26T19:45:22.548Z",
+          "cooResponses": [
+            {
+              "note": "[Task confermata]",
+              "at": "2026-03-26T19:47:57.458Z"
+            }
+          ],
+          "completedAt": "2026-03-26T19:47:57.458Z"
         },
         {
           "id": "test_ceo_2_1774554140410",
