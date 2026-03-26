@@ -8,6 +8,14 @@
     <meta http-equiv="Expires" content="0">
     <title>Project Command Center — Mattia D'Ambrosio</title>
     <script>
+    // DEBUG: mostra errori JS su schermo (rimovere dopo fix)
+    window.onerror = function(msg, src, line) {
+        var d = document.createElement('div');
+        d.style.cssText = 'position:fixed;bottom:60px;left:10px;right:10px;z-index:9999;background:#DC2626;color:#fff;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:600;font-family:system-ui';
+        d.textContent = 'JS ERROR: ' + msg + ' (line ' + line + ')';
+        document.body.appendChild(d);
+        setTimeout(function() { d.remove(); }, 8000);
+    };
     if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()});});}
     if('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0,0);
@@ -6052,12 +6060,12 @@ function renderProjectDashboard(p) {
 
     let html = '';
 
-    // ── Stats a 4 colonne (stile CEO) ──
-    html += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','todo')"><div class="dash-stat-value" style="color:var(--slate)">${todo}</div><div class="dash-stat-label">Da fare</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--blue)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','blocked')"><div class="dash-stat-value" style="color:var(--red)">${blocked}</div><div class="dash-stat-label">Bloccate</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','done')"><div class="dash-stat-value" style="color:var(--green)">${done}</div><div class="dash-stat-label">Completate</div></div>`;
+    // ── Stats a 2x2 griglia su mobile ──
+    html += `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','todo')"><div class="dash-stat-value" style="color:var(--slate)">${todo}</div><div class="dash-stat-label">Da fare</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--blue)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','blocked')"><div class="dash-stat-value" style="color:var(--red)">${blocked}</div><div class="dash-stat-label">Bloccate</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','done')"><div class="dash-stat-value" style="color:var(--green)">${done}</div><div class="dash-stat-label">Completate</div></div>`;
     html += `</div>`;
 
     // ── Progress bar multi-colore (stile CEO) ──
@@ -6164,7 +6172,7 @@ function renderProjectDashboard(p) {
 
     // ── Completate — conteggio ──
     if (done > 0) {
-        html += `<div style="margin-bottom:16px;padding:12px 14px;background:var(--green-bg, #F0FDF4);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showTasksByStatus('${p.id}','done')">`;
+        html += `<div style="margin-bottom:16px;padding:12px 14px;background:var(--green-bg, #F0FDF4);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:8px;cursor:pointer;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','done')">`;
         html += `<span style="font-size:16px">&#9989;</span>`;
         html += `<span style="font-size:14px;font-weight:600;color:var(--green)">${done} task completate su ${total}</span>`;
         html += `<span style="font-size:11px;color:var(--text-muted);margin-left:auto">Vedi tutte &rarr;</span>`;
@@ -6933,9 +6941,10 @@ function cycleProjectStatus(projectId) {
 
 // ========== TASK MODAL ==========
 function openTaskModal(taskId, projectId, unused, defaultStatus) {
+  try {
     const projects = getProjects();
     const p = projects.find(pr => pr.id === projectId);
-    if (!p) return;
+    if (!p) { _showToast('DEBUG: progetto non trovato (id=' + projectId + ', tot=' + projects.length + ')', true); return; }
 
     const isNew = !taskId;
     const task = isNew ? {
@@ -6945,7 +6954,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
         createdAt: Date.now(), completedAt: null, recurrence: null, note: '',
         nextCheck: '', doneWhen: '', dependsLabel: '', activityLog: []
     } : p.tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task) { _showToast('DEBUG: task non trovata (id=' + taskId + ')', true); return; }
 
     const team = getTeam();
     const otherTasks = p.tasks.filter(t => t.id !== task.id);
@@ -7121,6 +7130,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     document.getElementById('taskModal').classList.add('open');
     document.getElementById('taskModal').onclick = (e) => { if (e.target === document.getElementById('taskModal')) closeTaskModal(); };
     if (isNew) setTimeout(() => document.getElementById('tmTitle').focus(), 100);
+  } catch(err) { _showToast('DEBUG openTaskModal ERROR: ' + err.message, true); }
 }
 
 function selectChip(el, rowId) {
