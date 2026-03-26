@@ -156,7 +156,7 @@
         }
         .header-back:hover { color: var(--accent-strong); }
         .header-title {
-            font-size: 24px; font-weight: 800; letter-spacing: -0.6px;
+            font-size: 22px; font-weight: 800; letter-spacing: -0.6px;
             color: var(--text); line-height: 1.2;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             max-width: 50vw;
@@ -166,7 +166,7 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
             max-width: 45vw; margin-top: 1px;
         }
-        .header-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .header-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
 
         .status-badge {
             font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
@@ -1102,15 +1102,16 @@
             .header {
                 flex-wrap: wrap; padding: 12px 16px; gap: 8px;
             }
-            .header-left { min-width: 0; flex: 1 1 100%; }
-            .header { padding: 8px 16px; gap: 6px; }
-            .header-title { font-size: 16px; max-width: 100%; white-space: normal; }
+            .desktop-only { display: none !important; }
+            .header-left { min-width: 0; flex: 1 1 auto; }
+            .header { padding: 10px 16px; gap: 8px; }
+            .header-title { font-size: 18px; max-width: 100%; white-space: normal; }
             .header-desc { max-width: 100%; font-size: 12px; }
             .breadcrumb { font-size: 11px; margin-bottom: 0; }
-            .header-right { flex-wrap: wrap; gap: 6px; justify-content: flex-start; flex: 1 1 100%; }
-            .header-right .add-btn { padding: 8px 16px; font-size: 13px; min-height: 40px; }
-            .header-right .icon-btn { width: 44px; height: 44px; font-size: 16px; }
-            .copy-data-btn { font-size: 12px !important; padding: 8px 12px !important; }
+            .header-right { flex-wrap: nowrap; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
+            .header-right .add-btn { padding: 8px 14px; font-size: 13px; min-height: 40px; }
+            .header-right .icon-btn { width: 40px; height: 40px; font-size: 16px; }
+            .copy-data-btn { font-size: 11px !important; padding: 6px 10px !important; }
 
             /* Global dashboard */
             .global-view { padding: 16px; gap: 12px; }
@@ -1480,13 +1481,12 @@
         </div>
         <div class="header-right" id="headerRight">
             <button class="add-btn" id="addBtn" onclick="handleAdd()">+ Nuovo</button>
-            <button class="icon-btn" title="Backup" onclick="openBackupModal()">&#128190;</button>
+            <button class="icon-btn desktop-only" title="Backup" onclick="openBackupModal()">&#128190;</button>
             <button class="copy-data-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
-            <button class="icon-btn" title="Anteprima CEO" onclick="previewCEO()">&#128065;</button>
-            <button class="copy-data-btn" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
+            <button class="icon-btn desktop-only" title="Anteprima CEO" onclick="previewCEO()">&#128065;</button>
+            <button class="copy-data-btn desktop-only" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
             <span id="syncIndicator" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>
-            <button class="icon-btn" title="Refresh dati" onclick="_manualRefresh()" style="font-size:14px">&#8635;</button>
-            <button class="icon-btn" title="Ricarica app (forza aggiornamento)" onclick="_hardReload()" style="font-size:14px">&#9889;</button>
+            <button class="icon-btn" title="Aggiorna dati e app" onclick="_smartRefresh()" style="font-size:16px">&#8635;</button>
             <button class="icon-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Tema chiaro/scuro" style="font-size:18px"></button>
         </div>
     </div>
@@ -4112,6 +4112,39 @@ function _hardReload() {
     var u = new URL(window.location.href);
     u.searchParams.set('_cb', Date.now());
     window.location.replace(u.toString());
+}
+
+function _smartRefresh() {
+    _showToast('Aggiornamento in corso...');
+    // 1) Svuota caches (Service Worker ecc.)
+    if ('caches' in window) {
+        caches.keys().then(function(names) {
+            names.forEach(function(name) { caches.delete(name); });
+        });
+    }
+    // 2) Fetch nuova versione HTML con cache-bust per forzare bypass
+    fetch(window.location.pathname + '?_cb=' + Date.now(), { cache: 'no-store' })
+        .then(function() {
+            // 3) Aggiorna dati in-app (se COO su GH Pages, fetch CEO actions)
+            if (CEO_MODE) {
+                loadCEOData(function() {
+                    // 4) Ricarica pagina con cache-bust
+                    var u = new URL(window.location.href);
+                    u.searchParams.set('_cb', Date.now());
+                    window.location.replace(u.toString());
+                }, true);
+            } else {
+                var u = new URL(window.location.href);
+                u.searchParams.set('_cb', Date.now());
+                window.location.replace(u.toString());
+            }
+        })
+        .catch(function() {
+            // Fallback: ricarica comunque
+            var u = new URL(window.location.href);
+            u.searchParams.set('_cb', Date.now());
+            window.location.replace(u.toString());
+        });
 }
 
 // ========== PUBLISH TO GITHUB (CEO sync) ==========
