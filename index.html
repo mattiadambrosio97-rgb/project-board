@@ -3760,21 +3760,11 @@ function _manualRefresh() {
             _showToast('Dati aggiornati');
         }, true);
     } else if (window.location.hostname.indexOf('github.io') !== -1) {
-        var cooToken = getGHToken();
-        if (!cooToken) return;
-        _ghFetchJSON(GH_DATA_FILE, cooToken).then(function(data) {
-            if (!data) { _showToast('Nessun dato trovato', true); return; }
-            if (data.launches) saveLaunches(data.launches);
-            if (data.projects && data.projects.length > 0) saveProjects(data.projects);
-            if (data.team && data.team.length > 0) safeSetItem('pb_team', JSON.stringify(data.team));
-            if (data.resources) safeSetItem('pb_resources', JSON.stringify(data.resources));
-            if (data.ceoLinks) safeSetItem('pb_ceoLinks', JSON.stringify(data.ceoLinks));
-            window._lastCooSync = Date.now();
-            render();
-            _updateSyncIndicator();
-            _showToast('Dati aggiornati');
-        }).catch(function() { _showToast('Errore nel refresh', true); });
+        // COO su GitHub Pages: fetch solo feedback CEO, MAI data.json (il COO e' la fonte dati)
         _cooFetchCeoActions();
+        render();
+        _updateSyncIndicator();
+        _showToast('Dati aggiornati');
     } else {
         render();
         _showToast('Dati locali aggiornati');
