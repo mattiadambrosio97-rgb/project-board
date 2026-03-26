@@ -1,6 +1,17 @@
 {
-  "lastUpdate": "2026-03-26T12:45:35.943Z",
-  "taskActions": {},
+  "lastUpdate": "2026-03-26T12:45:53.656Z",
+  "taskActions": {
+    "id_1774522152441_zf0809": {
+      "status": "complete",
+      "updates": [
+        {
+          "type": "complete",
+          "note": "Fatto contattato e va tutto bene",
+          "at": "2026-03-26T12:45:53.656Z"
+        }
+      ]
+    }
+  },
   "resourceActions": {
     "res_demo_002": {
       "feedback": [
