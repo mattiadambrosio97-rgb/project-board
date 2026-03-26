@@ -4491,11 +4491,15 @@ function render() {
     if (calYear) safeSessionSet('pb_calYear', calYear);
     if (calMonth !== undefined && calMonth !== null) safeSessionSet('pb_calMonth', calMonth);
     var mc = document.getElementById('mainContent');
-    renderHeader();
+    var header = document.getElementById('header');
     if (state.currentView === 'global') {
+        header.style.display = '';
+        renderHeader();
         mc.innerHTML = renderGlobalWrapper();
         if (state.globalTab === 0) _cooFetchCeoActions();
     } else {
+        // Dentro un progetto: nascondi header, layout pulito stile CEO
+        header.style.display = 'none';
         mc.innerHTML = renderDetail();
     }
 }
@@ -5982,6 +5986,18 @@ function renderDetail() {
     if (!p) return '';
 
     let html = '<div class="detail-view">';
+
+    // ── Header progetto inline (header principale nascosto) ──
+    html += `<div style="padding:16px 24px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">`;
+    html += `<button onclick="goGlobal()" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;padding:0;font-family:var(--font)">&#8592; Tutti i progetti</button>`;
+    html += `<div style="flex:1;min-width:0">`;
+    html += `<div style="font-size:20px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)} <span class="status-badge status-${p.status||'draft'}" onclick="cycleProjectStatus('${p.id}')" style="font-size:11px;margin-left:6px;cursor:pointer">${(p.status||'draft').replace('-',' ')}</span></div>`;
+    if (p.description) html += `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${esc(p.description)}</div>`;
+    html += `</div>`;
+    html += `<button class="add-btn" onclick="handleAdd()" style="flex-shrink:0">+ Task</button>`;
+    html += `<button class="icon-btn" onclick="openProjectModal('${p.id}')" title="Impostazioni progetto" style="flex-shrink:0">&#9881;</button>`;
+    html += `</div>`;
+
     // Tabs
     html += '<div class="tabs-bar">';
     var _dtabs = isMobile() ? TABS_MOBILE : TABS;
