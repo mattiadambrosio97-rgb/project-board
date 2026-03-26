@@ -7,10 +7,16 @@
             "note": "Cosa devo fare?",
             "status": null,
             "at": "2026-03-26T22:26:19.944Z"
+          },
+          {
+            "note": "",
+            "status": "in_progress",
+            "at": "2026-03-26T22:37:12.340Z"
           }
-        ]
+        ],
+        "status": "in_progress"
       }
     }
   },
-  "lastUpdate": "2026-03-26T22:26:19.944Z"
+  "lastUpdate": "2026-03-26T22:37:12.340Z"
 }
