@@ -4791,7 +4791,7 @@ function _manualRefresh() {
         }, true);
     } else if (window.location.hostname.indexOf('github.io') !== -1) {
         // COO su GitHub Pages: fetch solo feedback CEO, MAI data.json (il COO e' la fonte dati)
-        _cooFetchCeoActions();
+        _cooFetchCeoActions(); _cooFetchTeamActions();
         render();
         _updateSyncIndicator();
         _showToast('Dati aggiornati');
@@ -4961,12 +4961,12 @@ function render() {
         header.style.display = '';
         renderHeader();
         mc.innerHTML = renderGlobalWrapper();
-        if (state.globalTab === 0) _cooFetchCeoActions();
+        if (state.globalTab === 0) _cooFetchCeoActions(); _cooFetchTeamActions();
     } else {
         // Dentro un progetto: nascondi header, layout pulito stile CEO
         header.style.display = 'none';
         mc.innerHTML = renderDetail();
-        _cooFetchCeoActions(); // Anche in vista progetto per notifiche CEO
+        _cooFetchCeoActions(); _cooFetchTeamActions(); // Anche in vista progetto per notifiche CEO
     }
 }
 
@@ -5118,6 +5118,75 @@ function _cooFetchCeoActions() {
             if (needSave2) { saveProjects(projects2); render(); }
         }
     }).catch(function() { /* silent fail — badges stay as '...' */ });
+}
+
+// COO: fetch team-actions.json per aggiornamenti dai team member
+var _cooTeamActions = null;
+function _cooFetchTeamActions() {
+    var ghToken = getGHToken();
+    if (!ghToken) return;
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_TEAM_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + ghToken }, cache: 'no-store'
+    }).then(function(r) {
+        if (!r.ok) return null;
+        return r.json();
+    }).then(function(fileData) {
+        if (!fileData || !fileData.content) return;
+        var decoded = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, ''))));
+        var teamActs = JSON.parse(decoded);
+        _cooTeamActions = teamActs;
+
+        // Aggiorna task con flag teamHasUpdate per ogni membro
+        var projects = getProjects();
+        var needSave = false;
+        projects.forEach(function(p) {
+            (p.tasks || []).forEach(function(t) {
+                // Cerca aggiornamenti da qualsiasi membro del team
+                Object.keys(TEAM_SLUG_MAP).forEach(function(slug) {
+                    var memberName = TEAM_SLUG_MAP[slug];
+                    var memberData = teamActs[memberName];
+                    if (!memberData || !memberData.taskActions || !memberData.taskActions[t.id]) return;
+                    var ta = memberData.taskActions[t.id];
+                    if (!ta.updates || ta.updates.length === 0) return;
+
+                    var lastTeamUpdate = ta.updates[ta.updates.length - 1];
+                    var lastCooResponse = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+                    var teamIsNewer = !lastCooResponse || new Date(lastTeamUpdate.at) > new Date(lastCooResponse.at);
+
+                    if (teamIsNewer) {
+                        // Status update dal membro
+                        if (ta.status === 'done' && t.status !== 'done' && t.status !== 'da_verificare') {
+                            t.status = 'da_verificare';
+                            t.teamCompletedBy = memberName;
+                            needSave = true;
+                        } else if (ta.status === 'in_progress' && t.status === 'todo') {
+                            t.status = 'in-progress';
+                            needSave = true;
+                        } else if (ta.status === 'blocked' && t.status !== 'blocked') {
+                            t.status = 'blocked';
+                            needSave = true;
+                        }
+
+                        // Flag per notifica
+                        if (!t.teamHasUpdate || t._teamLastUpdateAt !== lastTeamUpdate.at) {
+                            t.teamHasUpdate = true;
+                            t._teamLastUpdateAt = lastTeamUpdate.at;
+                            t._teamLastUpdateBy = memberName;
+                            t._teamLastUpdateNote = lastTeamUpdate.note || '';
+                            if (!t.teamUpdates) t.teamUpdates = [];
+                            // Aggiungi solo se non già presente
+                            var alreadyHas = t.teamUpdates.some(function(u) { return u.at === lastTeamUpdate.at && u.from === memberName; });
+                            if (!alreadyHas) {
+                                t.teamUpdates.push({ from: memberName, note: lastTeamUpdate.note || '', status: lastTeamUpdate.status, at: lastTeamUpdate.at });
+                                needSave = true;
+                            }
+                        }
+                    }
+                });
+            });
+        });
+        if (needSave) { saveProjects(projects); render(); }
+    }).catch(function() { /* silent */ });
 }
 
 function renderGlobalWrapper() {
@@ -5823,15 +5892,19 @@ function renderGlobal() {
     // Task con aggiornamenti da Alberto
     const ceoUpdatedTasks = allTasks.filter(t => t.ceoHasUpdate);
 
+    // Task con aggiornamenti dal team
+    const teamUpdatedTasks = allTasks.filter(t => t.teamHasUpdate);
+
     // Progetti con note da Alberto
     const ceoProjectNotes = projects.filter(p => p.ceoHasProjectNote);
 
     // Riga 1: ACTION CARDS — urgenti, visivamente distinte
-    const hasActions = actions.length > 0 || daVerificare.length > 0 || ceoUpdatedTasks.length > 0 || ceoProjectNotes.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
+    const hasActions = actions.length > 0 || daVerificare.length > 0 || ceoUpdatedTasks.length > 0 || teamUpdatedTasks.length > 0 || ceoProjectNotes.length > 0 || dueTodayAll.length > 0 || dueTomorrowAll.length > 0 || overdueAll.length > 0;
     if (hasActions) {
         html += '<div class="action-bar">';
         if (ceoProjectNotes.length > 0) html += `<div class="action-card" style="border-color:var(--purple,#8B5CF6)" onclick="showCeoProjectNotes()"><span class="action-card-icon" style="color:var(--purple,#8B5CF6)">&#128172;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--purple,#8B5CF6)">${ceoProjectNotes.length}</span><span class="action-card-label" style="color:var(--purple,#8B5CF6)">Note progetto</span></div></div>`;
         if (ceoUpdatedTasks.length > 0) html += `<div class="action-card" style="border-color:var(--blue)" onclick="showCeoUpdatedTasks()"><span class="action-card-icon" style="color:var(--blue)">&#128172;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--blue)">${ceoUpdatedTasks.length}</span><span class="action-card-label" style="color:var(--blue)">Risposte Alberto</span></div></div>`;
+        if (teamUpdatedTasks.length > 0) html += `<div class="action-card" style="border-color:var(--green)" onclick="showTeamUpdatedTasks()"><span class="action-card-icon" style="color:var(--green)">&#128101;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--green)">${teamUpdatedTasks.length}</span><span class="action-card-label" style="color:var(--green)">Aggiornamenti Team</span></div></div>`;
         if (daVerificare.length > 0) html += `<div class="action-card" style="border-color:var(--teal)" onclick="showDaVerificareTasks()"><span class="action-card-icon" style="color:var(--teal)">&#9745;</span><div class="action-card-body"><span class="action-card-num" style="color:var(--teal)">${daVerificare.length}</span><span class="action-card-label" style="color:var(--teal)">Da verificare</span></div></div>`;
         if (actions.length > 0) html += `<div class="action-card danger" onclick="showUnblockPopup()"><span class="action-card-icon">&#9888;</span><div class="action-card-body"><span class="action-card-num">${actions.length}</span><span class="action-card-label">Da sbloccare</span></div></div>`;
         if (overdueAll.length > 0) html += `<div class="action-card danger" onclick="showOverdueTasks()"><span class="action-card-icon">&#128680;</span><div class="action-card-body"><span class="action-card-num">${overdueAll.length}</span><span class="action-card-label">In ritardo</span></div></div>`;
@@ -8378,6 +8451,80 @@ function showCeoUpdatedTasks() {
     document.getElementById('backupModal').classList.add('open');
 }
 
+function showTeamUpdatedTasks() {
+    var projects = getProjects();
+    var items = [];
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.teamHasUpdate) items.push({ id: t.id, title: t.title, projectName: p.name, projectId: p.id, teamUpdates: t.teamUpdates || [], assignee: t.assignee });
+        });
+    });
+    if (!items.length) {
+        document.getElementById('backupModal').classList.remove('open');
+        return;
+    }
+    var modal = document.getElementById('backupModalInner');
+    var html = '<div style="font-size:18px;font-weight:700;margin-bottom:6px;color:var(--green)">Aggiornamenti dal Team (' + items.length + ')</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:16px">I membri del team hanno inviato aggiornamenti su queste task.</div>';
+    items.forEach(function(t) {
+        var lastUpdate = t.teamUpdates.length > 0 ? t.teamUpdates[t.teamUpdates.length - 1] : null;
+        var updateNote = lastUpdate ? lastUpdate.note : '';
+        var updateFrom = lastUpdate ? lastUpdate.from : '';
+        var updateStatus = lastUpdate && lastUpdate.status ? (lastUpdate.status === 'in_progress' ? 'In corso' : lastUpdate.status === 'done' ? 'Completata' : lastUpdate.status === 'blocked' ? 'Bloccata' : lastUpdate.status) : '';
+        var updateDate = lastUpdate ? new Date(lastUpdate.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+        html += '<div style="padding:14px 16px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:10px;margin-bottom:10px">';
+        html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
+        html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + esc(t.projectName) + ' &middot; ' + esc(t.assignee || '') + (updateDate ? ' &middot; ' + updateDate : '') + '</div>';
+        if (updateStatus) html += '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">Stato: ' + updateStatus + '</div>';
+        if (updateNote) html += '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--green)"><strong>' + esc(updateFrom) + ':</strong> ' + esc(updateNote) + '</div>';
+        html += '<div style="display:flex;gap:6px;margin-bottom:8px">';
+        html += '<input id="teamUpdReply_' + t.id + '" type="text" placeholder="Rispondi..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToTeam(\'' + t.id + '\',\'' + t.projectId + '\')">';
+        html += '<button onclick="cooRespondToTeam(\'' + t.id + '\',\'' + t.projectId + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+        html += '</div>';
+        html += '<button onclick="cooAckTeamUpdate(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Segna come letto</button>';
+        html += '</div>';
+    });
+    html += '<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')">Chiudi</button></div>';
+    modal.innerHTML = html;
+    document.getElementById('backupModal').classList.add('open');
+}
+
+function cooRespondToTeam(taskId, projectId) {
+    var input = document.getElementById('teamUpdReply_' + taskId);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) return;
+    var projects = getProjects();
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.id === taskId) {
+                if (!t.cooResponses) t.cooResponses = [];
+                t.cooResponses.push({ note: note, at: new Date().toISOString() });
+                t.teamHasUpdate = false;
+            }
+        });
+    });
+    saveProjects(projects);
+    showTeamUpdatedTasks();
+}
+
+function cooAckTeamUpdate(taskId, projectId) {
+    var projects = getProjects();
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.id === taskId) {
+                t.teamHasUpdate = false;
+            }
+        });
+    });
+    saveProjects(projects);
+    showTeamUpdatedTasks();
+    if (!getProjects().some(function(p) { return (p.tasks||[]).some(function(t) { return t.teamHasUpdate; }); })) {
+        document.getElementById('backupModal').classList.remove('open');
+        render();
+    }
+}
+
 function cooRespondFromPopup(taskId, projectId) {
     var input = document.getElementById('ceoUpdReply_' + taskId);
     if (!input) return;
@@ -8884,7 +9031,7 @@ init();
             var cooToken = getGHToken();
             if (!cooToken) return;
             _loadAppData(function() {
-                _cooFetchCeoActions();
+                _cooFetchCeoActions(); _cooFetchTeamActions();
                 _cooFetchCeoActionsForBacheca();
                 _updateSyncIndicator();
                 render();
