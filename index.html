@@ -2163,6 +2163,23 @@ function renderLaunchesSection() {
 function init() {
     if (!CEO_MODE) {
         seedData();
+        // Su GitHub Pages COO: se localStorage è vuoto, carica da data.json
+        if (window.location.hostname.indexOf('github.io') !== -1 && getLaunches().length === 0) {
+            var loc = window.location;
+            var dataUrl = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/') + 'data.json?t=' + Date.now();
+            fetch(dataUrl).then(function(r) { return r.json(); }).then(function(data) {
+                if (data.launches && data.launches.length > 0 && getLaunches().length === 0) {
+                    saveLaunches(data.launches);
+                }
+                if (data.projects && data.projects.length > 0 && getProjects().length === 0) {
+                    saveProjects(data.projects);
+                }
+                if (data.team && data.team.length > 0) {
+                    safeSetItem('pb_team', JSON.stringify(data.team));
+                }
+                render();
+            }).catch(function() {});
+        }
         // Migrate review -> todo (colonna rimossa)
         const ps = getProjects();
         let changed = false;
