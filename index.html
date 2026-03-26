@@ -1519,19 +1519,19 @@
     <!-- MAIN CONTENT -->
     <div class="main-content" id="mainContent"></div>
 
-    <!-- TASK MODAL -->
-    <div class="modal-overlay" id="taskModal" onclick="if(event.target===this)closeTaskModal()">
-        <div class="modal" id="taskModalInner" onclick="event.stopPropagation()"></div>
+    <!-- BACKUP MODAL (z-index base) -->
+    <div class="modal-overlay" id="backupModal" style="z-index:1000" onclick="if(event.target===this)closeBackupModal()">
+        <div class="modal" id="backupModalInner" onclick="event.stopPropagation()"></div>
     </div>
 
-    <!-- PROJECT MODAL -->
-    <div class="modal-overlay" id="projectModal" onclick="if(event.target===this)closeProjectModal()">
+    <!-- PROJECT MODAL (sopra backup) -->
+    <div class="modal-overlay" id="projectModal" style="z-index:1010" onclick="if(event.target===this)closeProjectModal()">
         <div class="modal" id="projectModalInner" onclick="event.stopPropagation()"></div>
     </div>
 
-    <!-- BACKUP MODAL -->
-    <div class="modal-overlay" id="backupModal" onclick="if(event.target===this)closeBackupModal()">
-        <div class="modal" id="backupModalInner" onclick="event.stopPropagation()"></div>
+    <!-- TASK MODAL (sopra tutto) -->
+    <div class="modal-overlay" id="taskModal" style="z-index:1020" onclick="if(event.target===this)closeTaskModal()">
+        <div class="modal" id="taskModalInner" onclick="event.stopPropagation()"></div>
     </div>
 
 
@@ -1665,6 +1665,7 @@ function generatePMAnalysis() {
         }
 
         analyzed.push({
+            id: p.id,
             name: p.name,
             pct,
             level,
@@ -5987,15 +5988,14 @@ function renderDetail() {
 
     let html = '<div class="detail-view">';
 
-    // ── Header progetto inline (header principale nascosto) ──
-    html += `<div style="padding:16px 24px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap">`;
-    html += `<button onclick="goGlobal()" style="background:none;border:none;color:var(--accent);font-size:14px;font-weight:600;cursor:pointer;padding:0;font-family:var(--font)">&#8592; Tutti i progetti</button>`;
-    html += `<div style="flex:1;min-width:0">`;
-    html += `<div style="font-size:20px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)} <span class="status-badge status-${p.status||'draft'}" onclick="cycleProjectStatus('${p.id}')" style="font-size:11px;margin-left:6px;cursor:pointer">${(p.status||'draft').replace('-',' ')}</span></div>`;
-    if (p.description) html += `<div style="font-size:12px;color:var(--text-muted);margin-top:2px">${esc(p.description)}</div>`;
+    // ── Header progetto inline — compatto su mobile ──
+    html += `<div style="padding:10px 16px 0;display:flex;align-items:center;gap:8px">`;
+    html += `<button onclick="goGlobal()" style="background:none;border:none;color:var(--accent);font-size:13px;font-weight:600;cursor:pointer;padding:4px 0;font-family:var(--font);flex-shrink:0">&#8592;</button>`;
+    html += `<div style="flex:1;min-width:0;overflow:hidden">`;
+    html += `<div style="font-size:17px;font-weight:800;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(p.name)} <span class="status-badge status-${p.status||'draft'}" onclick="cycleProjectStatus('${p.id}')" style="font-size:10px;margin-left:4px;cursor:pointer">${(p.status||'draft').replace('-',' ')}</span></div>`;
     html += `</div>`;
-    html += `<button class="add-btn" onclick="handleAdd()" style="flex-shrink:0">+ Task</button>`;
-    html += `<button class="icon-btn" onclick="openProjectModal('${p.id}')" title="Impostazioni progetto" style="flex-shrink:0">&#9881;</button>`;
+    html += `<button class="add-btn" onclick="handleAdd()" style="flex-shrink:0;padding:6px 10px;font-size:13px">+ Task</button>`;
+    html += `<button class="icon-btn" onclick="openProjectModal('${p.id}')" title="Impostazioni progetto" style="flex-shrink:0;width:30px;height:30px;font-size:13px">&#9881;</button>`;
     html += `</div>`;
 
     // Tabs
@@ -6179,7 +6179,7 @@ function renderProjectDashboard(p) {
 
         sTasks.forEach(t => {
             const isOverdue = t.dueDate && t.dueDate < todayStr;
-            html += `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${style.bg};border:1px solid var(--border);border-radius:8px;margin-bottom:5px;cursor:pointer;transition:border-color 0.15s" onclick="openTaskModal('${t.id}','${p.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">`;
+            html += `<div style="display:flex;align-items:center;gap:8px;padding:12px 14px;background:${style.bg};border:1px solid var(--border);border-radius:8px;margin-bottom:5px;cursor:pointer;transition:border-color 0.15s;touch-action:manipulation;-webkit-tap-highlight-color:transparent;min-height:44px" onclick="openTaskModal('${t.id}','${p.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">`;
             html += `<span style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0">${esc(t.title)}</span>`;
             if (t.assignee) html += `<span style="font-size:12px;color:var(--text-muted);flex-shrink:0;background:var(--surface);padding:2px 8px;border-radius:6px;border:1px solid var(--border)">${esc(t.assignee)}</span>`;
             if (t.dueDate) {
@@ -7390,7 +7390,7 @@ function showTasksByStatus(projectId, status) {
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:${colorMap[status]}">${STATUS_LABELS[status]} (${items.length})</div>`;
     items.forEach(t => {
         const dc = dateClass(t.dueDate, t.status);
-        html += `<div style="padding:12px 16px;background:${bgMap[status]};border-radius:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:${bgMap[status]};border-radius:10px;margin-bottom:8px;cursor:pointer;display:flex;align-items:center;gap:10px" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="flex:1">
                 <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
                 <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${t.assignee||'Non assegnata'}${t.dueDate ? ' — '+smartDate(t.dueDate) : ''}</div>
@@ -7414,7 +7414,7 @@ function showBlockedTasks() {
     const modal = document.getElementById('backupModalInner');
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--red)">Task bloccate (${items.length})</div>`;
     items.forEach(({task: t, project: p}) => {
-        html += `<div style="padding:12px 16px;background:var(--red-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:var(--red-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
             <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${esc(p.name)} — ${t.assignee||'Non assegnata'} — Scadenza: ${t.dueDate ? smartDate(t.dueDate) : 'Nessuna'}</div>
             ${t.dependsLabel ? '<div style="font-size:12px;color:var(--orange);margin-top:4px">⛓️ '+esc(t.dependsLabel)+'</div>' : ''}
@@ -7442,7 +7442,7 @@ function showWeekTasks() {
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--orange)">Scadenze questa settimana (${items.length})</div>`;
     items.forEach(({task: t, project: p}) => {
         const dc = dateClass(t.dueDate, t.status);
-        html += `<div style="padding:12px 16px;background:var(--bg);border-radius:10px;margin-bottom:8px;cursor:pointer;border-left:3px solid ${dc==='overdue'?'var(--red)':dc==='today'?'var(--orange)':'var(--blue)'}" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:var(--bg);border-radius:10px;margin-bottom:8px;cursor:pointer;border-left:3px solid ${dc==='overdue'?'var(--red)':dc==='today'?'var(--orange)':'var(--blue)'}" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
             <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${esc(p.name)} — ${t.assignee||'Non assegnata'} — <span class="task-card-due ${dc}">${smartDate(t.dueDate)}</span></div>
         </div>`;
@@ -7468,7 +7468,7 @@ function showUnblockPopup() {
             const color = a.isBlocked ? 'var(--red)' : 'var(--orange)';
             const label = a.isBlocked ? 'Bloccata' : 'Scaduta';
             const days = a.isOverdue && a.dueDate ? Math.abs(daysDiff(a.dueDate)) + 'gg fa' : '';
-            var clickHandler = a.taskId && a.projectId ? `onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${a.taskId}','${a.projectId}')"` : '';
+            var clickHandler = a.taskId && a.projectId ? `onclick="openTaskFromPopup('${a.taskId}','${a.projectId}')"` : '';
             html += `<div style="padding:10px 14px;background:${a.isBlocked ? 'var(--red-bg)' : 'var(--orange-bg)'};border-radius:8px;margin-bottom:6px;${a.taskId ? 'cursor:pointer' : ''}" ${clickHandler}>
                 <div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;"><span style="color:${color};font-size:11px;">${icon}</span> ${esc(a.task)}</div>
                 <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">${label}${days ? ' — ' + days : ''} &middot; ${esc(a.project)}${a.reason ? ' — ' + esc(a.reason) : ''}</div>
@@ -7801,7 +7801,7 @@ function showOverdueTasks() {
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--red)">In ritardo (${items.length})</div>`;
     items.forEach(({task: t, project: p}) => {
         const days = Math.abs(daysDiff(t.dueDate));
-        html += `<div style="padding:12px 16px;background:var(--red-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:var(--red-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
             <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${esc(p.name)} — ${t.assignee||'Non assegnata'} — <span style="font-weight:700;color:var(--red)">${days}g in ritardo</span></div>
         </div>`;
@@ -7824,7 +7824,7 @@ function showDueTomorrowTasks() {
     const modal = document.getElementById('backupModalInner');
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--yellow)">Scade domani (${items.length})</div>`;
     items.forEach(({task: t, project: p}) => {
-        html += `<div style="padding:12px 16px;background:var(--yellow-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:var(--yellow-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
             <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${esc(p.name)} — ${t.assignee||'Non assegnata'}</div>
         </div>`;
@@ -7846,7 +7846,7 @@ function showDueTodayTasks() {
     const modal = document.getElementById('backupModalInner');
     let html = `<div style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--orange)">Scadenze di oggi (${items.length})</div>`;
     items.forEach(({task: t, project: p}) => {
-        html += `<div style="padding:12px 16px;background:var(--orange-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:var(--orange-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
             <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${esc(p.name)} — ${t.assignee||'Non assegnata'} — <span style="font-weight:700;color:var(--orange)">Scade oggi</span></div>
         </div>`;
@@ -7869,7 +7869,7 @@ function showNoDueTasks() {
     html += `<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Queste task non hanno deadline. Rischiano di restare invisibili.</div>`;
     items.forEach(({task: t, project: p}) => {
         const age = t.createdAt ? Math.round((Date.now() - t.createdAt) / 86400000) : 0;
-        html += `<div style="padding:12px 16px;background:var(--purple-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${t.id}','${p.id}')">
+        html += `<div style="padding:12px 16px;background:var(--purple-bg);border-radius:10px;margin-bottom:8px;cursor:pointer" onclick="openTaskFromPopup('${t.id}','${p.id}')">
             <div style="font-size:14px;font-weight:700;color:var(--text)">${esc(t.title)}</div>
             <div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${esc(p.name)} — ${t.assignee||'Non assegnata'}${age > 0 ? ' — creata '+age+'g fa' : ''}</div>
         </div>`;
