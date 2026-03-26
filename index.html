@@ -1334,6 +1334,9 @@
             .ceo-container { padding: 20px 16px; max-width: 100%; }
             .ceo-projects-grid { grid-template-columns: 1fr; }
             .ceo-stats-bar { flex-wrap: wrap; }
+            .ceo-quick-links { grid-template-columns: repeat(3, 1fr) !important; gap: 6px !important; }
+            .ceo-quick-links a { padding: 8px 6px !important; flex-direction: column !important; gap: 4px !important; text-align: center; justify-content: center; }
+            .ceo-quick-links a span:last-child { font-size: 10px !important; white-space: normal !important; line-height: 1.2; }
         }
         @media (min-width: 1200px) {
             .ceo-container { max-width: 1100px; }
@@ -2624,6 +2627,161 @@ function ceoToggleResource(resId) {
     if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
 }
 
+// ========== CEO TASK ACTIONS (modale + push to GitHub) ==========
+function ceoOpenTask(taskId, projectId) {
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) return;
+    var t = (p.tasks || []).find(function(tk) { return tk.id === taskId; });
+    if (!t) return;
+
+    var isBlocked = t.status === 'blocked';
+    var isOverdue = t.dueDate && t.dueDate < today();
+    var isDueToday = t.dueDate && t.dueDate === today();
+    var hasCeoNote = t.ceoNote && t.ceoNote.trim();
+    var statusColor = isBlocked ? 'var(--red)' : t.status === 'ceo_done' ? 'var(--green)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--blue)';
+    var statusLabel = isBlocked ? 'BLOCCATA' : t.status === 'ceo_done' ? 'COMPLETATA (in attesa conferma COO)' : isOverdue ? 'IN RITARDO' : isDueToday ? 'SCADE OGGI' : t.status === 'in_progress' ? 'IN CORSO' : 'DA FARE';
+
+    var modal = document.getElementById('taskModalInner');
+    var html = '<div class="modal-close-bar"><button class="modal-close-x" onclick="closeTaskModal()" aria-label="Chiudi">&times;</button></div>';
+
+    // Status badge
+    html += '<div style="display:inline-block;padding:4px 12px;border-radius:6px;background:' + statusColor + ';color:#fff;font-size:11px;font-weight:800;margin-bottom:12px">' + statusLabel + '</div>';
+
+    // Titolo
+    html += '<div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
+    html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:16px">' + esc(p.name);
+    if (t.dueDate) {
+        var dLeft = daysUntil(t.dueDate);
+        var dateF = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'long'});
+        html += ' &middot; Scadenza: <strong>' + dateF + '</strong>';
+        if (dLeft !== null && dLeft >= 0) html += ' (' + dLeft + ' giorni)';
+    }
+    html += '</div>';
+
+    // Messaggio COO (ceoNote)
+    if (hasCeoNote) {
+        html += '<div style="padding:14px 16px;background:var(--accent-soft, #FFF1ED);border:1px solid var(--accent);border-radius:10px;margin-bottom:16px">';
+        html += '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px;text-transform:uppercase">Istruzioni dal team operativo</div>';
+        html += '<div style="font-size:14px;color:var(--text);line-height:1.6">' + esc(t.ceoNote) + '</div>';
+        html += '</div>';
+    } else if (t.note) {
+        html += '<div style="padding:12px 14px;background:var(--bg);border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);line-height:1.5">' + esc(t.note) + '</div>';
+    }
+
+    // Storico aggiornamenti CEO
+    var ceoUpdates = t.ceoUpdates || [];
+    if (ceoUpdates.length > 0) {
+        html += '<div style="margin-bottom:16px">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">Aggiornamenti precedenti</div>';
+        ceoUpdates.slice().reverse().forEach(function(u) {
+            var d = new Date(u.at);
+            var dateStr = d.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            var typeLabel = u.type === 'complete' ? 'Completata' : u.type === 'update' ? 'Aggiornamento' : 'Nota';
+            var typeColor = u.type === 'complete' ? 'var(--green)' : 'var(--blue)';
+            html += '<div style="padding:8px 12px;background:var(--bg);border-radius:8px;margin-bottom:4px;font-size:12px">';
+            html += '<span style="font-weight:700;color:' + typeColor + '">' + typeLabel + '</span>';
+            html += '<span style="color:var(--text-muted);margin-left:8px">' + dateStr + '</span>';
+            if (u.note) html += '<div style="color:var(--text-secondary);margin-top:4px">' + esc(u.note) + '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Area input nota
+    html += '<div style="margin-bottom:16px">';
+    html += '<textarea id="ceoTaskNote" class="modal-textarea" rows="3" placeholder="Scrivi una nota, un aggiornamento, o il motivo per cui non hai potuto completarla..." style="font-size:14px"></textarea>';
+    html += '</div>';
+
+    // Bottoni azione
+    if (t.status !== 'ceo_done' && t.status !== 'done') {
+        html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'complete\')" style="flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Completa</button>';
+        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'update\')" style="flex:1;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Aggiorna il COO</button>';
+        html += '</div>';
+    } else if (t.status === 'ceo_done') {
+        html += '<div style="padding:12px;background:var(--green-bg);border:1px solid var(--green);border-radius:10px;text-align:center;font-size:14px;font-weight:600;color:var(--green)">In attesa di conferma dal COO</div>';
+    }
+
+    modal.innerHTML = html;
+    document.getElementById('taskModal').classList.add('open');
+}
+
+function ceoTaskAction(taskId, projectId, actionType) {
+    var noteText = (document.getElementById('ceoTaskNote') || {}).value || '';
+    if (actionType === 'update' && !noteText.trim()) {
+        alert('Scrivi una nota per aggiornare il COO.');
+        return;
+    }
+
+    // Aggiorna i dati locali
+    if (!_ceoData) return;
+    var p = _ceoData.projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) return;
+    var t = (p.tasks || []).find(function(tk) { return tk.id === taskId; });
+    if (!t) return;
+
+    if (!t.ceoUpdates) t.ceoUpdates = [];
+    t.ceoUpdates.push({
+        type: actionType,
+        note: noteText.trim(),
+        at: new Date().toISOString()
+    });
+
+    if (actionType === 'complete') {
+        t.status = 'ceo_done';
+    }
+
+    _ceoData.publishedAt = new Date().toISOString();
+
+    // Push to GitHub
+    ceoPushData(_ceoData, function(ok) {
+        if (ok) {
+            closeTaskModal();
+            renderCEOView();
+        } else {
+            alert('Errore nel salvataggio. Riprova.');
+        }
+    });
+}
+
+function ceoPushData(data, callback) {
+    var token = safeGetItem('pb_gh_token_ceo');
+    if (!token) {
+        token = prompt('Per salvare le tue azioni serve un token GitHub (solo la prima volta).\nChiedi a Mattia di fornirti il token.');
+        if (!token) { callback(false); return; }
+        safeSetItem('pb_gh_token_ceo', token.trim());
+    }
+
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+        headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(existing) {
+        var body = { message: 'CEO update ' + new Date().toISOString().split('T')[0], content: content };
+        if (existing && existing.sha) body.sha = existing.sha;
+
+        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+    }).then(function(r) {
+        if (r.ok) {
+            callback(true);
+        } else {
+            r.json().then(function(err) {
+                if (err.message && err.message.indexOf('Bad credentials') !== -1) {
+                    safeSetItem('pb_gh_token_ceo', '');
+                    alert('Token non valido. Riprova.');
+                }
+                callback(false);
+            });
+        }
+    }).catch(function() { callback(false); });
+}
+
 function ceoToggleTheme() {
     document.body.classList.toggle('dark');
     safeSetItem('pb_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
@@ -2669,12 +2827,12 @@ function renderCEOHome() {
     // ========== CEO QUICK LINKS — rettangolini orizzontali, prima di tutto ==========
     var ceoLinks = getCeoLinks();
     if (ceoLinks.length > 0) {
-        html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">';
+        html += '<div class="ceo-quick-links" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:18px">';
         ceoLinks.forEach(function(lk) {
             var hasUrl = lk.url && lk.url.trim();
-            html += '<a ' + (hasUrl ? 'href="' + esc(lk.url) + '" target="_blank" rel="noopener"' : 'href="javascript:void(0)"') + ' style="text-decoration:none;display:flex;align-items:center;gap:8px;padding:8px 14px;background:var(--surface);border:1px solid var(--border);border-radius:10px;transition:all 0.15s;cursor:' + (hasUrl ? 'pointer' : 'default') + '"' + (hasUrl ? ' onmouseenter="this.style.borderColor=\'' + lk.color + '\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 2px 8px ' + lk.color + '22\'" onmouseleave="this.style.borderColor=\'\';this.style.transform=\'\';this.style.boxShadow=\'\'"' : '') + '>';
-            html += '<span style="font-size:18px">' + lk.icon + '</span>';
-            html += '<span style="font-size:13px;font-weight:700;color:var(--text);white-space:nowrap">' + esc(lk.label) + '</span>';
+            html += '<a ' + (hasUrl ? 'href="' + esc(lk.url) + '" target="_blank" rel="noopener"' : 'href="javascript:void(0)"') + ' style="text-decoration:none;display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:10px;transition:all 0.15s;cursor:' + (hasUrl ? 'pointer' : 'default') + '"' + (hasUrl ? ' onmouseenter="this.style.borderColor=\'' + lk.color + '\';this.style.transform=\'translateY(-1px)\';this.style.boxShadow=\'0 2px 8px ' + lk.color + '22\'" onmouseleave="this.style.borderColor=\'\';this.style.transform=\'\';this.style.boxShadow=\'\'"' : '') + '>';
+            html += '<span style="font-size:18px;flex-shrink:0">' + lk.icon + '</span>';
+            html += '<span style="font-size:12px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(lk.label) + '</span>';
             html += '</a>';
         });
         html += '</div>';
@@ -2718,15 +2876,17 @@ function renderCEOHome() {
             var isBlocked = t.status === 'blocked';
             var isOverdue = t.dueDate && t.dueDate < todayStr;
             var isDueToday = t.dueDate && t.dueDate === todayStr;
-            var borderColor = isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
-            var bgColor = isBlocked ? 'var(--red-bg, #FEF2F2)' : isOverdue ? 'var(--red-bg, #FEF2F2)' : isDueToday ? 'var(--orange-bg, #FFF7ED)' : 'var(--surface)';
+            var isCeoDone = t.status === 'ceo_done';
+            var borderColor = isCeoDone ? 'var(--green)' : isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
+            var bgColor = isCeoDone ? 'var(--green-bg, #F0FDF4)' : isBlocked ? 'var(--red-bg, #FEF2F2)' : isOverdue ? 'var(--red-bg, #FEF2F2)' : isDueToday ? 'var(--orange-bg, #FFF7ED)' : 'var(--surface)';
             var hasCeoNote = t.ceoNote && t.ceoNote.trim();
 
-            html += '<div style="background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:16px 18px;margin-bottom:10px">';
+            html += '<div onclick="ceoOpenTask(\'' + t.id + '\',\'' + item.projectId + '\')" style="cursor:pointer;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:16px 18px;margin-bottom:10px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
 
             // Top: badge urgenza + progetto + scadenza
             html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">';
-            if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
+            if (isCeoDone) html += '<span style="background:var(--green);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">COMPLETATA</span>';
+            else if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
             else if (isOverdue) html += '<span style="background:var(--red);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
             else if (isDueToday) html += '<span style="background:var(--orange);color:#fff;font-size:10px;font-weight:800;border-radius:4px;padding:2px 6px">OGGI</span>';
             html += '<span style="font-size:11px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</span>';
