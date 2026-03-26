@@ -4741,11 +4741,6 @@ function renderGlobalWrapper() {
     });
     html += '</div>';
 
-    // Daily quote banner
-    if (state.globalTab === 0) {
-        html += '<div style="text-align:center;font-style:italic;font-weight:700;font-size:15px;color:var(--text-muted);padding:10px 16px 4px;line-height:1.4">«' + esc(getDailyQuote()) + '»</div>';
-    }
-
     // Filters for non-panoramica views
     if (state.globalTab > 0) {
         html += renderGlobalFilters();
