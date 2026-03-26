@@ -3618,8 +3618,9 @@ function setGHToken(t) { safeSetItem('pb_gh_token', t); }
 // Registro CEO actions gestite dal COO (separato da projects, sopravvive ai sync)
 function _getCooAcked() { try { return JSON.parse(safeGetItem('pb_coo_acked') || '{}'); } catch(e) { return {}; } }
 function _setCooAcked(taskId) { var a = _getCooAcked(); a[taskId] = new Date().toISOString(); safeSetItem('pb_coo_acked', JSON.stringify(a)); }
-function _isCooAcked(taskId) { return !!_getCooAcked()[taskId]; }
+function _isCooAcked(taskId, ceoLatestAt) { var at = _getCooAcked()[taskId]; if (!at) return false; if (ceoLatestAt && new Date(ceoLatestAt) > new Date(at)) return false; return true; }
 function _clearCooAcked(taskId) { var a = _getCooAcked(); delete a[taskId]; safeSetItem('pb_coo_acked', JSON.stringify(a)); }
+function _autoPublishForCEO() { if (CEO_MODE || _ceoPreview) return; if (!getGHToken()) return; publishForCEO(); }
 
 function _showCooOnboarding(onSuccess) {
     var mc = document.getElementById('mainContent');
@@ -3788,21 +3789,16 @@ function _applyCeoActionsToData() {
                 if (ta) {
                     t.ceoUpdates = ta.updates || [];
                     if (ta.status === 'complete') {
-                        // Se il COO ha rimesso la task in lavorazione (status non è done/da_verificare),
-                        // NON sovrascrivere con ceo_done — il COO ha rifiutato
-                        if (t.status === 'done' || t.status === 'da_verificare') {
-                            t.status = 'ceo_done';
+                        // Controlla se il COO ha risposto DOPO l'ultima azione del CEO
+                        var lastCeoAct = (ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
+                        var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+                        var cooRespondedAfter = lastCooResp && lastCeoAct && new Date(lastCooResp.at) > new Date(lastCeoAct.at);
+                        if (cooRespondedAfter) {
+                            // COO ha gia' gestito — rispetta lo status in data.json
+                            // (done = confermata, todo = rimessa in lavorazione)
                         } else {
-                            // Il COO ha rifiutato o non ancora gestito.
-                            // Se ci sono cooResponses più recenti dell'ultima azione CEO, è stato rifiutato
-                            var lastCeoAct = (ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
-                            var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
-                            if (lastCooResp && lastCeoAct && new Date(lastCooResp.at) > new Date(lastCeoAct.at)) {
-                                // COO ha risposto dopo — task resta nel suo status attuale (in_progress)
-                            } else {
-                                // Nessuna risposta COO → probabilmente non ancora gestita, mostra ceo_done
-                                t.status = 'ceo_done';
-                            }
+                            // COO non ha ancora gestito — mostra "in attesa di conferma"
+                            t.status = 'ceo_done';
                         }
                     }
                 }
@@ -3997,7 +3993,8 @@ function _cooFetchCeoActions() {
                     var ta = ceoActs.taskActions[t.id];
                     if (!ta) return;
                     // Skip se il COO ha già gestito questa azione (confermata o rifiutata)
-                    if (_isCooAcked(t.id)) return;
+                    var _latestCeoAt = (ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1].at : null;
+                    if (_isCooAcked(t.id, _latestCeoAt)) return;
                     // Completate → da_verificare
                     if (ta.status === 'complete' && t.status !== 'done' && t.status !== 'da_verificare') {
                         t.status = 'da_verificare';
@@ -4066,7 +4063,7 @@ function renderHeader() {
         const p = getProjects().find(pr => pr.id === state.currentProjectId);
         if (!p) { goGlobal(); return; }
         bc.innerHTML = `<button class="header-back" onclick="goGlobal()">&#8592; Tutti i progetti</button>`;
-        title.innerHTML = `${esc(p.name)} <span class="status-badge status-${p.status}" onclick="cycleProjectStatus('${p.id}')" style="font-size:11px;margin-left:8px;">${p.status.replace('-',' ')}</span>`;
+        title.innerHTML = `${esc(p.name)} <span class="status-badge status-${p.status||'draft'}" onclick="cycleProjectStatus('${p.id}')" style="font-size:11px;margin-left:8px;">${(p.status||'draft').replace('-',' ')}</span>`;
         desc.textContent = p.description || '';
         addBtn.textContent = '+ Task';
     }
@@ -4426,7 +4423,7 @@ function renderGlobal() {
         if (blocked > 0) html += `<div class="project-card-alert">${blocked}</div>`;
         html += `<div class="project-card-header">
             <span class="project-card-name">${esc(p.name)} <span class="health-emoji">${projectHealthEmoji(p)}</span></span>
-            <span class="status-badge status-${p.status}" style="font-size:10px;padding:2px 8px;">${p.status.replace('-',' ')}</span>
+            <span class="status-badge status-${p.status||'draft'}" style="font-size:10px;padding:2px 8px;">${(p.status||'draft').replace('-',' ')}</span>
         </div>`;
         // Scadenza progetto — prominente
         if (p.launchDate) {
@@ -6874,6 +6871,7 @@ function cooRespondFromPopup(taskId, projectId) {
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Risposta inviata ad Alberto: ' + note });
     saveProjects(projects);
+    _autoPublishForCEO();
     _showToast('Risposta inviata!');
     document.getElementById('backupModal').classList.remove('open');
     render();
@@ -6888,16 +6886,15 @@ function confirmTask(taskId, projectId) {
     // Leggi commento opzionale
     var commentInput = document.getElementById('daVerificaComment_' + taskId);
     var comment = commentInput ? commentInput.value.trim() : '';
-    if (comment) {
-        if (!t.cooResponses) t.cooResponses = [];
-        t.cooResponses.push({ note: comment, at: new Date().toISOString() });
-    }
+    if (!t.cooResponses) t.cooResponses = [];
+    t.cooResponses.push({ note: comment || '[Task confermata]', at: new Date().toISOString() });
     t.status = 'done';
     t.completedAt = new Date().toISOString();
     _setCooAcked(taskId);
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Confermata dal COO' + (comment ? ': ' + comment : ' (completata da Alberto)') });
     saveProjects(projects);
+    _autoPublishForCEO();
     document.getElementById('backupModal').classList.remove('open');
     _showToast('Task confermata!');
     render();
@@ -6912,15 +6909,14 @@ function rejectTask(taskId, projectId) {
     // Leggi commento opzionale
     var commentInput = document.getElementById('daVerificaComment_' + taskId);
     var comment = commentInput ? commentInput.value.trim() : '';
-    if (comment) {
-        if (!t.cooResponses) t.cooResponses = [];
-        t.cooResponses.push({ note: comment, at: new Date().toISOString() });
-    }
-    t.status = 'in_progress';
+    if (!t.cooResponses) t.cooResponses = [];
+    t.cooResponses.push({ note: comment || '[Task rimessa in lavorazione]', at: new Date().toISOString() });
+    t.status = 'todo';
     _setCooAcked(taskId);
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Rimessa in lavorazione dal COO' + (comment ? ': ' + comment : '') });
     saveProjects(projects);
+    _autoPublishForCEO();
     document.getElementById('backupModal').classList.remove('open');
     _showToast(comment ? 'Rimessa in lavorazione con feedback' : 'Task rimessa in lavorazione');
     render();
@@ -6942,6 +6938,7 @@ function cooRespondToTask(taskId, projectId) {
     if (!t.activityLog) t.activityLog = [];
     t.activityLog.push({ date: today(), text: 'Risposta inviata ad Alberto: ' + note });
     saveProjects(projects);
+    _autoPublishForCEO();
     _showToast('Risposta inviata!');
     closeTaskModal();
     render();
