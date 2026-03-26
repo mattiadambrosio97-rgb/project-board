@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T19:45:45.477Z",
+  "lastUpdate": "2026-03-26T19:48:40.125Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -12,12 +12,17 @@
       ]
     },
     "task_piattaforma": {
-      "status": "update",
+      "status": "complete",
       "updates": [
         {
           "type": "update",
           "note": "Io preferirei Zoom per le breakout rooms",
           "at": "2026-03-26T14:22:22.797Z"
+        },
+        {
+          "type": "complete",
+          "note": "",
+          "at": "2026-03-26T19:48:40.125Z"
         }
       ]
     },
