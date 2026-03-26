@@ -1,5 +1,16 @@
 {
-  "lastUpdate": "",
+  "lastUpdate": "2026-03-26T12:45:35.943Z",
   "taskActions": {},
-  "resourceActions": {}
+  "resourceActions": {
+    "res_demo_002": {
+      "feedback": [
+        {
+          "note": "Interessantissimo",
+          "at": "2026-03-26T12:45:35.942Z"
+        }
+      ],
+      "read": true,
+      "readAt": "2026-03-26T12:45:35.942Z"
+    }
+  }
 }
