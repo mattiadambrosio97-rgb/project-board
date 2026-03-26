@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T14:20:27.245Z",
+  "publishedAt": "2026-03-26T14:23:56.518Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -139,14 +139,33 @@
           "note": "Bloccata finche Alberto non decide",
           "comments": [],
           "dependsOn": [],
-          "activityLog": [],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Risposta inviata ad Alberto: Ok zoom"
+            }
+          ],
           "createdAt": 1774534628500,
           "completedAt": null,
           "recurrence": null,
           "nextCheck": "",
           "doneWhen": "Alberto sceglie la piattaforma",
           "dependsLabel": "Decisione di Alberto",
-          "estimateHours": 0
+          "estimateHours": 0,
+          "ceoHasUpdate": false,
+          "ceoUpdates": [
+            {
+              "type": "update",
+              "note": "Io preferirei Zoom per le breakout rooms",
+              "at": "2026-03-26T14:22:22.797Z"
+            }
+          ],
+          "cooResponses": [
+            {
+              "note": "Ok zoom",
+              "at": "2026-03-26T14:23:56.518Z"
+            }
+          ]
         },
         {
           "id": "task_slide",
