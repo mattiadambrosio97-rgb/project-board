@@ -2857,13 +2857,6 @@ function renderCEOView() {
     }
     mc.scrollTop = 0;
     window.scrollTo(0, 0);
-    setTimeout(function() { window.scrollTo(0, 0); }, 50);
-    setTimeout(function() { window.scrollTo(0, 0); }, 300);
-    // Aspetta che i font siano caricati (causa layout shift alla prima apertura)
-    if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(function() { window.scrollTo(0, 0); });
-    }
-    setTimeout(function() { window.scrollTo(0, 0); }, 800);
 }
 
 // Su mobile: apri task/risorsa inline invece che in modal
@@ -4293,6 +4286,10 @@ function render() {
             return;
         }
         if (!_ceoData) {
+            // Mostra loading che parte da top — evita layout shift dal form token
+            var mc = document.getElementById('mainContent');
+            mc.innerHTML = '<div class="ceo-container" style="text-align:center;padding-top:60px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Caricamento...</div><div style="font-size:13px;color:var(--text-muted)">Sto scaricando i dati dal server</div></div>';
+            window.scrollTo(0, 0);
             loadCEOData(function() { render(); });
             return;
         }
