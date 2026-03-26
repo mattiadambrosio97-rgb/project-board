@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T20:59:49.813Z",
+  "publishedAt": "2026-03-26T20:59:53.839Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -168,7 +168,7 @@
         {
           "id": "testB_1774558526794",
           "title": "TEST-B: Alberto completa questa task",
-          "status": "da_verificare",
+          "status": "done",
           "assignee": "Alberto",
           "priority": "medium",
           "dueDate": "2026-03-27",
@@ -178,7 +178,12 @@
           "tags": [
             "test"
           ],
-          "activityLog": [],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Confermata dal COO (completata da Alberto)"
+            }
+          ],
           "ceoUpdates": [
             {
               "type": "complete",
@@ -186,7 +191,14 @@
               "at": "2026-03-26T20:58:40.910Z"
             }
           ],
-          "ceoCompletedAt": "2026-03-26T20:58:40.910Z"
+          "ceoCompletedAt": "2026-03-26T20:58:40.910Z",
+          "cooResponses": [
+            {
+              "note": "[Task confermata]",
+              "at": "2026-03-26T20:59:53.839Z"
+            }
+          ],
+          "completedAt": "2026-03-26T20:59:53.839Z"
         },
         {
           "id": "testC_1774558526794",
