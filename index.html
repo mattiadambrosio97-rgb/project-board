@@ -3351,7 +3351,7 @@ function renderGlobal() {
             if (!isBlocked && !isOverdue) return;
             const lastComment = (t.comments || []).slice(-1)[0];
             const reason = lastComment ? lastComment.text : '';
-            actions.push({ person: t.assignee, task: t.title, project: p.name, isBlocked, isOverdue, dueDate: t.dueDate, reason });
+            actions.push({ person: t.assignee, task: t.title, project: p.name, taskId: t.id, projectId: p.id, isBlocked, isOverdue, dueDate: t.dueDate, reason });
         });
     });
 
@@ -5737,7 +5737,8 @@ function showUnblockPopup() {
             const color = a.isBlocked ? 'var(--red)' : 'var(--orange)';
             const label = a.isBlocked ? 'Bloccata' : 'Scaduta';
             const days = a.isOverdue && a.dueDate ? Math.abs(daysDiff(a.dueDate)) + 'gg fa' : '';
-            html += `<div style="padding:10px 14px;background:${a.isBlocked ? 'var(--red-bg)' : 'var(--orange-bg)'};border-radius:8px;margin-bottom:6px;">
+            var clickHandler = a.taskId && a.projectId ? `onclick="document.getElementById('backupModal').classList.remove('open');openTaskModal('${a.taskId}','${a.projectId}')"` : '';
+            html += `<div style="padding:10px 14px;background:${a.isBlocked ? 'var(--red-bg)' : 'var(--orange-bg)'};border-radius:8px;margin-bottom:6px;${a.taskId ? 'cursor:pointer' : ''}" ${clickHandler}>
                 <div style="font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;"><span style="color:${color};font-size:11px;">${icon}</span> ${esc(a.task)}</div>
                 <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">${label}${days ? ' — ' + days : ''} &middot; ${esc(a.project)}${a.reason ? ' — ' + esc(a.reason) : ''}</div>
             </div>`;
