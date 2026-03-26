@@ -3808,8 +3808,25 @@ function _applyCeoActionsToData() {
             (p.tasks || []).forEach(function(t) {
                 var ta = _ceoActions.taskActions[t.id];
                 if (ta) {
-                    if (ta.status === 'complete') t.status = 'ceo_done';
                     t.ceoUpdates = ta.updates || [];
+                    if (ta.status === 'complete') {
+                        // Se il COO ha rimesso la task in lavorazione (status non è done/da_verificare),
+                        // NON sovrascrivere con ceo_done — il COO ha rifiutato
+                        if (t.status === 'done' || t.status === 'da_verificare') {
+                            t.status = 'ceo_done';
+                        } else {
+                            // Il COO ha rifiutato o non ancora gestito.
+                            // Se ci sono cooResponses più recenti dell'ultima azione CEO, è stato rifiutato
+                            var lastCeoAct = (ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
+                            var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+                            if (lastCooResp && lastCeoAct && new Date(lastCooResp.at) > new Date(lastCeoAct.at)) {
+                                // COO ha risposto dopo — task resta nel suo status attuale (in_progress)
+                            } else {
+                                // Nessuna risposta COO → probabilmente non ancora gestita, mostra ceo_done
+                                t.status = 'ceo_done';
+                            }
+                        }
+                    }
                 }
             });
         });
