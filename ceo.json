@@ -1,5 +1,5 @@
 {
-  "lastUpdate": "2026-03-26T14:31:08.660Z",
+  "lastUpdate": "2026-03-26T14:32:09.238Z",
   "taskActions": {
     "task_budget": {
       "status": "complete",
@@ -37,5 +37,10 @@
       ]
     }
   },
-  "resourceActions": {}
+  "resourceActions": {
+    "res_1774535506316_9j7g": {
+      "read": true,
+      "readAt": "2026-03-26T14:32:09.238Z"
+    }
+  }
 }
