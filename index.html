@@ -2861,6 +2861,112 @@ function ceoMarkResource(resId, action) {
     });
 }
 
+function ceoOpenResource(resId) {
+    var resources = getResources();
+    var res = resources.find(function(r) { return r.id === resId; });
+    if (!res) return;
+    var _ca = _ceoActions || { taskActions: {}, resourceActions: {} };
+    var resActions = _ca.resourceActions[resId] || {};
+    var isRead = resActions.read;
+    var typeIcon = res.type === 'link' ? '&#128279;' : res.type === 'html' ? '&#128196;' : '&#128221;';
+    var typeLabel = res.type === 'link' ? 'Link' : res.type === 'html' ? 'HTML' : 'Nota';
+    var dateStr = res.createdAt ? new Date(res.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+
+    var modal = document.getElementById('backupModalInner');
+    var html = '';
+
+    // Header
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">';
+    html += '<span style="font-size:24px">' + typeIcon + '</span>';
+    html += '<div>';
+    html += '<div style="font-size:18px;font-weight:800;color:var(--text)">' + esc(res.title) + '</div>';
+    html += '<div style="font-size:12px;color:var(--text-muted)">' + typeLabel + (dateStr ? ' &middot; ' + dateStr : '') + '</div>';
+    html += '</div>';
+    if (isRead) html += '<span style="margin-left:auto;font-size:11px;font-weight:700;color:var(--green);background:var(--green-bg);border-radius:6px;padding:3px 8px">LETTO</span>';
+    html += '</div>';
+
+    // Contenuto
+    if (res.content && res.content.trim()) {
+        html += '<div style="padding:14px;background:var(--bg);border-radius:10px;font-size:14px;line-height:1.7;color:var(--text);margin-bottom:14px">' + simpleMarkdown(res.content) + '</div>';
+    }
+
+    // Link
+    if (res.url && res.url.trim()) {
+        var links = res.url.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+        if (links.length > 0) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
+            links.forEach(function(lnk) {
+                var label = lnk.replace(/^https?:\\/\\/(www\\.)?/, '').split('/')[0].split('?')[0];
+                if (label.length > 30) label = label.substring(0, 27) + '...';
+                html += '<a href="' + esc(lnk) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">' + (links.length > 1 ? esc(label) : 'Apri link') + ' &#8599;</a>';
+            });
+            html += '</div>';
+        }
+    }
+
+    // Thread conversazione
+    var ceoFeedback = (resActions.feedback) || [];
+    var cooReplies = res.cooReplies || [];
+    var allMessages = [];
+    ceoFeedback.forEach(function(fb) { allMessages.push({ type: 'ceo', note: fb.note, at: fb.at }); });
+    cooReplies.forEach(function(cr) { allMessages.push({ type: 'coo', note: cr.note, at: cr.at }); });
+    allMessages.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+    if (allMessages.length > 0) {
+        html += '<div style="margin-bottom:14px;padding:12px;background:var(--surface);border:1px solid var(--border);border-radius:10px">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase">Conversazione</div>';
+        allMessages.forEach(function(msg) {
+            var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            var isCeo = msg.type === 'ceo';
+            var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
+            var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+            var name = isCeo ? 'Tu' : 'Mattia (COO)';
+            html += '<div style="padding:8px 12px;background:' + bgCol + ';border-radius:8px;margin-bottom:4px;font-size:12px">';
+            html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+            html += ' <span style="font-size:10px;font-weight:600;color:var(--text-muted)">' + mDate + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + esc(msg.note) + '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Area input
+    html += '<div style="margin-bottom:16px">';
+    html += '<textarea id="ceoResNote_' + resId + '" rows="3" placeholder="Scrivi una nota, un commento, o una domanda per Mattia..." style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical"></textarea>';
+    html += '</div>';
+
+    // Bottoni azione
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    if (!isRead) {
+        html += '<button onclick="ceoMarkResourceWithNote(\'' + resId + '\')" style="flex:1;padding:12px;background:var(--green);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Segna come letto</button>';
+    }
+    html += '<button onclick="ceoSendResourceFeedbackModal(\'' + resId + '\')" style="flex:1;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);min-width:120px">Invia risposta</button>';
+    html += '</div>';
+
+    html += '<div style="text-align:right;margin-top:12px"><button class="btn-cancel" onclick="document.getElementById(\'backupModal\').classList.remove(\'open\')">Chiudi</button></div>';
+
+    modal.innerHTML = html;
+    document.getElementById('backupModal').classList.add('open');
+}
+
+function ceoSendResourceFeedbackModal(resId) {
+    var input = document.getElementById('ceoResNote_' + resId);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
+    if (!_ceoActions.resourceActions[resId]) _ceoActions.resourceActions[resId] = {};
+    var ra = _ceoActions.resourceActions[resId];
+    if (!ra.feedback) ra.feedback = [];
+    ra.feedback.push({ note: note, at: new Date().toISOString() });
+    if (!ra.read) { ra.read = true; ra.readAt = new Date().toISOString(); }
+    ceoPushActions(function(ok) {
+        if (ok) {
+            document.getElementById('backupModal').classList.remove('open');
+            renderCEOView();
+        } else alert('Errore nel salvataggio. Riprova.');
+    });
+}
+
 function ceoMarkResourceWithNote(resId) {
     if (!_ceoActions) _ceoActions = { lastUpdate: '', taskActions: {}, resourceActions: {} };
     if (!_ceoActions.resourceActions[resId]) _ceoActions.resourceActions[resId] = {};
@@ -2868,15 +2974,17 @@ function ceoMarkResourceWithNote(resId) {
     ra.read = true;
     ra.readAt = new Date().toISOString();
     // Se c'e' un commento, aggiungilo come feedback
-    var input = document.getElementById('ceoResFeedbackInput_' + resId);
+    var input = document.getElementById('ceoResNote_' + resId) || document.getElementById('ceoResFeedbackInput_' + resId);
     var note = input ? input.value.trim() : '';
     if (note) {
         if (!ra.feedback) ra.feedback = [];
         ra.feedback.push({ note: note, at: new Date().toISOString() });
     }
     ceoPushActions(function(ok) {
-        if (ok) renderCEOView();
-        else alert('Errore nel salvataggio. Riprova.');
+        if (ok) {
+            document.getElementById('backupModal').classList.remove('open');
+            renderCEOView();
+        } else alert('Errore nel salvataggio. Riprova.');
     });
 }
 
@@ -3205,8 +3313,8 @@ function renderCEOHome() {
 
             html += '<div style="background:' + (isRead ? 'var(--surface)' : 'var(--accent-soft,#FFF1ED)') + ';border:1px solid ' + (isRead ? 'var(--border)' : 'var(--accent)') + ';border-radius:10px;margin-bottom:8px;overflow:hidden;opacity:' + (isRead ? '0.7' : '1') + '">';
 
-            // Header cliccabile
-            html += '<div style="padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="ceoToggleResource(\'' + res.id + '\')">';
+            // Header cliccabile — apre modale risorsa
+            html += '<div style="padding:12px 14px;display:flex;align-items:center;gap:10px;cursor:pointer" onclick="ceoOpenResource(\'' + res.id + '\')">';
             html += '<span style="font-size:18px">' + typeIcon + '</span>';
             html += '<div style="flex:1;min-width:0">';
             html += '<div style="font-size:13px;font-weight:700;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(res.title);
@@ -3216,66 +3324,6 @@ function renderCEOHome() {
             if (isRead) html += ' &middot; <span style="color:var(--green);font-weight:600">Letto</span>';
             html += '</div>';
             html += '</div>';
-            html += '<span id="resChevron_' + res.id + '" style="font-size:14px;color:var(--text-muted);transition:transform 0.2s">&#9660;</span>';
-            html += '</div>';
-
-            // Contenuto espandibile
-            html += '<div id="resBody_' + res.id + '" style="display:none;padding:0 14px 12px;border-top:1px solid var(--border-light)">';
-            // Contenuto (nota/markdown)
-            if (res.content && res.content.trim()) {
-                html += '<div style="margin-top:10px;padding:12px;background:var(--bg);border-radius:8px;font-size:13px;line-height:1.6;color:var(--text)">' + simpleMarkdown(res.content) + '</div>';
-            }
-            // Link (uno o più, separati da newline)
-            if (res.url && res.url.trim()) {
-                var links = res.url.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; });
-                if (links.length > 0) {
-                    html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">';
-                    links.forEach(function(lnk, i) {
-                        var label = lnk.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('?')[0];
-                        if (label.length > 30) label = label.substring(0, 27) + '...';
-                        html += '<a href="' + esc(lnk) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--accent);color:#fff;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none">' + (links.length > 1 ? esc(label) : 'Apri link') + ' &#8599;</a>';
-                    });
-                    html += '</div>';
-                }
-            }
-
-            // Thread conversazione: feedback Alberto + risposte COO, in ordine cronologico
-            var ceoFeedback = (resActions.feedback) || [];
-            var cooReplies = res.cooReplies || [];
-            var allMessages = [];
-            ceoFeedback.forEach(function(fb) { allMessages.push({ type: 'ceo', note: fb.note, at: fb.at }); });
-            cooReplies.forEach(function(cr) { allMessages.push({ type: 'coo', note: cr.note, at: cr.at }); });
-            allMessages.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
-            if (allMessages.length > 0) {
-                html += '<div style="margin-top:10px">';
-                allMessages.forEach(function(msg) {
-                    var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    if (msg.type === 'ceo') {
-                        html += '<div style="padding:5px 8px;background:var(--surface);border-radius:6px;margin-bottom:3px;font-size:11px">';
-                        html += '<span style="font-weight:700;color:var(--blue)">Tu</span> <span style="color:var(--text-muted);margin-left:4px">' + mDate + '</span>';
-                        html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
-                        html += '</div>';
-                    } else {
-                        html += '<div style="padding:5px 8px;background:var(--accent-soft,#FFF1ED);border-radius:6px;margin-bottom:3px;font-size:11px">';
-                        html += '<span style="font-weight:700;color:var(--accent)">Mattia (COO)</span> <span style="color:var(--text-muted);margin-left:4px">' + mDate + '</span>';
-                        html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
-                        html += '</div>';
-                    }
-                });
-                html += '</div>';
-            }
-
-            // Campo risposta + azioni
-            html += '<div style="margin-top:10px" onclick="event.stopPropagation()">';
-            html += '<input id="ceoResFeedbackInput_' + res.id + '" type="text" placeholder="Commento (opzionale)..." style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;margin-bottom:6px" onkeydown="if(event.key===\'Enter\')ceoSendResourceFeedback(\'' + res.id + '\')">';
-            html += '<div style="display:flex;gap:6px">';
-            if (!isRead) {
-                html += '<button onclick="ceoMarkResourceWithNote(\'' + res.id + '\')" style="flex:1;padding:9px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Segna come letto</button>';
-            }
-            html += '<button onclick="ceoSendResourceFeedback(\'' + res.id + '\')" style="flex:1;padding:9px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia risposta</button>';
-            html += '</div>';
-            html += '</div>';
-
             html += '</div>';
             html += '</div>';
         });
