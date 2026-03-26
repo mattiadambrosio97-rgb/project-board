@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:07:36.628Z",
+  "publishedAt": "2026-03-26T21:08:36.249Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -130,90 +130,6 @@
           "doneWhen": "Landing live e testata",
           "dependsLabel": "",
           "estimateHours": 8
-        },
-        {
-          "id": "testA_1774558526794",
-          "title": "TEST-A: Alberto scrivi un messaggio",
-          "status": "in_progress",
-          "assignee": "Alberto",
-          "priority": "high",
-          "dueDate": "2026-03-27",
-          "note": "Alberto deve cliccare Aggiorna il COO e scrivere qualcosa",
-          "ceoNote": "Scrivi un aggiornamento su questa task",
-          "createdAt": "2026-03-26T20:55:26.794Z",
-          "tags": [
-            "test"
-          ],
-          "activityLog": [
-            {
-              "date": "2026-03-26",
-              "text": "Risposta inviata ad Alberto: Ok"
-            }
-          ],
-          "ceoHasUpdate": false,
-          "ceoUpdates": [
-            {
-              "type": "update",
-              "note": "Fatto ho rivisto tutto",
-              "at": "2026-03-26T20:58:33.922Z"
-            }
-          ],
-          "cooResponses": [
-            {
-              "note": "Ok",
-              "at": "2026-03-26T20:59:49.813Z"
-            }
-          ]
-        },
-        {
-          "id": "testB_1774558526794",
-          "title": "TEST-B: Alberto completa questa task",
-          "status": "done",
-          "assignee": "Alberto",
-          "priority": "medium",
-          "dueDate": "2026-03-27",
-          "note": "Alberto deve cliccare Completa dalla vista CEO",
-          "ceoNote": "Quando hai finito, segna come completata",
-          "createdAt": "2026-03-26T20:55:26.794Z",
-          "tags": [
-            "test"
-          ],
-          "activityLog": [
-            {
-              "date": "2026-03-26",
-              "text": "Confermata dal COO (completata da Alberto)"
-            }
-          ],
-          "ceoUpdates": [
-            {
-              "type": "complete",
-              "note": "",
-              "at": "2026-03-26T20:58:40.910Z"
-            }
-          ],
-          "ceoCompletedAt": "2026-03-26T20:58:40.910Z",
-          "cooResponses": [
-            {
-              "note": "[Task confermata]",
-              "at": "2026-03-26T20:59:53.839Z"
-            }
-          ],
-          "completedAt": "2026-03-26T20:59:53.839Z"
-        },
-        {
-          "id": "testC_1774558526794",
-          "title": "TEST-C: Task per nota progetto",
-          "status": "todo",
-          "assignee": "Alberto",
-          "priority": "low",
-          "dueDate": "2026-03-27",
-          "note": "Questa serve solo come riferimento - il test e sulla nota progetto",
-          "ceoNote": "Ignora questa task, scrivi una nota sul progetto",
-          "createdAt": "2026-03-26T20:55:26.794Z",
-          "tags": [
-            "test"
-          ],
-          "activityLog": []
         }
       ],
       "ceoHasProjectNote": false,
