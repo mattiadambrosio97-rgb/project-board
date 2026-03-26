@@ -6059,18 +6059,27 @@ function renderProjectDashboard(p) {
     const inProgress = tasks.filter(t=>t.status==='in_progress').length;
     const blocked = tasks.filter(t=>t.status==='blocked').length;
     const done = tasks.filter(t=>t.status==='done').length;
-    const pct = tasks.length ? Math.round(done / tasks.length * 100) : 0;
-    const nextDue = tasks.filter(t=>t.status!=='done'&&t.dueDate).sort((a,b)=>a.dueDate.localeCompare(b.dueDate)).slice(0,5);
-    const blockedTasks = tasks.filter(t=>t.status==='blocked');
+    const total = tasks.length;
+    const pct = total ? Math.round(done / total * 100) : 0;
+    const todayStr = today();
 
     let html = '';
-    html += '<div class="dash-stats">';
-    html += `<div class="dash-stat-card" style="cursor:pointer" onclick="showTasksByStatus('${p.id}','todo')"><div class="dash-stat-value" style="color:var(--slate)">${todo}</div><div class="dash-stat-label">Da fare</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--blue)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer" onclick="showTasksByStatus('${p.id}','blocked')"><div class="dash-stat-value" style="color:var(--red)">${blocked}</div><div class="dash-stat-label">Bloccate</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer" onclick="showTasksByStatus('${p.id}','done')"><div class="dash-stat-value" style="color:var(--green)">${done}</div><div class="dash-stat-label">Completate</div></div>`;
-    html += '</div>';
-    html += `<div class="dash-progress-bar"><div class="dash-progress-fill" style="width:${pct}%;background:${completionColor(pct)}"></div></div>`;
+
+    // ── Stats a 4 colonne (stile CEO) ──
+    html += `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','todo')"><div class="dash-stat-value" style="color:var(--slate)">${todo}</div><div class="dash-stat-label">Da fare</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--blue)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','blocked')"><div class="dash-stat-value" style="color:var(--red)">${blocked}</div><div class="dash-stat-label">Bloccate</div></div>`;
+    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center" onclick="showTasksByStatus('${p.id}','done')"><div class="dash-stat-value" style="color:var(--green)">${done}</div><div class="dash-stat-label">Completate</div></div>`;
+    html += `</div>`;
+
+    // ── Progress bar multi-colore (stile CEO) ──
+    html += `<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:16px;display:flex">`;
+    if (done > 0) html += `<div style="width:${done/total*100}%;background:var(--green);transition:width 0.3s"></div>`;
+    if (inProgress > 0) html += `<div style="width:${inProgress/total*100}%;background:var(--blue);transition:width 0.3s"></div>`;
+    if (blocked > 0) html += `<div style="width:${blocked/total*100}%;background:var(--red);transition:width 0.3s"></div>`;
+    if (todo > 0) html += `<div style="width:${todo/total*100}%;background:var(--border);transition:width 0.3s"></div>`;
+    html += `</div>`;
 
     // ── Scadenza globale progetto ──
     if (p.launchDate) {
@@ -6081,7 +6090,7 @@ function renderProjectDashboard(p) {
         const borderCol = overdue ? 'var(--red)' : urgent ? 'var(--accent)' : 'var(--border)';
         const bgCol = overdue ? 'var(--red-bg)' : urgent ? 'var(--accent-soft)' : 'var(--surface)';
         const labelCol = overdue ? 'var(--red)' : urgent ? 'var(--accent)' : 'var(--text-muted)';
-        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px solid ${borderCol};background:${bgCol};margin:12px 0 16px;">
+        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px solid ${borderCol};background:${bgCol};margin-bottom:16px;">
             <span style="font-size:22px;">${overdue ? '&#9888;' : '&#127937;'}</span>
             <div style="flex:1;">
                 <div style="font-size:10px;font-weight:700;color:${labelCol};text-transform:uppercase;letter-spacing:0.5px;">Scadenza progetto</div>
@@ -6091,7 +6100,7 @@ function renderProjectDashboard(p) {
             <button onclick="openProjectModal('${p.id}')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);color:var(--text-secondary);transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'">Modifica</button>
         </div>`;
     } else {
-        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);margin:12px 0 16px;cursor:pointer;" onclick="openProjectModal('${p.id}')">
+        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);margin-bottom:16px;cursor:pointer;" onclick="openProjectModal('${p.id}')">
             <span style="font-size:20px;">&#128197;</span>
             <div>
                 <div style="font-size:13px;font-weight:600;color:var(--text-muted);">Nessuna scadenza impostata</div>
@@ -6100,43 +6109,80 @@ function renderProjectDashboard(p) {
         </div>`;
     }
 
-    // Next deadlines
-    if (nextDue.length > 0) {
-        html += '<div class="dash-section"><div class="dash-section-title">Prossime scadenze</div><div class="dash-list">';
-        nextDue.forEach(t => {
-            const dc = dateClass(t.dueDate, t.status);
-            html += `<div class="dash-list-item" onclick="openTaskModal('${t.id}','${p.id}')">
-                <span style="flex:1;font-weight:600">${esc(t.title)}</span>
-                <span class="task-card-due ${dc}">${smartDate(t.dueDate)}</span>
-            </div>`;
-        });
-        html += '</div></div>';
+    // ── Conversazione CEO-COO (se ci sono note) ──
+    const pCooResps = p.cooProjectResponses || [];
+    const pNotes = p.ceoProjectNotes || [];
+    const pConvo = [];
+    pNotes.forEach(n => { pConvo.push({ from: 'ceo', note: n.note, at: n.at }); });
+    pCooResps.forEach(r => { pConvo.push({ from: 'coo', note: r.note, at: r.at }); });
+    pConvo.sort((a, b) => new Date(a.at) - new Date(b.at));
+
+    if (pConvo.length > 0 || pNotes.length > 0) {
+        html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px">`;
+        html += `<div style="font-size:15px;font-weight:800;color:var(--text);margin-bottom:10px">&#128172; Note sul progetto</div>`;
+        if (pConvo.length > 0) {
+            html += `<div style="max-height:250px;overflow-y:auto;margin-bottom:10px">`;
+            pConvo.forEach(msg => {
+                const isCeo = msg.from === 'ceo';
+                const msgDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                const bgCol = isCeo ? 'var(--surface)' : 'var(--accent-soft,#FFF1ED)';
+                const nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+                const name = isCeo ? 'Alberto' : 'Tu (COO)';
+                html += `<div style="padding:8px 12px;background:${bgCol};border-radius:8px;margin-bottom:5px;font-size:13px">
+                    <span style="font-weight:700;color:${nameCol}">${name}</span>
+                    <span style="font-size:11px;color:var(--text-muted)"> &middot; ${msgDate}</span>
+                    ${msg.note ? '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + esc(msg.note) + '</div>' : ''}
+                </div>`;
+            });
+            html += `</div>`;
+        }
+        html += `<div style="display:flex;gap:8px">`;
+        html += `<input id="cooProjectNote_${p.id}" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key==='Enter')cooSendProjectNote('${p.id}')">`;
+        html += `<button onclick="cooSendProjectNote('${p.id}')" style="padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>`;
+        html += `</div></div>`;
     }
 
-    // Blocked
-    if (blockedTasks.length > 0) {
-        html += '<div class="dash-section"><div class="dash-section-title" style="color:var(--red)">Blocchi attivi</div><div class="dash-list">';
-        blockedTasks.forEach(t => {
-            html += `<div class="dash-list-item" onclick="openTaskModal('${t.id}','${p.id}')" style="border-left:3px solid var(--red)">
-                <span style="flex:1;font-weight:600">${esc(t.title)}</span>
-                <span style="font-size:11px;color:var(--text-muted)">${esc(t.assignee||'')}</span>
-            </div>`;
-        });
-        html += '</div></div>';
-    }
+    // ── Task raggruppate per status (stile CEO, con assignee, cliccabili) ──
+    const statusOrder = ['blocked', 'in_progress', 'todo'];
+    const statusStyles = {
+        blocked: {label:'Bloccate', color:'var(--red)', bg:'var(--red-bg, #FEF2F2)'},
+        in_progress: {label:'In Corso', color:'var(--blue)', bg:'var(--blue-bg, #EFF6FF)'},
+        todo: {label:'Da Fare', color:'var(--slate)', bg:'var(--bg)'}
+    };
 
-    // Activity log (simulate from tasks)
-    html += '<div class="dash-section"><div class="dash-section-title">Attivita recenti</div><div class="activity-log">';
-    const recentActivities = tasks.filter(t => t.completedAt || t.createdAt).sort((a,b) => (b.completedAt||b.createdAt) - (a.completedAt||a.createdAt)).slice(0,10);
-    recentActivities.forEach(t => {
-        const ts = t.completedAt || t.createdAt;
-        const action = t.completedAt ? 'completata' : 'creata';
-        html += `<div class="activity-item">
-            <span class="activity-time">${formatTimestamp(ts)}</span>
-            <span>"${esc(t.title)}" ${action} ${t.assignee ? 'da ' + esc(t.assignee) : ''}</span>
-        </div>`;
+    statusOrder.forEach(status => {
+        const sTasks = tasks.filter(t => t.status === status);
+        if (sTasks.length === 0) return;
+        const style = statusStyles[status];
+
+        html += `<div style="margin-bottom:16px">`;
+        html += `<div style="font-size:13px;font-weight:700;color:${style.color};margin-bottom:8px;display:flex;align-items:center;gap:6px">`;
+        html += `<span style="width:8px;height:8px;border-radius:50%;background:${style.color}"></span>`;
+        html += `${style.label} (${sTasks.length})`;
+        html += `</div>`;
+
+        sTasks.forEach(t => {
+            const isOverdue = t.dueDate && t.dueDate < todayStr;
+            html += `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:${style.bg};border:1px solid var(--border);border-radius:8px;margin-bottom:5px;cursor:pointer;transition:border-color 0.15s" onclick="openTaskModal('${t.id}','${p.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">`;
+            html += `<span style="font-size:14px;font-weight:600;color:var(--text);flex:1;min-width:0">${esc(t.title)}</span>`;
+            if (t.assignee) html += `<span style="font-size:12px;color:var(--text-muted);flex-shrink:0;background:var(--surface);padding:2px 8px;border-radius:6px;border:1px solid var(--border)">${esc(t.assignee)}</span>`;
+            if (t.dueDate) {
+                const dc = dateClass(t.dueDate, t.status);
+                html += `<span class="task-card-due ${dc}" style="font-size:12px;flex-shrink:0">${smartDate(t.dueDate)}</span>`;
+            }
+            html += `</div>`;
+        });
+        html += `</div>`;
     });
-    html += '</div></div>';
+
+    // ── Completate — conteggio ──
+    if (done > 0) {
+        html += `<div style="margin-bottom:16px;padding:12px 14px;background:var(--green-bg, #F0FDF4);border:1px solid var(--border);border-radius:10px;display:flex;align-items:center;gap:8px;cursor:pointer" onclick="showTasksByStatus('${p.id}','done')">`;
+        html += `<span style="font-size:16px">&#9989;</span>`;
+        html += `<span style="font-size:14px;font-weight:600;color:var(--green)">${done} task completate su ${total}</span>`;
+        html += `<span style="font-size:11px;color:var(--text-muted);margin-left:auto">Vedi tutte &rarr;</span>`;
+        html += `</div>`;
+    }
 
     return html;
 }
@@ -7599,6 +7645,24 @@ function cooRespondToProjectNote(pid) {
     _autoPublishForCEO();
     _showToast('Risposta inviata!');
     document.getElementById('backupModal').classList.remove('open');
+    render();
+}
+
+// Invia nota progetto dalla dashboard COO
+function cooSendProjectNote(pid) {
+    var input = document.getElementById('cooProjectNote_' + pid);
+    if (!input) return;
+    var note = input.value.trim();
+    if (!note) { input.focus(); return; }
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === pid; });
+    if (!p) { _showToast('Progetto non trovato', true); return; }
+    if (!p.cooProjectResponses) p.cooProjectResponses = [];
+    p.cooProjectResponses.push({ note: note, at: new Date().toISOString() });
+    p.ceoHasProjectNote = false;
+    saveProjects(projects);
+    _autoPublishForCEO();
+    _showToast('Risposta inviata!');
     render();
 }
 
