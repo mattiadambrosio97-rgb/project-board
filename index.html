@@ -2089,7 +2089,7 @@ function renderLaunchCalendar(allLaunches, editable) {
         });
 
         rows.forEach(function(rowLaunches, ri) {
-            html += '<div style="display:flex;height:' + rowH + 'px;align-items:center;position:relative">';
+            html += '<div class="gantt-row" data-brand="' + esc(brand) + '" style="display:flex;height:' + rowH + 'px;align-items:center;position:relative">';
 
             // Brand label solo sulla prima riga
             if (ri === 0) {
@@ -2123,7 +2123,7 @@ function renderLaunchCalendar(allLaunches, editable) {
                 var isLive = st === 'live';
                 var borderStyle = isLive ? '2px solid ' + bColor : '1px solid ' + bColor + '80';
                 var cursor = editable ? 'cursor:grab;' : '';
-                var cleanName = l.name.replace(/^Lancio\s+/i, '').replace(/^(ADT|USR|GTF|ADM)\s+/i, '');
+                var cleanName = l.name;
 
                 html += '<div class="gantt-bar" data-launch-id="' + l.id + '" style="position:absolute;left:' + barL + 'px;width:' + barW + 'px;top:5px;bottom:5px;background:' + bBg + ';border:' + borderStyle + ';border-radius:6px;display:flex;align-items:center;overflow:hidden;z-index:1;' + cursor + 'user-select:none;touch-action:none">';
                 if (editable) html += '<div class="gantt-handle gantt-handle-l" style="position:absolute;left:0;top:0;bottom:0;width:8px;cursor:ew-resize;z-index:2;border-radius:6px 0 0 6px" data-side="left"></div>';
@@ -2152,7 +2152,19 @@ function renderLaunchCalendar(allLaunches, editable) {
 
 // ========== GANTT DRAG & RESIZE ==========
 (function() {
-    var _drag = null; // { bar, launchId, mode:'move'|'left'|'right', startX, origLeft, origWidth, startSi, startEi }
+    var _drag = null;
+
+    function findBrandAtY(y) {
+        var rows = document.querySelectorAll('.gantt-row[data-brand]');
+        var best = null, bestDist = 99999;
+        rows.forEach(function(row) {
+            var rect = row.getBoundingClientRect();
+            var mid = rect.top + rect.height / 2;
+            var dist = Math.abs(y - mid);
+            if (dist < bestDist) { bestDist = dist; best = row.getAttribute('data-brand'); }
+        });
+        return best;
+    }
 
     function ganttPointerDown(e) {
         var handle = e.target.closest('.gantt-handle');
@@ -2188,13 +2200,15 @@ function renderLaunchCalendar(allLaunches, editable) {
             launchId: launchId,
             mode: mode,
             startX: e.clientX,
+            startY: e.clientY,
             origLeft: parseFloat(bar.style.left),
             origWidth: parseFloat(bar.style.width),
             startSi: si,
             startEi: ei,
+            startBrand: launch.brand || '',
             dayW: dayW,
             days: days,
-            minWidth: dayW - 4
+            _newBrand: null
         };
     }
 
@@ -2208,26 +2222,34 @@ function renderLaunchCalendar(allLaunches, editable) {
             var newEi = _drag.startEi + dayShift;
             if (newSi < 0) { newEi -= newSi; newSi = 0; }
             if (newEi >= _drag.days.length) { newSi -= (newEi - _drag.days.length + 1); newEi = _drag.days.length - 1; }
-            var newLeft = newSi * _drag.dayW + 2;
-            _drag.bar.style.left = newLeft + 'px';
+            _drag.bar.style.left = (newSi * _drag.dayW + 2) + 'px';
             _drag._newSi = newSi;
             _drag._newEi = newEi;
+
+            // Vertical: check brand under pointer
+            var brandUnder = findBrandAtY(e.clientY);
+            _drag._newBrand = brandUnder;
+            // Visual feedback: dim if changing brand
+            if (brandUnder && brandUnder !== _drag.startBrand) {
+                _drag.bar.style.outline = '2px dashed rgba(0,0,0,0.3)';
+                _drag.bar.style.outlineOffset = '2px';
+            } else {
+                _drag.bar.style.outline = '';
+                _drag.bar.style.outlineOffset = '';
+            }
         } else if (_drag.mode === 'left') {
             var newSi = _drag.startSi + dayShift;
             if (newSi < 0) newSi = 0;
             if (newSi > _drag.startEi) newSi = _drag.startEi;
-            var newLeft = newSi * _drag.dayW + 2;
-            var newWidth = (_drag.startEi - newSi + 1) * _drag.dayW - 4;
-            _drag.bar.style.left = newLeft + 'px';
-            _drag.bar.style.width = newWidth + 'px';
+            _drag.bar.style.left = (newSi * _drag.dayW + 2) + 'px';
+            _drag.bar.style.width = ((_drag.startEi - newSi + 1) * _drag.dayW - 4) + 'px';
             _drag._newSi = newSi;
             _drag._newEi = _drag.startEi;
         } else if (_drag.mode === 'right') {
             var newEi = _drag.startEi + dayShift;
             if (newEi >= _drag.days.length) newEi = _drag.days.length - 1;
             if (newEi < _drag.startSi) newEi = _drag.startSi;
-            var newWidth = (newEi - _drag.startSi + 1) * _drag.dayW - 4;
-            _drag.bar.style.width = newWidth + 'px';
+            _drag.bar.style.width = ((newEi - _drag.startSi + 1) * _drag.dayW - 4) + 'px';
             _drag._newSi = _drag.startSi;
             _drag._newEi = newEi;
         }
@@ -2238,22 +2260,30 @@ function renderLaunchCalendar(allLaunches, editable) {
         _drag.bar.style.opacity = '';
         _drag.bar.style.zIndex = '';
         _drag.bar.style.cursor = '';
+        _drag.bar.style.outline = '';
+        _drag.bar.style.outlineOffset = '';
 
         var newSi = _drag._newSi;
         var newEi = _drag._newEi;
-        var changed = (newSi !== undefined && newEi !== undefined) && (newSi !== _drag.startSi || newEi !== _drag.startEi);
+        var newBrand = _drag._newBrand;
+        var datesChanged = (newSi !== undefined && newEi !== undefined) && (newSi !== _drag.startSi || newEi !== _drag.startEi);
+        var brandChanged = newBrand && newBrand !== _drag.startBrand;
 
-        if (changed) {
+        if (datesChanged || brandChanged) {
             var launches = getLaunches();
             var idx = launches.findIndex(function(l) { return l.id === _drag.launchId; });
-            if (idx >= 0 && _drag.days[newSi] && _drag.days[newEi]) {
-                launches[idx].startDate = _drag.days[newSi];
-                launches[idx].endDate = _drag.days[newEi];
+            if (idx >= 0) {
+                if (datesChanged && _drag.days[newSi] && _drag.days[newEi]) {
+                    launches[idx].startDate = _drag.days[newSi];
+                    launches[idx].endDate = _drag.days[newEi];
+                }
+                if (brandChanged) {
+                    launches[idx].brand = newBrand;
+                }
                 saveLaunches(launches);
                 render();
             }
-        } else if (_drag.mode === 'move' && Math.abs(e.clientX - _drag.startX) < 5) {
-            // Click senza drag → apri modal
+        } else if (_drag.mode === 'move' && Math.abs(e.clientX - _drag.startX) < 5 && Math.abs(e.clientY - _drag.startY) < 5) {
             openLaunchModal(_drag.launchId);
         }
 
