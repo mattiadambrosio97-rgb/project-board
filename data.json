@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T21:28:38.578Z",
+  "publishedAt": "2026-03-26T21:28:42.108Z",
   "projects": [],
   "team": [
     {
@@ -46,15 +46,6 @@
     }
   ],
   "launches": [
-    {
-      "id": "ln_s3",
-      "name": "Lancio ADT Kick Off",
-      "brand": "ADT",
-      "startDate": "2026-04-12",
-      "endDate": "2026-04-16",
-      "projectId": "",
-      "notes": ""
-    },
     {
       "id": "ln_s4",
       "name": "Lancio Circolo dei Top Drivers Aprile",
