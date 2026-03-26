@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T14:17:58.735Z",
+  "publishedAt": "2026-03-26T14:20:27.245Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -12,7 +12,7 @@
           "id": "task_budget",
           "title": "Approvare budget Ads Q2 (3000/mese)",
           "assignee": "Alberto",
-          "status": "todo",
+          "status": "done",
           "dueDate": "2026-03-30",
           "ceoNote": "Devi confermare il budget mensile per le campagne Meta Q2. Abbiamo proposto 3000 euro/mese. Rispondi con ok o modifiche.",
           "tags": [
@@ -21,14 +21,33 @@
           "note": "",
           "comments": [],
           "dependsOn": [],
-          "activityLog": [],
+          "activityLog": [
+            {
+              "date": "2026-03-26",
+              "text": "Confermata dal COO (completata da Alberto)"
+            }
+          ],
           "createdAt": 1774534628499,
-          "completedAt": null,
+          "completedAt": "2026-03-26T14:20:27.245Z",
           "recurrence": null,
           "nextCheck": "",
           "doneWhen": "Alberto conferma il budget",
           "dependsLabel": "",
-          "estimateHours": 0
+          "estimateHours": 0,
+          "ceoUpdates": [
+            {
+              "type": "complete",
+              "note": "Budget approvato, 3000 va bene",
+              "at": "2026-03-26T14:19:24.373Z"
+            }
+          ],
+          "ceoCompletedAt": "2026-03-26T14:19:24.373Z",
+          "cooResponses": [
+            {
+              "note": "[Task confermata]",
+              "at": "2026-03-26T14:20:27.245Z"
+            }
+          ]
         },
         {
           "id": "task_copy_review",
