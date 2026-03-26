@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:13:01.832Z",
+  "publishedAt": "2026-03-26T10:14:47.057Z",
   "projects": [
     {
       "id": "id_1774513635614_94lnp5",
@@ -1908,9 +1908,9 @@
     {
       "id": "ln_1774517452235_d96lxq",
       "name": "Lancio USR Setup Pack",
-      "brand": "USR",
-      "startDate": "2026-04-06",
-      "endDate": "2026-04-09",
+      "brand": "GTF",
+      "startDate": "2026-04-08",
+      "endDate": "2026-04-11",
       "projectId": "",
       "notes": ""
     },
