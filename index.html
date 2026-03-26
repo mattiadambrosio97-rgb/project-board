@@ -3982,6 +3982,22 @@ function renderTeamTaskDetail() {
     });
     html += '</select></div>';
 
+    // Bottoni rapidi stato
+    html += '<div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap">';
+    var quickBtns = [
+        { key: 'in_progress', label: 'In corso', color: 'var(--blue,#2563EB)', icon: '&#9654;' },
+        { key: 'done', label: 'Fatto', color: 'var(--green)', icon: '&#10003;' },
+        { key: 'blocked', label: 'Bloccata', color: 'var(--red)', icon: '&#9888;' }
+    ];
+    quickBtns.forEach(function(btn) {
+        var isActive = currentStatus === btn.key;
+        var bg = isActive ? btn.color : 'transparent';
+        var txtColor = isActive ? '#fff' : btn.color;
+        var border = btn.color;
+        html += '<button onclick="teamQuickStatus(\'' + task.id + '\',\'' + btn.key + '\')" style="flex:1;min-width:90px;padding:12px 8px;background:' + bg + ';color:' + txtColor + ';border:2px solid ' + border + ';border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:var(--font);transition:all 0.15s">' + btn.icon + ' ' + btn.label + '</button>';
+    });
+    html += '</div>';
+
     html += '</div>';
 
     // Conversazione (solo messaggi con testo)
@@ -4027,6 +4043,17 @@ function teamGoHome() {
     _teamOpenTaskId = null;
     renderTeamView();
     window.scrollTo(0, 0);
+}
+
+function teamQuickStatus(taskId, newStatus) {
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    myActions.taskActions[taskId].status = newStatus;
+    teamPushActions(function(ok) {
+        if (ok) renderTeamView();
+        else alert('Errore nel salvataggio. Riprova.');
+    });
 }
 
 function teamChangeStatus(taskId) {
