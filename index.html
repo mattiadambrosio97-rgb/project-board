@@ -1230,15 +1230,19 @@
             .calendar-day-header { font-size: 10px; padding: 6px 2px; font-weight: 700; }
             .calendar-task-pill { font-size: 0; padding: 0; height: 5px; border-radius: 3px; margin: 1px 0; }
 
-            /* Calendar week grid — lista verticale */
+            /* Calendar week grid — agenda verticale */
             .cal-week-grid { grid-template-columns: 1fr !important; gap: 0; }
-            .cal-week-day { min-height: auto; padding: 12px 14px; border-bottom: 1px solid var(--border-light); }
-            .cal-week-day-header { padding-bottom: 6px; margin-bottom: 6px; }
-            .cal-week-day-name { font-size: 14px; }
-            .cal-week-day-num { font-size: 18px; width: 34px; height: 34px; }
-            .cal-week-task-card { padding: 10px 12px; border-radius: 8px; }
-            .cal-week-task-title { font-size: 15px; white-space: normal; }
-            .cal-week-task-meta { font-size: 12px; }
+            .cal-week-day { min-height: auto; padding: 10px 12px; border-bottom: 1px solid var(--border-light); }
+            .cal-week-day.today { background: var(--accent-soft); }
+            .cal-week-day.weekend:not(.today) { background: var(--bg); }
+            .cal-week-day-header { padding-bottom: 6px; margin-bottom: 6px; flex-wrap: nowrap; }
+            .cal-week-day-name { font-size: 14px; font-weight: 700; }
+            .cal-week-day-num { font-size: 16px; width: 32px; height: 32px; }
+            .cal-week-day-num.today { background: var(--accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+            .cal-week-task-card { padding: 10px 12px; border-radius: 8px; margin-bottom: 4px; }
+            .cal-week-task-title { font-size: 14px; white-space: normal; font-weight: 600; }
+            .cal-week-task-meta { font-size: 12px; color: var(--text-muted); }
+            .cal-week-status-dot { width: 8px; height: 8px; flex-shrink: 0; }
 
             /* Calendar year grid — 2 colonne */
             .cal-year-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
@@ -5617,11 +5621,19 @@ function renderGlobalCalendar() {
         navLabel = monthName.charAt(0).toUpperCase()+monthName.slice(1);
     }
 
+    var _mob = isMobile();
+    if (_mob && calView !== 'week') { calView = 'week'; }
+    // Ricalcola navLabel per settimana forzata
+    if (_mob) {
+        const _ws = getWeekStart(calYear, calMonth, calWeekDay || new Date().getDate());
+        const _we = new Date(_ws); _we.setDate(_we.getDate() + 6);
+        navLabel = _ws.toLocaleDateString('it-IT',{day:'numeric',month:'short'}) + ' — ' + _we.toLocaleDateString('it-IT',{day:'numeric',month:'short',year:'numeric'});
+    }
     let html = `<div class="calendar-nav">
         <button class="calendar-nav-btn" onclick="calNavPrev();render()">&#8249;</button>
         <span class="calendar-month-label">${navLabel}</span>
         <button class="calendar-nav-btn" onclick="calNavNext();render()">&#8250;</button>
-        <div class="cal-mode-toggle">
+        ${_mob ? '' : `<div class="cal-mode-toggle">
             <button class="cal-mode-btn ${calView==='week'?'active':''}" onclick="calView='week';render()">Settimana</button>
             <button class="cal-mode-btn ${calView==='month'?'active':''}" onclick="calView='month';render()">Mese</button>
             <button class="cal-mode-btn ${calView==='year'?'active':''}" onclick="calView='year';render()">Anno</button>
@@ -5629,7 +5641,7 @@ function renderGlobalCalendar() {
         <div class="cal-mode-toggle">
             <button class="cal-mode-btn ${calMode==='project'?'active':''}" onclick="calMode='project';render()">Progetti</button>
             <button class="cal-mode-btn ${calMode==='task'?'active':''}" onclick="calMode='task';render()">Task</button>
-        </div>
+        </div>`}
     </div>`;
 
     // Helper: render day cell content based on calMode
@@ -6420,7 +6432,7 @@ function toggleSort(col) {
 let calYear = Number(safeSessionGet('pb_calYear')) || null;
 let calMonth = safeSessionGet('pb_calMonth') !== null ? Number(safeSessionGet('pb_calMonth')) : null;
 let calMode = safeSessionGet('pb_calMode') || 'project';
-let calView = safeSessionGet('pb_calView') || 'month';
+let calView = safeSessionGet('pb_calView') || (isMobile() ? 'week' : 'month');
 let calWeekDay = Number(safeSessionGet('pb_calWeekDay')) || null;
 
 function getWeekStart(y, m, d) {
