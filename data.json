@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T22:26:02.122Z",
+  "publishedAt": "2026-03-26T22:35:55.748Z",
   "projects": [
     {
       "id": "id_1774561315044_2num0g",
@@ -51,7 +51,25 @@
           "comments": [],
           "createdAt": 1774563947933,
           "completedAt": null,
-          "activityLog": []
+          "activityLog": [],
+          "teamHasUpdate": false,
+          "_teamLastUpdateAt": "2026-03-26T22:26:19.944Z",
+          "_teamLastUpdateBy": "Kevin",
+          "_teamLastUpdateNote": "Cosa devo fare?",
+          "teamUpdates": [
+            {
+              "from": "Kevin",
+              "note": "Cosa devo fare?",
+              "status": null,
+              "at": "2026-03-26T22:26:19.944Z"
+            }
+          ],
+          "cooResponses": [
+            {
+              "note": "Schifo",
+              "at": "2026-03-26T22:35:42.730Z"
+            }
+          ]
         }
       ]
     }
