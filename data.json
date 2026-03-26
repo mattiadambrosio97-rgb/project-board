@@ -2116,6 +2116,14 @@
       "type": "note",
       "content": "Webinar gratuito previsto per metà aprile. Obiettivo: lead generation per Setup Pack.\n\n**Titolo proposto:** \"I 3 errori di setup che ti costano 1 secondo al giro (e come correggerli in 15 minuti)\"\n\n**Scaletta:**\n1. Intro + chi siamo (5 min) — Alberto presenta\n2. Errore #1: bilanciamento freni (10 min) — Max spiega con telemetria live\n3. Errore #2: rapporti cambio sbagliati (10 min) — Max\n4. Errore #3: pressioni gomme a caso (10 min) — Max\n5. Q&A (10 min)\n6. Pitch Setup Pack + offerta webinar-only (5 min) — Alberto\n\n**Da confermare:** data esatta, piattaforma (Zoom o YouTube Live), se Daniele partecipa.\n\nApprovami la scaletta così procediamo con la landing page.",
       "createdAt": "2026-03-26T10:00:00.000Z"
+    },
+    {
+      "id": "res_commercialisti_001",
+      "title": "Lista commercialisti Palermo — leggila e dimmi quale preferisci",
+      "type": "link",
+      "url": "commercialisti-palermo.html",
+      "content": "",
+      "createdAt": "2026-03-26T12:30:00.000Z"
     }
   ]
 }

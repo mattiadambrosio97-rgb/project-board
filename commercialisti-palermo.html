@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Commercialisti Palermo</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8f9fa;color:#1a1a2e;line-height:1.6;padding:20px;max-width:540px;margin:0 auto;font-size:18px}
+.header{text-align:center;padding:28px 0 20px}
+.header h1{font-size:28px;font-weight:700;color:#1a1a2e}
+.header p{font-size:17px;color:#6b7280;margin-top:6px}
+.badge{display:inline-block;background:#fee2e2;color:#dc2626;font-size:15px;font-weight:600;padding:6px 14px;border-radius:20px;margin-top:12px}
+.card{background:#fff;border-radius:14px;padding:22px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.card-rank{display:inline-block;background:#1a1a2e;color:#fff;font-size:15px;font-weight:700;width:28px;height:28px;line-height:28px;text-align:center;border-radius:7px;margin-right:10px;vertical-align:middle}
+.card-name{font-size:21px;font-weight:700;vertical-align:middle}
+.card-since{font-size:15px;color:#6b7280;margin-left:6px;vertical-align:middle}
+.card-addr{font-size:17px;color:#4b5563;margin-top:12px;padding-left:2px}
+.card-note{font-size:16px;color:#6b7280;margin-top:10px;padding:10px 12px;background:#f3f4f6;border-radius:8px;line-height:1.5}
+.card-note strong{color:#1a1a2e}
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:16px 10px;border-radius:12px;text-decoration:none;font-size:16px;font-weight:600;transition:transform .1s}
+.btn:active{transform:scale(.96)}
+.btn-call{background:#16a34a;color:#fff}
+.btn-map{background:#1a1a2e;color:#fff}
+.btn-web{background:#e5e7eb;color:#1a1a2e}
+.btn svg{width:20px;height:20px;flex-shrink:0}
+.summary{background:#fff;border-radius:14px;padding:22px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.summary h2{font-size:20px;font-weight:700;margin-bottom:10px}
+.summary p{font-size:17px;color:#4b5563}
+.summary .price{font-size:28px;font-weight:800;color:#16a34a}
+.summary .price-old{font-size:20px;color:#dc2626;text-decoration:line-through;margin-left:8px;font-weight:600}
+.divider{height:1px;background:#e5e7eb;margin:14px 0}
+.tag{display:inline-block;font-size:14px;font-weight:600;padding:4px 10px;border-radius:6px;margin-top:8px}
+.tag-top{background:#dcfce7;color:#16a34a}
+.tag-mondello{background:#dbeafe;color:#2563eb}
+.tag-storico{background:#fef3c7;color:#d97706}
+.footer{text-align:center;padding:24px 0 36px;font-size:14px;color:#9ca3af}
+</style>
+</head>
+<body>
+
+<div class="header">
+<h1>Commercialisti Palermo</h1>
+<p>Lista studi per cambio commercialista SRL</p>
+<div class="badge">REDA SRL: 11.500 &euro;/anno (TROPPO)</div>
+</div>
+
+<div class="summary">
+<h2>Quanto dovreste pagare</h2>
+<div><span class="price">3.000 - 4.500 &euro;</span><span class="price-old">11.500 &euro;</span></div>
+<div class="divider"></div>
+<p>SRL con 2 buste paga, collaboratori P.IVA, costi digitali, no affitto. Chiedere forfait annuale tutto incluso: contabilit&agrave; + bilancio + dichiarazioni + buste paga.</p>
+</div>
+
+<!-- 1 -->
+<div class="card">
+<span class="card-rank">1</span><span class="card-name">Studio La Porta</span><span class="card-since">dal 1988</span>
+<span class="tag tag-mondello">MONDELLO</span> <span class="tag tag-top">CONSIGLIATO</span>
+<div class="card-addr">Via Partanna Mondello 41/o, 90151 Palermo</div>
+<div class="card-note">35+ anni di esperienza. <strong>Vicinissimo a Via Pertini.</strong> Contabilit&agrave;, bilancio, dichiarazioni, ricorsi tributari.</div>
+<div class="actions">
+<a href="tel:+390916911711" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+La+Porta+Via+Partanna+Mondello+41+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://www.studiolaporta.it/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 2 -->
+<div class="card">
+<span class="card-rank">2</span><span class="card-name">Studio Scuderi</span><span class="card-since">dal 1969</span>
+<span class="tag tag-storico">55+ ANNI</span>
+<div class="card-addr">Via Emanuele Notarbartolo 5, 90141 Palermo</div>
+<div class="card-note">Il pi&ugrave; storico. Centinaia di clienti in Sicilia, molti da 30+ anni. Fiscale, societario, crisi d'impresa.</div>
+<div class="actions">
+<a href="tel:+390916251184" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+Scuderi+Via+Notarbartolo+5+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://www.studio-scuderi.it/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 3 -->
+<div class="card">
+<span class="card-rank">3</span><span class="card-name">Studio Mazzeo e Scalia</span><span class="card-since">dal 1985</span>
+<div class="card-addr">Piazza Ottavio Ziino 33, Palermo</div>
+<div class="card-note">3 commercialisti associati con competenze differenziate. Contabilit&agrave;, fiscale, lavoro, controllo di gestione.</div>
+<div class="actions">
+<a href="tel:+390916815211" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+Mazzeo+Scalia+Piazza+Ziino+33+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://www.studiomazzeoscalia.it/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 4 -->
+<div class="card">
+<span class="card-rank">4</span><span class="card-name">Studio Romano</span><span class="card-since">dal 1990</span>
+<div class="card-addr">Via dei Nebrodi 65, Palermo</div>
+<div class="card-note">Consulenza societaria, revisione legale, finanza agevolata e internazionalizzazione. Buon profilo per crescita futura.</div>
+<div class="actions">
+<a href="tel:+39091522096" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+Romano+Via+dei+Nebrodi+65+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://www.studiosromano.it/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 5 -->
+<div class="card">
+<span class="card-rank">5</span><span class="card-name">I&S Studio</span><span class="card-since">Invidiata &amp; Spiaggia</span>
+<div class="card-addr">Via della Libert&agrave; 3, 90139 Palermo</div>
+<div class="card-note">Studio giovane, sedi Palermo + Milano. Gestiscono anche buste paga internamente. Contabilit&agrave;, societario, 730.</div>
+<div class="actions">
+<a href="tel:+390916090290" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/I%26S+Studio+Commercialisti+Via+della+Liberta+3+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://www.isstudiocommercialisti.it/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 6 -->
+<div class="card">
+<span class="card-rank">6</span><span class="card-name">Studio Sciortino &amp; Partners</span>
+<div class="card-addr">Via Alfonso Borrelli 3, 90139 Palermo</div>
+<div class="card-note">Specializzati in contabilit&agrave; aziendale e pratiche CCIAA. Adempimenti tributari e amministrativi.</div>
+<div class="actions">
+<a href="tel:+39091333844" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+Sciortino+Partners+Via+Borrelli+3+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://www.studiosciortino.eu/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 7 -->
+<div class="card">
+<span class="card-rank">7</span><span class="card-name">Studio Gagliano</span><span class="card-since">50+ anni</span>
+<div class="card-addr">Via Giuseppe Sciuti 41, 90144 Palermo</div>
+<div class="card-note">Consolidata esperienza fiscale-tributaria. Solo su appuntamento (lun, mer, ven).</div>
+<div class="actions">
+<a href="tel:+39091305353" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+Gagliano+Via+Sciuti+41+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+<a href="https://studiocommercialistagaglianopalermo.com/" target="_blank" class="btn btn-web"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>Sito</a>
+</div>
+</div>
+
+<!-- 8 -->
+<div class="card">
+<span class="card-rank">8</span><span class="card-name">Studio Zimmardi</span>
+<div class="card-addr">Piazzale Ungheria 58, 90141 Palermo</div>
+<div class="card-note">Approccio personalizzato. Anche sede ad Altofonte.</div>
+<div class="actions">
+<a href="tel:+390919778053" class="btn btn-call"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>Chiama</a>
+<a href="https://www.google.com/maps/search/Studio+Zimmardi+Piazzale+Ungheria+58+Palermo" target="_blank" class="btn btn-map"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>Mappa</a>
+</div>
+</div>
+
+<div class="summary">
+<h2>Cosa chiedere al telefono</h2>
+<p><strong>"Buongiorno, cerchiamo un commercialista per la nostra SRL. Abbiamo:</strong></p>
+<div class="divider"></div>
+<p>- 2 buste paga (socio + dipendente)<br>- Collaboratori tutti a P.IVA<br>- Costi prevalentemente digitali (plugin, servizi online)<br>- No affitto, no magazzino<br><br><strong>Ci serve gestione completa: contabilit&agrave;, bilancio, dichiarazioni, F24, buste paga. Qual &egrave; il vostro forfait annuale tutto incluso?"</strong></p>
+</div>
+
+<div class="footer">Aggiornato marzo 2026</div>
+
+</body>
+</html>
