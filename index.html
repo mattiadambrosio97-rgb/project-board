@@ -7,6 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Project Command Center — Mattia D'Ambrosio</title>
+    <script>if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){});}</script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -3061,7 +3062,7 @@ function loadCEOData(callback) {
     if (_ceoData) { callback(_ceoData); return; }
     var loc = window.location;
     var dataUrl = loc.protocol + '//' + loc.host + loc.pathname.replace(/\/?$/, '/') + 'data.json?t=' + Date.now();
-    fetch(dataUrl).then(function(r) {
+    fetch(dataUrl, { cache: 'no-store' }).then(function(r) {
         if (!r.ok) throw new Error('HTTP ' + r.status);
         return r.json();
     }).then(function(d) {
