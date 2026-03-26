@@ -3696,6 +3696,7 @@ function renderTeamView() {
         mc.innerHTML = renderTeamTaskDetail();
     } else {
         mc.innerHTML = renderTeamHome();
+        if (_teamViewTab === 1) setTimeout(initTeamTouchDrag, 50);
     }
 }
 
@@ -3819,7 +3820,7 @@ function renderTeamHome() {
             });
             listGroups.forEach(function(grp) {
                 if (grp.items.length === 0) return;
-                html += '<div style="font-size:15px;font-weight:800;color:' + grp.color + ';margin-bottom:8px;margin-top:16px;display:flex;align-items:center;gap:6px">' + grp.label + ' <span style="background:' + grp.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + grp.items.length + '</span></div>';
+                html += '<div onclick="teamBoardColumnPopup(\'' + grp.key + '\')" style="cursor:pointer;font-size:15px;font-weight:800;color:' + grp.color + ';margin-bottom:8px;margin-top:16px;display:flex;align-items:center;gap:6px">' + grp.label + ' <span style="background:' + grp.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + grp.items.length + '</span></div>';
                 grp.items.forEach(function(item) {
                     html += _renderTeamTaskCard(item, todayStr);
                 });
@@ -3849,7 +3850,7 @@ function renderTeamHome() {
         columns.forEach(function(col) {
             var colTasks = allMyTasks.filter(function(i) { return (i.task.status || 'todo') === col.key; });
             html += '<div data-team-col="' + col.key + '" style="min-width:220px;flex:1;background:' + col.bg + ';border:1px solid var(--border);border-radius:12px;padding:10px;transition:outline 0.2s">';
-            html += '<div style="font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
+            html += '<div onclick="teamBoardColumnPopup(\'' + col.key + '\')" style="cursor:pointer;font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
             html += col.label;
             if (colTasks.length > 0) html += '<span style="background:' + col.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + colTasks.length + '</span>';
             html += '</div>';
@@ -4107,6 +4108,81 @@ function onTeamDragEnd() {
     document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
 }
 
+// Touch drag & drop per mobile
+var _touchDragEl = null, _touchDragClone = null, _touchDragTaskId = null, _touchStartY = 0, _touchStartX = 0, _touchMoved = false;
+function initTeamTouchDrag() {
+    var cards = document.querySelectorAll('[draggable="true"]');
+    cards.forEach(function(card) {
+        card.addEventListener('touchstart', function(e) {
+            var taskId = card.getAttribute('ondragstart');
+            if (!taskId) return;
+            var m = taskId.match(/onTeamDragStart\(event,'([^']+)'\)/);
+            if (!m) return;
+            _touchDragTaskId = m[1];
+            _touchDragEl = card;
+            _touchMoved = false;
+            var touch = e.touches[0];
+            _touchStartX = touch.clientX;
+            _touchStartY = touch.clientY;
+        }, { passive: true });
+    });
+    document.addEventListener('touchmove', function(e) {
+        if (!_touchDragEl) return;
+        var touch = e.touches[0];
+        var dx = Math.abs(touch.clientX - _touchStartX);
+        var dy = Math.abs(touch.clientY - _touchStartY);
+        if (!_touchMoved && (dx > 10 || dy > 10)) {
+            _touchMoved = true;
+            _touchDragClone = _touchDragEl.cloneNode(true);
+            _touchDragClone.style.cssText = 'position:fixed;z-index:10000;pointer-events:none;opacity:0.85;transform:rotate(2deg);width:' + _touchDragEl.offsetWidth + 'px;box-shadow:0 8px 24px rgba(0,0,0,.2);border-radius:8px';
+            document.body.appendChild(_touchDragClone);
+            _touchDragEl.style.opacity = '0.3';
+        }
+        if (_touchMoved && _touchDragClone) {
+            e.preventDefault();
+            _touchDragClone.style.left = (touch.clientX - 30) + 'px';
+            _touchDragClone.style.top = (touch.clientY - 20) + 'px';
+            // Highlight drop target
+            document.querySelectorAll('[data-team-col]').forEach(function(col) {
+                var r = col.getBoundingClientRect();
+                if (touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom) {
+                    col.style.outline = '2px dashed var(--accent)';
+                } else {
+                    col.style.outline = '';
+                }
+            });
+        }
+    }, { passive: false });
+    document.addEventListener('touchend', function(e) {
+        if (!_touchDragEl) return;
+        if (_touchMoved && _touchDragClone) {
+            var touch = e.changedTouches[0];
+            var dropped = false;
+            document.querySelectorAll('[data-team-col]').forEach(function(col) {
+                var r = col.getBoundingClientRect();
+                if (touch.clientX >= r.left && touch.clientX <= r.right && touch.clientY >= r.top && touch.clientY <= r.bottom) {
+                    var newStatus = col.getAttribute('data-team-col');
+                    if (_touchDragTaskId) {
+                        var myActions = _getTeamMemberActions();
+                        if (!myActions.taskActions) myActions.taskActions = {};
+                        if (!myActions.taskActions[_touchDragTaskId]) myActions.taskActions[_touchDragTaskId] = { updates: [] };
+                        myActions.taskActions[_touchDragTaskId].status = newStatus;
+                        teamPushActions(function(ok) { if (ok) renderTeamView(); else alert('Errore. Riprova.'); });
+                        dropped = true;
+                    }
+                }
+                col.style.outline = '';
+            });
+            _touchDragClone.remove();
+            _touchDragClone = null;
+            if (!dropped && _touchDragEl) _touchDragEl.style.opacity = '';
+        }
+        _touchDragEl = null;
+        _touchDragTaskId = null;
+        _touchMoved = false;
+    });
+}
+
 function teamFilterByStatus(statusKey) {
     _teamViewTab = 1; // vai a Board
     renderTeamView();
@@ -4120,6 +4196,59 @@ function teamFilterByStatus(statusKey) {
             setTimeout(function() { col.style.outline = ''; col.style.outlineOffset = ''; }, 1500);
         }
     }, 100);
+}
+
+function teamBoardColumnPopup(statusKey) {
+    var statusLabels = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccate', da_verificare: 'Da verificare', done: 'Completate' };
+    var statusColors = { todo: 'var(--slate)', in_progress: 'var(--yellow)', blocked: 'var(--red)', da_verificare: 'var(--teal)', done: 'var(--green)' };
+    var label = statusLabels[statusKey] || statusKey;
+    var color = statusColors[statusKey] || 'var(--text)';
+    var projects = (_teamData && _teamData.projects) || [];
+    var myActions = _getTeamMemberActions();
+    var todayStr = today();
+    var tasks = [];
+    projects.forEach(function(p) {
+        if (p.status === 'completato') return;
+        (p.tasks || []).forEach(function(t) {
+            if (!t.assignee || t.assignee !== TEAM_MEMBER_NAME) return;
+            var ta = (myActions.taskActions || {})[t.id];
+            var st = (ta && ta.status) ? ta.status : (t.status || 'todo');
+            if (st === statusKey) tasks.push({ task: t, projectName: p.name });
+        });
+    });
+    if (statusKey === 'done') {
+        projects.forEach(function(p) {
+            (p.completedTasks || []).forEach(function(ct) {
+                if (ct.assignee === TEAM_MEMBER_NAME) tasks.push({ task: ct, projectName: p.name });
+            });
+        });
+    }
+    var h = '<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)this.remove()" id="teamColPopup">';
+    h += '<div style="background:var(--surface);border-radius:16px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;padding:24px 20px;box-shadow:0 8px 30px rgba(0,0,0,.2)">';
+    h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
+    h += '<div style="font-size:18px;font-weight:800;color:' + color + '">' + label + ' <span style="background:' + color + ';color:#fff;font-size:12px;font-weight:800;border-radius:10px;padding:2px 10px;margin-left:6px">' + tasks.length + '</span></div>';
+    h += '<button onclick="document.getElementById(\'teamColPopup\').remove()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text-muted);padding:4px 8px">&times;</button>';
+    h += '</div>';
+    if (tasks.length === 0) {
+        h += '<div style="text-align:center;padding:30px 0;color:var(--text-muted);font-size:15px">Nessuna task</div>';
+    } else {
+        tasks.forEach(function(item) {
+            var t = item.task;
+            var isOverdue = t.dueDate && t.dueDate < todayStr && statusKey !== 'done';
+            h += '<div onclick="document.getElementById(\'teamColPopup\').remove();teamOpenTask(\'' + t.id + '\')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+            h += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
+            h += '<div style="font-size:12px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</div>';
+            if (t.dueDate) {
+                var dateFormatted = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                var dateColor = isOverdue ? 'var(--red)' : 'var(--text-muted)';
+                h += '<div style="font-size:12px;font-weight:700;color:' + dateColor + ';margin-top:4px">&#128197; ' + dateFormatted + (isOverdue ? ' (scaduta)' : '') + '</div>';
+            }
+            if (t.note) h += '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
+            h += '</div>';
+        });
+    }
+    h += '</div></div>';
+    document.body.insertAdjacentHTML('beforeend', h);
 }
 
 function renderCEOHome() {
