@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T14:25:17.613Z",
+  "publishedAt": "2026-03-26T14:31:57.981Z",
   "projects": [
     {
       "id": "proj_meta_q2",
@@ -81,6 +81,11 @@
               "type": "complete",
               "note": "La variante 2 mi piace",
               "at": "2026-03-26T14:24:54.228Z"
+            },
+            {
+              "type": "update",
+              "note": "Variante 2 rivista",
+              "at": "2026-03-26T14:31:08.660Z"
             }
           ],
           "ceoCompletedAt": "2026-03-26T14:24:54.228Z",
@@ -89,7 +94,8 @@
               "note": "Vedi anche la variante 4 però",
               "at": "2026-03-26T14:25:17.613Z"
             }
-          ]
+          ],
+          "ceoHasUpdate": true
         },
         {
           "id": "task_landing",
@@ -299,6 +305,14 @@
     }
   ],
   "resources": [
+    {
+      "id": "res_1774535506316_9j7g",
+      "title": "ergwehtr",
+      "type": "note",
+      "url": "wthweth",
+      "content": "qerh",
+      "createdAt": "2026-03-26T14:31:48.844Z"
+    },
     {
       "id": "res_competitor",
       "title": "Analisi competitor SimRacing Academy (Q1 2026)",
