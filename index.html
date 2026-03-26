@@ -3711,13 +3711,19 @@ function renderTeamHome() {
             if (t.assignee === TEAM_MEMBER_NAME && t.status !== 'done') {
                 var ta = myActions.taskActions[t.id];
                 var memberStatus = (ta && ta.status) || null;
-                myTasks.push({ task: t, projectName: p.name, projectId: p.id, memberStatus: memberStatus });
+                // Check se COO ha risposto dopo il nostro ultimo aggiornamento
+                var lastMyUpdate = (ta && ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
+                var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+                var cooHasReplied = lastCooResp && (!lastMyUpdate || new Date(lastCooResp.at) > new Date(lastMyUpdate.at));
+                myTasks.push({ task: t, projectName: p.name, projectId: p.id, memberStatus: memberStatus, cooHasReplied: cooHasReplied, lastCooResp: lastCooResp });
             }
         });
     });
 
-    // Ordina: bloccate/scadute prima
+    // Ordina: risposte COO prima, poi bloccate/scadute
     myTasks.sort(function(a, b) {
+        var aReply = a.cooHasReplied ? 0 : 1, bReply = b.cooHasReplied ? 0 : 1;
+        if (aReply !== bReply) return aReply - bReply;
         var ta = a.task, tb = b.task;
         var aBlk = ta.status === 'blocked' ? 0 : 1, bBlk = tb.status === 'blocked' ? 0 : 1;
         if (aBlk !== bBlk) return aBlk - bBlk;
@@ -3757,6 +3763,7 @@ function renderTeamHome() {
     var totalMy = myTasks.length;
     var overdueMy = myTasks.filter(function(i) { return i.task.dueDate && i.task.dueDate < todayStr; }).length;
     var blockedMy = myTasks.filter(function(i) { return i.task.status === 'blocked'; }).length;
+    var cooRepliedMy = myTasks.filter(function(i) { return i.cooHasReplied; }).length;
 
     html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
     html += '<div style="flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">';
@@ -3771,6 +3778,11 @@ function renderTeamHome() {
         html += '<div style="flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedMy + '</div>';
         html += '<div style="font-size:13px;color:var(--red);font-weight:600">Bloccate</div></div>';
+    }
+    if (cooRepliedMy > 0) {
+        html += '<div style="flex:1;min-width:80px;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:12px;padding:12px;text-align:center">';
+        html += '<div style="font-size:24px;font-weight:800;color:var(--accent)">' + cooRepliedMy + '</div>';
+        html += '<div style="font-size:13px;color:var(--accent);font-weight:600">Risposte</div></div>';
     }
     html += '<div style="flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center">';
     html += '<div style="font-size:24px;font-weight:800;color:var(--green)">' + completedTasks.length + '</div>';
@@ -3787,12 +3799,13 @@ function renderTeamHome() {
             var isBlocked = t.status === 'blocked';
             var isOverdue = t.dueDate && t.dueDate < todayStr;
             var isDueToday = t.dueDate && t.dueDate === todayStr;
-            var borderColor = isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
-            var bgColor = isBlocked ? 'var(--red-bg,#FEF2F2)' : isOverdue ? 'var(--red-bg,#FEF2F2)' : isDueToday ? 'var(--orange-bg,#FFF7ED)' : 'var(--surface)';
+            var borderColor = item.cooHasReplied ? 'var(--accent)' : isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
+            var bgColor = item.cooHasReplied ? 'var(--accent-soft,#FFF1ED)' : isBlocked ? 'var(--red-bg,#FEF2F2)' : isOverdue ? 'var(--red-bg,#FEF2F2)' : isDueToday ? 'var(--orange-bg,#FFF7ED)' : 'var(--surface)';
 
             html += '<div onclick="teamOpenTask(\'' + t.id + '\',\'' + item.projectId + '\')" style="cursor:pointer;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
 
             html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">';
+            if (item.cooHasReplied) html += '<span style="background:var(--accent);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">RISPOSTA DA MATTIA</span>';
             if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
             else if (isOverdue) html += '<span style="background:var(--red);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
             else if (isDueToday) html += '<span style="background:var(--orange);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">OGGI</span>';
@@ -7935,23 +7948,24 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
         <textarea class="modal-textarea" id="tmCeoNote" rows="2" placeholder="Cosa deve fare Alberto?">${esc(task.ceoNote||'')}</textarea>
     </div></div>`;
 
-    // ── Chat con Alberto (se esiste) ──
+    // ── Chat task (CEO + Team + COO) ──
     var allTaskMsgs = [];
-    (task.ceoUpdates || []).forEach(function(u) { allTaskMsgs.push({ from: 'ceo', note: u.note, type: u.type, at: u.at }); });
-    (task.cooResponses || []).forEach(function(r) { allTaskMsgs.push({ from: 'coo', note: r.note, type: 'response', at: r.at }); });
+    (task.ceoUpdates || []).forEach(function(u) { allTaskMsgs.push({ from: 'Alberto', note: u.note, type: u.type, at: u.at, color: 'var(--blue)', bg: 'var(--blue-bg,#EFF6FF)' }); });
+    (task.teamUpdates || []).forEach(function(u) { allTaskMsgs.push({ from: u.from || task.assignee, note: u.note, type: 'update', status: u.status, at: u.at, color: 'var(--green)', bg: 'var(--green-bg,#F0FDF4)' }); });
+    (task.cooResponses || []).forEach(function(r) { allTaskMsgs.push({ from: 'Tu', note: r.note, type: 'response', at: r.at, color: 'var(--accent)', bg: 'var(--accent-soft,#FFF1ED)' }); });
     allTaskMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
     if (allTaskMsgs.length > 0) {
         html += '<div style="margin-bottom:12px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px">';
-        html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">Chat con Alberto</div>';
+        html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">Conversazione</div>';
         allTaskMsgs.forEach(function(msg) {
             var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            var isCeo = msg.from === 'ceo';
-            var bgCol = isCeo ? 'var(--blue-bg,#EFF6FF)' : 'var(--accent-soft,#FFF1ED)';
-            var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
-            var name = isCeo ? 'Alberto' : 'Tu';
-            html += '<div style="padding:5px 8px;background:' + bgCol + ';border-radius:6px;margin-bottom:3px;font-size:12px">';
-            html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+            html += '<div style="padding:5px 8px;background:' + msg.bg + ';border-radius:6px;margin-bottom:3px;font-size:12px">';
+            html += '<span style="font-weight:700;color:' + msg.color + '">' + esc(msg.from) + '</span>';
             html += ' <span style="font-size:10px;color:var(--text-muted)">' + mDate + '</span>';
+            if (msg.status) {
+                var sl = msg.status === 'in_progress' ? 'In corso' : msg.status === 'done' ? 'Completata' : msg.status === 'blocked' ? 'Bloccata' : msg.status;
+                html += ' <span style="font-size:10px;font-weight:700;color:' + msg.color + '">(' + sl + ')</span>';
+            }
             if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
             html += '</div>';
         });
