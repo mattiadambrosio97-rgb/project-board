@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-26T10:40:09.103Z",
+  "publishedAt": "2026-03-26T10:43:00.231Z",
   "projects": [
     {
       "id": "id_1774513635614_94lnp5",
@@ -1948,24 +1948,24 @@
     },
     {
       "id": "lk_coaches",
-      "label": "Gestione Coach",
+      "label": "Programmi Coach e Piloti",
       "url": "",
       "icon": "🎯",
       "color": "#7C3AED"
     },
     {
-      "id": "lk_vendite",
-      "label": "Report Vendite",
-      "url": "",
-      "icon": "💰",
-      "color": "#CA8A04"
+      "id": "lk_notebook",
+      "label": "NotebookLM",
+      "url": "https://notebooklm.google.com",
+      "icon": "📓",
+      "color": "#4285F4"
     },
     {
-      "id": "lk_analytics",
-      "label": "Analytics",
-      "url": "https://analytics.google.com",
-      "icon": "📊",
-      "color": "#0D9488"
+      "id": "lk_chatgpt",
+      "label": "ChatGPT",
+      "url": "https://chat.openai.com",
+      "icon": "🤖",
+      "color": "#10A37F"
     }
   ],
   "resources": []
