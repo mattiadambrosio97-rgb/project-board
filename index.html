@@ -3508,24 +3508,44 @@ function _cooFetchCeoActions() {
                     badgeEl.textContent = 'NON LETTO';
                 }
             }
-            var feedEl = document.getElementById('cooResFeedback_' + r.id);
+            // Update badges in BOTH locations (top panoramica + bottom pannello CEO)
+            ['cooResFeedback_', 'cooResTopFeedback_'].forEach(function(prefix) {
+                var feedEl = document.getElementById(prefix + r.id);
+                var feedback = ra.feedback || [];
+                if (feedEl && feedback.length > 0) {
+                    var fHtml = '<div style="padding:4px 10px 8px;border-top:1px solid var(--border-light)">';
+                    feedback.slice(-2).forEach(function(fb) {
+                        var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+                        fHtml += '<div style="font-size:11px;padding:4px 0"><span style="font-weight:700;color:var(--blue)">Alberto:</span> <span style="color:var(--text-secondary)">' + esc(fb.note) + '</span> <span style="color:var(--text-muted);font-size:10px">' + fDate + '</span></div>';
+                    });
+                    fHtml += '</div>';
+                    feedEl.innerHTML = fHtml;
+                }
+            });
+            // Top badge too
+            var topBadgeEl = document.getElementById('cooResTopBadge_' + r.id);
+            if (topBadgeEl) {
+                if (ra.read) {
+                    topBadgeEl.style.color = 'var(--green)';
+                    topBadgeEl.style.background = 'var(--green-bg,#F0FDF4)';
+                    topBadgeEl.textContent = 'LETTO';
+                } else {
+                    topBadgeEl.style.color = 'var(--orange)';
+                    topBadgeEl.style.background = 'var(--orange-bg,#FFF7ED)';
+                    topBadgeEl.textContent = 'NON LETTO';
+                }
+            }
+            // Msg badge next to both badge elements
             var feedback = ra.feedback || [];
-            if (feedEl && feedback.length > 0) {
-                var fHtml = '<div style="padding:4px 10px 8px;border-top:1px solid var(--border-light)">';
-                feedback.slice(-2).forEach(function(fb) {
-                    var fDate = new Date(fb.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                    fHtml += '<div style="font-size:11px;padding:4px 0"><span style="font-weight:700;color:var(--blue)">Alberto:</span> <span style="color:var(--text-secondary)">' + esc(fb.note) + '</span> <span style="color:var(--text-muted);font-size:10px">' + fDate + '</span></div>';
-                });
-                fHtml += '</div>';
-                feedEl.innerHTML = fHtml;
-            }
-            // Also update the badge next to button if there are messages
-            if (badgeEl && feedback.length > 0) {
-                var msgBadge = document.createElement('span');
-                msgBadge.style.cssText = 'font-size:9px;font-weight:800;color:var(--blue);background:var(--blue-bg,#EFF6FF);border-radius:4px;padding:1px 5px;margin-left:4px';
-                msgBadge.textContent = feedback.length + ' msg';
-                badgeEl.parentNode.insertBefore(msgBadge, badgeEl.nextSibling);
-            }
+            [badgeEl, topBadgeEl].forEach(function(bEl) {
+                if (bEl && feedback.length > 0 && !bEl.nextSibling?.classList?.contains('msg-count')) {
+                    var msgBadge = document.createElement('span');
+                    msgBadge.className = 'msg-count';
+                    msgBadge.style.cssText = 'font-size:9px;font-weight:800;color:var(--blue);background:var(--blue-bg,#EFF6FF);border-radius:4px;padding:1px 5px;margin-left:4px';
+                    msgBadge.textContent = feedback.length + ' msg';
+                    bEl.parentNode.insertBefore(msgBadge, bEl.nextSibling);
+                }
+            });
         });
         // Also check task actions for ceo_done
         if (ceoActs.taskActions) {
@@ -3847,6 +3867,38 @@ function renderGlobal() {
     let html = '<div class="global-view">';
 
     const todayStr = today();
+
+    // ===== BACHECA RISORSE — in cima a tutto =====
+    var topRes = getResources();
+    if (topRes.length > 0) {
+        html += '<div class="dash-section" style="margin-bottom:20px">';
+        html += '<div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between">';
+        html += '<span>Bacheca per Alberto</span>';
+        html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
+        html += '</div>';
+        html += '<div style="display:flex;flex-direction:column;gap:6px">';
+        topRes.forEach(function(r) {
+            var typeIcon = r.type === 'link' ? '&#128279;' : r.type === 'html' ? '&#128196;' : '&#128221;';
+            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:8px;overflow:hidden">';
+            html += '<div onclick="openResourceModal(\'' + r.id + '\')" style="display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;font-size:13px" title="Clicca per modificare">';
+            html += '<span style="font-size:16px">' + typeIcon + '</span>';
+            html += '<span style="font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + esc(r.title) + '</span>';
+            html += '<span id="cooResTopBadge_' + r.id + '" style="font-size:9px;font-weight:800;color:var(--text-muted);background:var(--bg);border-radius:4px;padding:2px 6px">...</span>';
+            html += '<button onclick="event.stopPropagation();deleteResource(\'' + r.id + '\')" style="background:none;border:none;color:var(--red);font-size:16px;cursor:pointer;padding:0 4px" title="Elimina">&times;</button>';
+            html += '</div>';
+            html += '<div id="cooResTopFeedback_' + r.id + '"></div>';
+            html += '</div>';
+        });
+        html += '</div></div>';
+    } else {
+        html += '<div class="dash-section" style="margin-bottom:20px">';
+        html += '<div class="dash-section-title" style="display:flex;align-items:center;justify-content:space-between">';
+        html += '<span>Bacheca per Alberto</span>';
+        html += '<button onclick="openResourceModal()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">+ Nuova</button>';
+        html += '</div>';
+        html += '<div style="font-size:13px;color:var(--text-muted);font-style:italic;padding:8px 0">Nessuna risorsa. Aggiungi link, note o documenti che Alberto deve leggere.</div>';
+        html += '</div>';
+    }
 
     // ===== LANCI MARKETING =====
     html += renderLaunchesSection();
