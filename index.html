@@ -3769,25 +3769,25 @@ function renderTeamHome() {
     var cooRepliedMy = myTasks.filter(function(i) { return i.cooHasReplied; }).length;
 
     html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
-    html += '<div onclick="teamFilterByStatus(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+    html += '<div onclick="teamBoardColumnPopup(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
     html += '<div style="font-size:24px;font-weight:800;color:var(--text)">' + totalMy + '</div>';
     html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600">Da fare</div></div>';
     if (overdueMy > 0) {
-        html += '<div onclick="teamFilterByStatus(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+        html += '<div onclick="teamBoardColumnPopup(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueMy + '</div>';
         html += '<div style="font-size:13px;color:var(--red);font-weight:600">Scadute</div></div>';
     }
     if (blockedMy > 0) {
-        html += '<div onclick="teamFilterByStatus(\'blocked\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+        html += '<div onclick="teamBoardColumnPopup(\'blocked\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedMy + '</div>';
         html += '<div style="font-size:13px;color:var(--red);font-weight:600">Bloccate</div></div>';
     }
     if (cooRepliedMy > 0) {
-        html += '<div onclick="teamFilterByStatus(\'in_progress\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+        html += '<div onclick="teamBoardColumnPopup(\'in_progress\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--accent)">' + cooRepliedMy + '</div>';
         html += '<div style="font-size:13px;color:var(--accent);font-weight:600">Risposte</div></div>';
     }
-    html += '<div onclick="teamFilterByStatus(\'done\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+    html += '<div onclick="teamBoardColumnPopup(\'done\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
     html += '<div style="font-size:24px;font-weight:800;color:var(--green)">' + completedTasks.length + '</div>';
     html += '<div style="font-size:13px;color:var(--green);font-weight:600">Completate</div></div>';
     html += '</div>';
@@ -3849,19 +3849,18 @@ function renderTeamHome() {
         html += '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch">';
         columns.forEach(function(col) {
             var colTasks = allMyTasks.filter(function(i) { return (i.task.status || 'todo') === col.key; });
-            html += '<div data-team-col="' + col.key + '" style="min-width:220px;flex:1;background:' + col.bg + ';border:1px solid var(--border);border-radius:12px;padding:10px;transition:outline 0.2s">';
+            html += '<div data-team-col="' + col.key + '" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')" style="min-width:220px;flex:1;background:' + col.bg + ';border:2px dashed transparent;border-radius:12px;padding:10px;min-height:120px;transition:border-color 0.15s,background 0.15s">';
             html += '<div onclick="teamBoardColumnPopup(\'' + col.key + '\')" style="cursor:pointer;font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
             html += col.label;
             if (colTasks.length > 0) html += '<span style="background:' + col.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + colTasks.length + '</span>';
             html += '</div>';
-            html += '<div style="min-height:40px;border-radius:8px;transition:background 0.2s" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')">';
             if (colTasks.length === 0) {
                 html += '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:16px 0">Trascina qui</div>';
             } else {
                 colTasks.forEach(function(item) {
                     var t = item.task;
                     var isOverdue = t.dueDate && t.dueDate < todayStr && t.status !== 'done';
-                    html += '<div draggable="true" ondragstart="onTeamDragStart(event,\'' + t.id + '\')" ondragend="onTeamDragEnd()" onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:grab;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;transition:transform 0.1s,opacity 0.2s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+                    html += '<div draggable="true" ondragstart="onTeamDragStart(event,\'' + t.id + '\')" ondragend="onTeamDragEnd(event)" onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:grab;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;transition:transform 0.1s,opacity 0.2s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
                     if (item.cooHasReplied) html += '<div style="font-size:10px;font-weight:800;color:var(--accent);margin-bottom:4px">RISPOSTA DA MATTIA</div>';
                     html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">' + esc(t.title) + '</div>';
                     html += '<div style="font-size:11px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
@@ -3874,7 +3873,6 @@ function renderTeamHome() {
                     html += '</div>';
                 });
             }
-            html += '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -4084,34 +4082,48 @@ function teamToggleTheme() {
 function onTeamDragStart(e, taskId) {
     _teamDragTaskId = taskId;
     e.dataTransfer.effectAllowed = 'move';
-    e.target.classList.add('dragging');
+    e.dataTransfer.setData('text/plain', taskId);
+    e.target.style.opacity = '0.4';
+    e.target.style.transform = 'rotate(2deg)';
 }
 function onTeamDragOver(e) {
     e.preventDefault();
-    e.currentTarget.classList.add('drag-over');
+    e.dataTransfer.dropEffect = 'move';
+    var col = e.currentTarget.closest('[data-team-col]') || e.currentTarget;
+    col.style.borderColor = 'var(--accent)';
+    col.style.background = 'var(--accent-soft,rgba(99,102,241,0.08))';
 }
 function onTeamDragLeaveCol(e) {
-    e.currentTarget.classList.remove('drag-over');
+    var col = e.currentTarget.closest('[data-team-col]') || e.currentTarget;
+    col.style.borderColor = 'transparent';
+    col.style.background = '';
 }
 function onTeamDrop(e, newStatus) {
     e.preventDefault();
-    e.currentTarget.classList.remove('drag-over');
-    if (!_teamDragTaskId) return;
+    var col = e.currentTarget.closest('[data-team-col]') || e.currentTarget;
+    col.style.borderColor = 'transparent';
+    col.style.background = '';
+    // Fallback: recupera taskId da dataTransfer se la variabile è vuota
+    var taskId = _teamDragTaskId || e.dataTransfer.getData('text/plain');
+    if (!taskId) return;
     var myActions = _getTeamMemberActions();
     if (!myActions.taskActions) myActions.taskActions = {};
-    if (!myActions.taskActions[_teamDragTaskId]) myActions.taskActions[_teamDragTaskId] = { updates: [] };
-    myActions.taskActions[_teamDragTaskId].status = newStatus;
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    myActions.taskActions[taskId].status = newStatus;
     _teamDragTaskId = null;
-    document.querySelectorAll('.dragging').forEach(function(el) { el.classList.remove('dragging'); });
+    document.querySelectorAll('[data-team-col]').forEach(function(c) { c.style.borderColor = 'transparent'; c.style.background = ''; });
     teamPushActions(function(ok) {
         if (ok) renderTeamView();
         else alert('Errore nel salvataggio. Riprova.');
     });
 }
-function onTeamDragEnd() {
+function onTeamDragEnd(e) {
     _teamDragTaskId = null;
-    document.querySelectorAll('.dragging').forEach(function(el) { el.classList.remove('dragging'); });
-    document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+    if (e && e.target) { e.target.style.opacity = ''; e.target.style.transform = ''; }
+    document.querySelectorAll('[data-team-col]').forEach(function(col) {
+        col.style.borderColor = 'transparent';
+        col.style.background = '';
+    });
 }
 
 // Touch drag & drop per mobile
@@ -4189,7 +4201,7 @@ function initTeamTouchDrag() {
     });
 }
 
-function teamFilterByStatus(statusKey) {
+function teamBoardColumnPopup(statusKey) {
     _teamViewTab = 1; // vai a Board
     renderTeamView();
     // Scroll alla colonna corrispondente
@@ -4241,7 +4253,9 @@ function teamBoardColumnPopup(statusKey) {
         tasks.forEach(function(item) {
             var t = item.task;
             var isOverdue = t.dueDate && t.dueDate < todayStr && statusKey !== 'done';
-            h += '<div onclick="document.getElementById(\'teamColPopup\').remove();teamOpenTask(\'' + t.id + '\')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+            h += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px">';
+            // Titolo cliccabile per aprire dettaglio
+            h += '<div onclick="document.getElementById(\'teamColPopup\').remove();teamOpenTask(\'' + t.id + '\')" style="cursor:pointer">';
             h += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
             h += '<div style="font-size:12px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</div>';
             if (t.dueDate) {
@@ -4251,10 +4265,35 @@ function teamBoardColumnPopup(statusKey) {
             }
             if (t.note) h += '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
             h += '</div>';
+            // Pulsanti rapidi cambio stato
+            if (statusKey !== 'done') {
+                h += '<div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">';
+                if (statusKey !== 'in_progress') h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'in_progress\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--blue,#2563EB);color:#fff;font-size:12px;font-weight:700;cursor:pointer">In corso</button>';
+                if (statusKey !== 'todo') h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'todo\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--slate);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Da fare</button>';
+                h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'done\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Fatto</button>';
+                if (statusKey !== 'blocked') h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'blocked\',\'' + statusKey + '\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--red);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Bloccata</button>';
+                h += '</div>';
+            }
+            h += '</div>';
         });
     }
     h += '</div></div>';
     document.body.insertAdjacentHTML('beforeend', h);
+}
+
+function teamPopupQuickStatus(taskId, newStatus, oldStatusKey) {
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    myActions.taskActions[taskId].status = newStatus;
+    teamPushActions(function(ok) {
+        if (!ok) { alert('Errore. Riprova.'); return; }
+        // Chiudi popup e riaprilo aggiornato
+        var popup = document.getElementById('teamColPopup');
+        if (popup) popup.remove();
+        renderTeamView();
+        teamBoardColumnPopup(oldStatusKey);
+    });
 }
 
 function renderCEOHome() {
