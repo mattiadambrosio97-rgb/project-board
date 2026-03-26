@@ -1229,29 +1229,20 @@
             .dash-stat-value { font-size: 28px; }
             .dash-stat-label { font-size: 12px; }
 
-            /* Modal — full screen on mobile */
+            /* Modal — full screen on mobile (COO only, CEO uses inline views) */
             .modal-overlay { padding: 0; }
             .modal-overlay.open { align-items: flex-start; }
-            .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-                width: 100%; max-width: 100%; height: 100%; max-height: 100%;
-                padding: 56px 16px 90px; border-radius: 0; margin: 0;
-                overflow-y: scroll; overflow-x: hidden;
-                -webkit-overflow-scrolling: touch;
-                overscroll-behavior: contain;
-                box-sizing: border-box;
-                transform: none !important; }
+            .modal { width: 100%; max-width: 100%; height: 100vh; max-height: 100vh;
+                padding: 16px 16px 24px; border-radius: 0; margin: 0;
+                overflow-y: auto; -webkit-overflow-scrolling: touch;
+                overscroll-behavior: contain; }
             .modal-title-input { font-size: 18px; }
-            .modal-close-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 1010;
-                background: var(--surface); padding: 8px 16px;
-                border-bottom: 1px solid var(--border-light);
-                margin: 0; }
+            .modal-close-bar { position: sticky; top: 0; z-index: 10;
+                background: var(--surface); padding: 4px 0 8px; margin: -4px 0 8px; }
             .modal-close-x { width: 44px; height: 44px; font-size: 26px;
                 background: var(--bg); border: 1px solid var(--border); }
-            .modal-actions { position: fixed; bottom: 0; left: 0; right: 0; z-index: 1010;
-                background: var(--surface);
-                padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
-                border-top: 1px solid var(--border-light);
-                margin: 0; box-sizing: border-box; }
+            .modal-actions { position: sticky; bottom: 0; background: var(--surface);
+                padding: 12px 0 4px; border-top: 1px solid var(--border-light); margin-top: 16px; }
             .modal-label { font-size: 12px; }
             .modal-select, .modal-input { font-size: 15px; padding: 10px 14px; min-height: 44px; }
             .modal-textarea { font-size: 16px; padding: 10px 14px; }
@@ -1287,7 +1278,8 @@
             .xp-bar-wrap { flex-wrap: wrap; gap: 6px; }
 
             /* Main content scroll */
-            .main-content { overflow-y: auto; overflow-x: hidden; }
+            .main-content { overflow-y: auto; overflow-x: hidden;
+                -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
 
             /* Touch-friendly: bigger tap targets */
             .quick-done-btn { padding: 8px 16px; font-size: 14px; min-height: 40px; }
@@ -2834,13 +2826,211 @@ function exitCEOPreview() {
 }
 
 var _ceoOpenProject = null; // project ID aperto in CEO view
+var _ceoOpenTaskInline = null; // {taskId, projectId} per vista inline mobile
+var _ceoOpenResInline = null; // resId per vista inline mobile
 
-function ceoGoHome() { _ceoOpenProject = null; renderCEOView(); }
-function ceoOpenProject(pid) { _ceoOpenProject = pid; renderCEOView(); }
+function ceoGoHome() { _ceoOpenProject = null; _ceoOpenTaskInline = null; _ceoOpenResInline = null; renderCEOView(); }
+function ceoOpenProject(pid) { _ceoOpenProject = pid; _ceoOpenTaskInline = null; _ceoOpenResInline = null; renderCEOView(); }
 function renderCEOView() {
     var mc = document.getElementById('mainContent');
-    mc.innerHTML = _ceoOpenProject ? renderCEOProject(_ceoOpenProject) : renderCEOHome();
+    if (_ceoOpenTaskInline) {
+        mc.innerHTML = _renderCeoTaskInline(_ceoOpenTaskInline.taskId, _ceoOpenTaskInline.projectId);
+    } else if (_ceoOpenResInline) {
+        mc.innerHTML = _renderCeoResInline(_ceoOpenResInline);
+    } else if (_ceoOpenProject) {
+        mc.innerHTML = renderCEOProject(_ceoOpenProject);
+    } else {
+        mc.innerHTML = renderCEOHome();
+    }
     mc.scrollTop = 0;
+}
+
+// Su mobile: apri task/risorsa inline invece che in modal
+function ceoOpenTask(taskId, projectId) {
+    if (window.innerWidth <= 768) {
+        _ceoOpenTaskInline = { taskId: taskId, projectId: projectId };
+        _ceoOpenResInline = null;
+        renderCEOView();
+        return;
+    }
+    _ceoOpenTaskModal(taskId, projectId);
+}
+function ceoOpenResource(resId) {
+    if (window.innerWidth <= 768) {
+        _ceoOpenResInline = resId;
+        _ceoOpenTaskInline = null;
+        renderCEOView();
+        return;
+    }
+    _ceoOpenResourceModal(resId);
+}
+
+// Vista inline task CEO (mobile)
+function _renderCeoTaskInline(taskId, projectId) {
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) return renderCEOHome();
+    var t = (p.tasks || []).find(function(tk) { return tk.id === taskId; });
+    if (!t) return renderCEOHome();
+
+    var isBlocked = t.status === 'blocked';
+    var isOverdue = t.dueDate && t.dueDate < today();
+    var isDueToday = t.dueDate && t.dueDate === today();
+    var hasCeoNote = t.ceoNote && t.ceoNote.trim();
+    var statusColor = isBlocked ? 'var(--red)' : t.status === 'ceo_done' ? 'var(--green)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--blue)';
+    var statusLabel = isBlocked ? 'BLOCCATA' : t.status === 'ceo_done' ? 'COMPLETATA (in attesa conferma)' : isOverdue ? 'IN RITARDO' : isDueToday ? 'SCADE OGGI' : t.status === 'in_progress' ? 'IN CORSO' : 'DA FARE';
+
+    var html = '<div class="ceo-container">';
+    html += '<button onclick="ceoGoHome()" style="background:none;border:none;color:var(--accent);font-size:15px;font-weight:600;cursor:pointer;padding:0;font-family:var(--font);margin-bottom:16px">&larr; Indietro</button>';
+
+    // Status
+    html += '<div style="display:inline-block;padding:5px 14px;border-radius:6px;background:' + statusColor + ';color:#fff;font-size:12px;font-weight:800;margin-bottom:12px">' + statusLabel + '</div>';
+
+    // Titolo
+    html += '<div style="font-size:22px;font-weight:800;color:var(--text);margin-bottom:6px">' + esc(t.title) + '</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:20px">' + esc(p.name);
+    if (t.dueDate) {
+        var dLeft = daysUntil(t.dueDate);
+        var dateF = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'long'});
+        html += ' &middot; Scadenza: <strong>' + dateF + '</strong>';
+        if (dLeft !== null && dLeft >= 0) html += ' (' + dLeft + ' giorni)';
+    }
+    html += '</div>';
+
+    // Messaggio COO
+    if (hasCeoNote) {
+        html += '<div style="padding:16px;background:var(--accent-soft, #FFF1ED);border:1px solid var(--accent);border-radius:12px;margin-bottom:20px">';
+        html += '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:6px;text-transform:uppercase">Istruzioni dal team operativo</div>';
+        html += '<div style="font-size:15px;color:var(--text);line-height:1.7">' + esc(t.ceoNote) + '</div>';
+        html += '</div>';
+    } else if (t.note) {
+        html += '<div style="padding:14px;background:var(--bg);border-radius:10px;margin-bottom:20px;font-size:14px;color:var(--text-secondary);line-height:1.6">' + esc(t.note) + '</div>';
+    }
+
+    // Conversazione
+    var allMsgs = [];
+    (t.ceoUpdates || []).forEach(function(u) { allMsgs.push({ from: 'ceo', note: u.note, type: u.type, at: u.at }); });
+    (t.cooResponses || []).forEach(function(r) { allMsgs.push({ from: 'coo', note: r.note, type: 'response', at: r.at }); });
+    allMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+    if (allMsgs.length > 0) {
+        html += '<div style="margin-bottom:20px">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px">Conversazione</div>';
+        allMsgs.forEach(function(msg) {
+            var d = new Date(msg.at);
+            var dateStr = d.toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            var isCeo = msg.from === 'ceo';
+            var typeLabel = msg.type === 'complete' ? 'Completata' : msg.type === 'update' ? 'Aggiornamento' : 'Risposta';
+            var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
+            var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+            var name = isCeo ? 'Tu' : 'Mattia (COO)';
+            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:13px">';
+            html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+            html += ' <span style="font-size:11px;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px;line-height:1.5">' + esc(msg.note) + '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Textarea
+    html += '<textarea id="ceoTaskNote" rows="3" placeholder="Scrivi una nota, un aggiornamento, o il motivo per cui non hai potuto completarla..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:16px"></textarea>';
+
+    // Bottoni
+    if (t.status !== 'ceo_done' && t.status !== 'done') {
+        html += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">';
+        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'complete\')" style="flex:1;padding:16px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:52px">Completa</button>';
+        html += '<button onclick="ceoTaskAction(\'' + taskId + '\',\'' + projectId + '\',\'update\')" style="flex:1;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:52px">Aggiorna il COO</button>';
+        html += '</div>';
+    } else if (t.status === 'ceo_done') {
+        html += '<div style="padding:16px;background:var(--green-bg);border:1px solid var(--green);border-radius:12px;text-align:center;font-size:15px;font-weight:600;color:var(--green);margin-bottom:20px">In attesa di conferma dal COO</div>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+// Vista inline risorsa CEO (mobile)
+function _renderCeoResInline(resId) {
+    var resources = getResources();
+    var res = resources.find(function(r) { return r.id === resId; });
+    if (!res) return renderCEOHome();
+    var _ca = _ceoActions || { taskActions: {}, resourceActions: {}, projectActions: {} };
+    var resActions = _ca.resourceActions[resId] || {};
+    var isRead = resActions.read;
+    var typeIcon = res.type === 'link' ? '&#128279;' : res.type === 'html' ? '&#128196;' : '&#128221;';
+    var typeLabel = res.type === 'link' ? 'Link' : res.type === 'html' ? 'HTML' : 'Nota';
+    var dateStr = res.createdAt ? new Date(res.createdAt).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'}) : '';
+
+    var html = '<div class="ceo-container">';
+    html += '<button onclick="ceoGoHome()" style="background:none;border:none;color:var(--accent);font-size:15px;font-weight:600;cursor:pointer;padding:0;font-family:var(--font);margin-bottom:16px">&larr; Indietro</button>';
+
+    // Header
+    html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">';
+    html += '<span style="font-size:28px;line-height:1">' + typeIcon + '</span>';
+    html += '<div style="flex:1;min-width:0">';
+    html += '<div style="font-size:20px;font-weight:800;color:var(--text)">' + esc(res.title) + '</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted)">' + typeLabel + (dateStr ? ' &middot; ' + dateStr : '') + '</div>';
+    html += '</div>';
+    if (isRead) html += '<span style="font-size:11px;font-weight:700;color:var(--green);background:var(--green-bg);border-radius:6px;padding:4px 10px;flex-shrink:0">LETTO</span>';
+    html += '</div>';
+
+    // Contenuto
+    if (res.content && res.content.trim()) {
+        html += '<div style="padding:18px;background:var(--bg);border-radius:12px;font-size:15px;line-height:1.8;color:var(--text);margin-bottom:18px">' + simpleMarkdown(res.content) + '</div>';
+    }
+
+    // Link
+    if (res.url && res.url.trim()) {
+        var links = res.url.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+        if (links.length > 0) {
+            html += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px">';
+            links.forEach(function(lnk) {
+                var label = lnk.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('?')[0];
+                if (label.length > 30) label = label.substring(0, 27) + '...';
+                html += '<a href="' + esc(lnk) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:12px 18px;background:var(--accent);color:#fff;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none">' + (links.length > 1 ? esc(label) : 'Apri link') + ' &#8599;</a>';
+            });
+            html += '</div>';
+        }
+    }
+
+    // Conversazione
+    var ceoFeedback = resActions.feedback || [];
+    var cooReplies = res.cooReplies || [];
+    var allMessages = [];
+    ceoFeedback.forEach(function(fb) { allMessages.push({ type: 'ceo', note: fb.note, at: fb.at }); });
+    cooReplies.forEach(function(cr) { allMessages.push({ type: 'coo', note: cr.note, at: cr.at }); });
+    allMessages.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+    if (allMessages.length > 0) {
+        html += '<div style="margin-bottom:18px;padding:14px;background:var(--surface);border:1px solid var(--border);border-radius:12px">';
+        html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:8px;text-transform:uppercase">Conversazione</div>';
+        allMessages.forEach(function(msg) {
+            var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            var isCeo = msg.type === 'ceo';
+            var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
+            var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
+            var name = isCeo ? 'Tu' : 'Mattia (COO)';
+            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:13px">';
+            html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
+            html += ' <span style="font-size:11px;color:var(--text-muted)">' + mDate + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.5">' + esc(msg.note) + '</div>';
+            html += '</div>';
+        });
+        html += '</div>';
+    }
+
+    // Textarea
+    html += '<textarea id="ceoResNote_' + resId + '" rows="3" placeholder="Scrivi una nota, un commento, o una domanda per Mattia..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:16px"></textarea>';
+
+    // Bottoni
+    html += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">';
+    if (!isRead) {
+        html += '<button onclick="ceoMarkResourceWithNote(\'' + resId + '\')" style="flex:1;padding:16px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:52px">Segna come letto</button>';
+    }
+    html += '<button onclick="ceoSendResourceFeedbackModal(\'' + resId + '\')" style="flex:1;padding:16px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:52px">Invia risposta</button>';
+    html += '</div>';
+
+    html += '</div>';
+    return html;
 }
 
 function ceoToggleInbox() {
@@ -2874,7 +3064,7 @@ function ceoMarkResource(resId, action) {
     });
 }
 
-function ceoOpenResource(resId) {
+function _ceoOpenResourceModal(resId) {
     var resources = getResources();
     var res = resources.find(function(r) { return r.id === resId; });
     if (!res) return;
@@ -2976,7 +3166,8 @@ function ceoSendResourceFeedbackModal(resId) {
     if (!ra.read) { ra.read = true; ra.readAt = new Date().toISOString(); }
     ceoPushActions(function(ok) {
         if (ok) {
-            document.getElementById('backupModal').classList.remove('open');
+            if (_ceoOpenResInline) { _ceoOpenResInline = null; }
+            try { document.getElementById('backupModal').classList.remove('open'); } catch(e) {}
             renderCEOView();
         } else alert('Errore nel salvataggio. Riprova.');
     });
@@ -2997,7 +3188,8 @@ function ceoMarkResourceWithNote(resId) {
     }
     ceoPushActions(function(ok) {
         if (ok) {
-            document.getElementById('backupModal').classList.remove('open');
+            if (_ceoOpenResInline) { _ceoOpenResInline = null; }
+            try { document.getElementById('backupModal').classList.remove('open'); } catch(e) {}
             renderCEOView();
         } else alert('Errore nel salvataggio. Riprova.');
     });
@@ -3024,7 +3216,7 @@ function ceoSendResourceFeedback(resId) {
 }
 
 // ========== CEO TASK ACTIONS (modale + push to GitHub) ==========
-function ceoOpenTask(taskId, projectId) {
+function _ceoOpenTaskModal(taskId, projectId) {
     var projects = getProjects();
     var p = projects.find(function(pr) { return pr.id === projectId; });
     if (!p) return;
@@ -3147,7 +3339,8 @@ function ceoTaskAction(taskId, projectId, actionType) {
     // Push only ceo.json
     ceoPushActions(function(ok) {
         if (ok) {
-            closeTaskModal();
+            if (_ceoOpenTaskInline) { _ceoOpenTaskInline = null; }
+            try { closeTaskModal(); } catch(e) {}
             renderCEOView();
         } else {
             alert('Errore nel salvataggio. Riprova.');
