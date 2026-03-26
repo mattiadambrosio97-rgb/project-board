@@ -2913,6 +2913,15 @@ function quickAddTask() {
     document.getElementById('projectModal').classList.add('open');
 }
 
+// ========== RESET VIA URL ==========
+// ?reset=1 → svuota localStorage e ricarica pulito
+(function() {
+    if (new URLSearchParams(window.location.search).get('reset') === '1') {
+        localStorage.clear();
+        window.location.replace(window.location.pathname);
+    }
+})();
+
 // ========== CEO MODE ==========
 // ?ceo=1 = CEO, tutto il resto = COO. Nessuna persistenza.
 var CEO_MODE = new URLSearchParams(window.location.search).get('ceo') === '1';
