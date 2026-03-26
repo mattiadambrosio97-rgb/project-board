@@ -2892,11 +2892,11 @@ function ceoOpenResource(resId) {
 
     // Link
     if (res.url && res.url.trim()) {
-        var links = res.url.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; });
+        var links = res.url.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l; });
         if (links.length > 0) {
             html += '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">';
             links.forEach(function(lnk) {
-                var label = lnk.replace(/^https?:\\/\\/(www\\.)?/, '').split('/')[0].split('?')[0];
+                var label = lnk.replace(/^https?:\/\/(www\.)?/, '').split('/')[0].split('?')[0];
                 if (label.length > 30) label = label.substring(0, 27) + '...';
                 html += '<a href="' + esc(lnk) + '" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:var(--accent);color:#fff;border-radius:8px;font-size:13px;font-weight:700;text-decoration:none">' + (links.length > 1 ? esc(label) : 'Apri link') + ' &#8599;</a>';
             });
