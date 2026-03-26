@@ -28,7 +28,7 @@
     })();
     // CEO mode: solo se ?ceo=1 nell'URL. Nessun redirect, nessun localStorage.
     (function(){
-        if (new URLSearchParams(window.location.search).get('ceo') === '1') {
+        if (new URLSearchParams(window.location.search).get('ceo') === '1' || new URLSearchParams(window.location.search).get('team')) {
             document.documentElement.classList.add('is-ceo');
         }
     })();
@@ -2919,6 +2919,10 @@ function quickAddTask() {
 // ========== CEO MODE ==========
 // ?ceo=1 = CEO, tutto il resto = COO. Nessuna persistenza.
 var CEO_MODE = new URLSearchParams(window.location.search).get('ceo') === '1';
+var TEAM_MEMBER_SLUG = new URLSearchParams(window.location.search).get('team') || '';
+var TEAM_MODE = !!TEAM_MEMBER_SLUG;
+var TEAM_SLUG_MAP = { kevin: 'Kevin', mattiafs: 'Mattia FS', max: 'Max', manlio: 'Manlio', daniele: 'Daniele' };
+var TEAM_MEMBER_NAME = TEAM_SLUG_MAP[TEAM_MEMBER_SLUG] || '';
 
 var _ceoPreview = false; // preview mode from COO
 function previewCEO() {
@@ -3591,6 +3595,383 @@ function daysUntil(dateStr) {
     return diff;
 }
 
+// ========== TEAM MEMBER MODE ==========
+var _teamData = null; // loaded from data.json (same as CEO)
+var _teamActions = null; // { memberName: { taskActions: { taskId: { status, updates: [...] } } } }
+var _teamOpenTaskId = null;
+
+function _showTeamOnboarding() {
+    var mc = document.getElementById('mainContent');
+    mc.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:80vh;min-height:80dvh;padding:20px">' +
+        '<div style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:40px 36px;max-width:400px;width:100%;box-shadow:var(--shadow-lg);text-align:center">' +
+        '<div style="font-size:24px;font-weight:800;color:var(--text);margin-bottom:8px">Ciao, ' + esc(TEAM_MEMBER_NAME) + '</div>' +
+        '<div style="font-size:14px;color:var(--text-muted);margin-bottom:24px">Clicca per accedere alle tue task.</div>' +
+        '<button id="teamAccessBtn" onclick="_teamQuickAccess()" style="width:100%;padding:16px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;font-family:var(--font);transition:background 0.2s" onmouseenter="this.style.background=\'var(--accent-strong)\'" onmouseleave="this.style.background=\'var(--accent)\'">Accedi</button>' +
+        '<div id="teamOnboardError" style="margin-top:12px;font-size:13px;color:var(--red);display:none"></div>' +
+        '</div></div>';
+}
+
+function _teamQuickAccess() {
+    var btn = document.getElementById('teamAccessBtn');
+    var errEl = document.getElementById('teamOnboardError');
+    var token = CEO_FIXED_TOKEN;
+    if (btn) { btn.textContent = 'Accesso in corso...'; btn.style.opacity = '0.7'; }
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
+    }).then(function(r) {
+        if (r.ok || r.status === 404) {
+            safeSetItem('pb_gh_token_team', token);
+            window.scrollTo(0, 0);
+            _teamData = null;
+            render();
+        } else {
+            if (btn) { btn.textContent = 'Accedi'; btn.style.opacity = '1'; }
+            if (errEl) { errEl.textContent = 'Errore. Riprova.'; errEl.style.display = 'block'; }
+        }
+    }).catch(function() {
+        if (btn) { btn.textContent = 'Accedi'; btn.style.opacity = '1'; }
+        if (errEl) { errEl.textContent = 'Errore di rete.'; errEl.style.display = 'block'; }
+    });
+}
+
+function loadTeamData(callback, silent) {
+    var token = safeGetItem('pb_gh_token_team');
+    if (!token) { if (callback) callback(); return; }
+    // Load published data (data.json)
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_DATA_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
+    }).then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(fileData) {
+        if (fileData && fileData.content) {
+            _teamData = JSON.parse(decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, '')))));
+        }
+        // Load team actions
+        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_TEAM_FILE + '?t=' + Date.now(), {
+            headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
+        });
+    }).then(function(r) { return (r && r.ok) ? r.json() : null; })
+    .then(function(fileData) {
+        if (fileData && fileData.content) {
+            _teamActions = JSON.parse(decodeURIComponent(escape(atob(fileData.content.replace(/\n/g, '')))));
+        } else {
+            _teamActions = {};
+        }
+        if (callback) callback();
+    }).catch(function() { if (callback) callback(); });
+}
+
+function teamPushActions(callback) {
+    var token = safeGetItem('pb_gh_token_team');
+    if (!token) { if (callback) callback(false); return; }
+    if (!_teamActions) _teamActions = {};
+    _teamActions.lastUpdate = new Date().toISOString();
+    var content = btoa(unescape(encodeURIComponent(JSON.stringify(_teamActions, null, 2))));
+    fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_TEAM_FILE + '?t=' + Date.now(), {
+        headers: { 'Authorization': 'Bearer ' + token }, cache: 'no-store'
+    }).then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(existing) {
+        var body = { message: 'Team actions ' + new Date().toISOString().split('T')[0], content: content };
+        if (existing && existing.sha) body.sha = existing.sha;
+        return fetch('https://api.github.com/repos/' + GH_REPO + '/contents/' + GH_TEAM_FILE, {
+            method: 'PUT',
+            headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+        });
+    }).then(function(r) {
+        if (callback) callback(r.ok);
+    }).catch(function() { if (callback) callback(false); });
+}
+
+function _getTeamMemberActions() {
+    if (!_teamActions) _teamActions = {};
+    if (!_teamActions[TEAM_MEMBER_NAME]) _teamActions[TEAM_MEMBER_NAME] = { taskActions: {} };
+    return _teamActions[TEAM_MEMBER_NAME];
+}
+
+function renderTeamView() {
+    var mc = document.getElementById('mainContent');
+    if (_teamOpenTaskId) {
+        mc.innerHTML = renderTeamTaskDetail();
+    } else {
+        mc.innerHTML = renderTeamHome();
+    }
+}
+
+function renderTeamHome() {
+    var projects = (_teamData && _teamData.projects) || [];
+    var todayStr = today();
+    var isDark = document.body.classList.contains('dark');
+    var myActions = _getTeamMemberActions();
+
+    // Raccogli task assegnate a questo membro
+    var myTasks = [];
+    projects.forEach(function(p) {
+        if (p.status === 'completato') return;
+        (p.tasks || []).forEach(function(t) {
+            if (t.assignee === TEAM_MEMBER_NAME && t.status !== 'done') {
+                var ta = myActions.taskActions[t.id];
+                var memberStatus = (ta && ta.status) || null;
+                myTasks.push({ task: t, projectName: p.name, projectId: p.id, memberStatus: memberStatus });
+            }
+        });
+    });
+
+    // Ordina: bloccate/scadute prima
+    myTasks.sort(function(a, b) {
+        var ta = a.task, tb = b.task;
+        var aBlk = ta.status === 'blocked' ? 0 : 1, bBlk = tb.status === 'blocked' ? 0 : 1;
+        if (aBlk !== bBlk) return aBlk - bBlk;
+        var aOvr = (ta.dueDate && ta.dueDate < todayStr) ? 0 : 1, bOvr = (tb.dueDate && tb.dueDate < todayStr) ? 0 : 1;
+        if (aOvr !== bOvr) return aOvr - bOvr;
+        return (ta.dueDate || '9999').localeCompare(tb.dueDate || '9999');
+    });
+
+    var completedTasks = [];
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.assignee === TEAM_MEMBER_NAME && t.status === 'done') {
+                completedTasks.push({ task: t, projectName: p.name });
+            }
+        });
+    });
+
+    // Saluto
+    var _hour = new Date().getHours();
+    var _greeting = _hour < 12 ? 'Buongiorno' : _hour < 18 ? 'Buon pomeriggio' : 'Buonasera';
+
+    var html = '<div class="ceo-container">';
+
+    // Header
+    html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">';
+    html += '<div style="flex:1">';
+    html += '<div style="font-size:22px;font-weight:800;color:var(--text)">' + _greeting + ', ' + esc(TEAM_MEMBER_NAME) + '</div>';
+    html += '<div style="font-size:14px;color:var(--text-muted);margin-top:2px">' + new Date().toLocaleDateString('it-IT', {weekday:'long', day:'numeric', month:'long'}) + '</div>';
+    html += '</div>';
+    html += '<div style="display:flex;align-items:center;gap:8px">';
+    html += '<button onclick="_teamRefresh()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '" title="Aggiorna">&#8635;</button>';
+    html += '<button onclick="teamToggleTheme()" style="background:' + (isDark ? '#1E1E1E' : 'var(--surface)') + ';border:1px solid ' + (isDark ? '#333' : 'var(--border)') + ';border-radius:10px;width:38px;height:38px;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:' + (isDark ? '#F5F3F0' : 'var(--text)') + '">' + (isDark ? '&#9728;' : '&#9790;') + '</button>';
+    html += '</div>';
+    html += '</div>';
+
+    // Stats rapide
+    var totalMy = myTasks.length;
+    var overdueMy = myTasks.filter(function(i) { return i.task.dueDate && i.task.dueDate < todayStr; }).length;
+    var blockedMy = myTasks.filter(function(i) { return i.task.status === 'blocked'; }).length;
+
+    html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
+    html += '<div style="flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">';
+    html += '<div style="font-size:24px;font-weight:800;color:var(--text)">' + totalMy + '</div>';
+    html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600">Da fare</div></div>';
+    if (overdueMy > 0) {
+        html += '<div style="flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center">';
+        html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueMy + '</div>';
+        html += '<div style="font-size:13px;color:var(--red);font-weight:600">Scadute</div></div>';
+    }
+    if (blockedMy > 0) {
+        html += '<div style="flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center">';
+        html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedMy + '</div>';
+        html += '<div style="font-size:13px;color:var(--red);font-weight:600">Bloccate</div></div>';
+    }
+    html += '<div style="flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center">';
+    html += '<div style="font-size:24px;font-weight:800;color:var(--green)">' + completedTasks.length + '</div>';
+    html += '<div style="font-size:13px;color:var(--green);font-weight:600">Completate</div></div>';
+    html += '</div>';
+
+    // Task attive
+    if (myTasks.length === 0) {
+        html += '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:16px;font-weight:600">Nessuna task assegnata al momento</div>';
+    } else {
+        html += '<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:12px">Le tue task</div>';
+        myTasks.forEach(function(item) {
+            var t = item.task;
+            var isBlocked = t.status === 'blocked';
+            var isOverdue = t.dueDate && t.dueDate < todayStr;
+            var isDueToday = t.dueDate && t.dueDate === todayStr;
+            var borderColor = isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
+            var bgColor = isBlocked ? 'var(--red-bg,#FEF2F2)' : isOverdue ? 'var(--red-bg,#FEF2F2)' : isDueToday ? 'var(--orange-bg,#FFF7ED)' : 'var(--surface)';
+
+            html += '<div onclick="teamOpenTask(\'' + t.id + '\',\'' + item.projectId + '\')" style="cursor:pointer;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+
+            html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">';
+            if (isBlocked) html += '<span style="background:var(--red);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
+            else if (isOverdue) html += '<span style="background:var(--red);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
+            else if (isDueToday) html += '<span style="background:var(--orange);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">OGGI</span>';
+            html += '<span style="font-size:13px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</span>';
+
+            if (t.dueDate) {
+                var dLeft = daysUntil(t.dueDate);
+                var dateFormatted = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
+                var dateColor = isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--text-muted)';
+                var dateLabel = isOverdue ? 'scaduta da ' + Math.abs(dLeft) + 'g' : isDueToday ? 'oggi' : dateFormatted + ' (' + dLeft + 'g)';
+                html += '<span style="font-size:13px;font-weight:700;color:' + dateColor + ';margin-left:auto">&#128197; ' + dateLabel + '</span>';
+            }
+            html += '</div>';
+
+            html += '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px">' + esc(t.title) + '</div>';
+            if (t.note) {
+                html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
+            }
+
+            // Status badge se il membro ha aggiornato
+            var ta = (_getTeamMemberActions().taskActions || {})[t.id];
+            if (ta && ta.status) {
+                var stLabel = ta.status === 'in_progress' ? 'In corso' : ta.status === 'done' ? 'Completata' : ta.status === 'blocked' ? 'Bloccata' : ta.status;
+                var stColor = ta.status === 'in_progress' ? 'var(--blue,#2563EB)' : ta.status === 'done' ? 'var(--green)' : 'var(--red)';
+                html += '<div style="margin-top:6px;font-size:12px;font-weight:700;color:' + stColor + '">Il tuo stato: ' + stLabel + '</div>';
+            }
+
+            html += '</div>';
+        });
+    }
+
+    // Completate (collassate)
+    if (completedTasks.length > 0) {
+        html += '<details style="margin-top:20px"><summary style="font-size:15px;font-weight:700;color:var(--text-muted);cursor:pointer;margin-bottom:10px">Completate (' + completedTasks.length + ')</summary>';
+        completedTasks.forEach(function(item) {
+            html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:6px;opacity:0.6">';
+            html += '<div style="font-size:14px;font-weight:600;color:var(--text);text-decoration:line-through">' + esc(item.task.title) + '</div>';
+            html += '<div style="font-size:12px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
+            html += '</div>';
+        });
+        html += '</details>';
+    }
+
+    html += '</div>';
+    return html;
+}
+
+function renderTeamTaskDetail() {
+    var projects = (_teamData && _teamData.projects) || [];
+    var task = null, projectName = '', projectId = '';
+    projects.forEach(function(p) {
+        (p.tasks || []).forEach(function(t) {
+            if (t.id === _teamOpenTaskId) { task = t; projectName = p.name; projectId = p.id; }
+        });
+    });
+    if (!task) return renderTeamHome();
+
+    var isDark = document.body.classList.contains('dark');
+    var todayStr = today();
+    var isOverdue = task.dueDate && task.dueDate < todayStr;
+    var isDueToday = task.dueDate && task.dueDate === todayStr;
+    var myActions = _getTeamMemberActions();
+    var ta = (myActions.taskActions || {})[task.id] || {};
+
+    var html = '<div class="ceo-container">';
+
+    // Back button
+    html += '<button onclick="teamGoHome()" style="background:none;border:none;color:var(--accent);font-size:17px;font-weight:700;cursor:pointer;padding:0;font-family:var(--font);margin-bottom:16px">&larr; Le mie task</button>';
+
+    // Task header
+    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px">';
+    html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600;margin-bottom:4px">' + esc(projectName) + '</div>';
+    html += '<div style="font-size:20px;font-weight:800;color:var(--text);margin-bottom:8px">' + esc(task.title) + '</div>';
+
+    if (task.dueDate) {
+        var dLeft = daysUntil(task.dueDate);
+        var dateFormatted = new Date(task.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {weekday:'short', day:'numeric', month:'long'});
+        var dateColor = isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--text-muted)';
+        html += '<div style="font-size:14px;font-weight:700;color:' + dateColor + ';margin-bottom:8px">&#128197; Scadenza: ' + dateFormatted;
+        if (isOverdue) html += ' (scaduta da ' + Math.abs(dLeft) + ' giorni)';
+        else if (isDueToday) html += ' (oggi)';
+        else html += ' (tra ' + dLeft + ' giorni)';
+        html += '</div>';
+    }
+
+    if (task.note) {
+        html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.5;margin-top:8px;white-space:pre-wrap">' + esc(task.note) + '</div>';
+    }
+    html += '</div>';
+
+    // Conversazione (COO responses + team updates)
+    var allMsgs = [];
+    (ta.updates || []).forEach(function(u) { allMsgs.push({ from: 'team', note: u.note, at: u.at, status: u.status }); });
+    (task.cooResponses || []).forEach(function(r) { allMsgs.push({ from: 'coo', note: r.note, at: r.at }); });
+    allMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
+
+    if (allMsgs.length > 0) {
+        html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px">Conversazione</div>';
+        allMsgs.forEach(function(m) {
+            var isTeam = m.from === 'team';
+            var align = isTeam ? 'flex-end' : 'flex-start';
+            var bg = isTeam ? 'var(--accent-soft,#FFF1ED)' : (isDark ? '#1E1E1E' : 'var(--surface)');
+            var border = isTeam ? 'var(--accent)' : 'var(--border)';
+            var label = isTeam ? esc(TEAM_MEMBER_NAME) : 'Mattia (COO)';
+            var timeStr = new Date(m.at).toLocaleString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:8px">';
+            html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%">';
+            html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
+            if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + esc(m.note) + '</div>';
+            if (m.status) {
+                var sl = m.status === 'in_progress' ? 'Messo in corso' : m.status === 'done' ? 'Segnato completato' : m.status === 'blocked' ? 'Segnato bloccato' : m.status;
+                html += '<div style="font-size:12px;font-weight:700;color:var(--accent);margin-top:4px">' + sl + '</div>';
+            }
+            html += '</div></div>';
+        });
+    }
+
+    // Input commento
+    html += '<textarea id="teamTaskNote" rows="3" placeholder="Scrivi un commento o aggiornamento..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:12px;margin-top:12px"></textarea>';
+
+    // Bottoni azione
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+    if (task.status !== 'done') {
+        html += '<button onclick="teamTaskAction(\'' + task.id + '\',\'in_progress\')" style="flex:1;padding:14px;background:var(--blue,#2563EB);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:48px">In corso</button>';
+        html += '<button onclick="teamTaskAction(\'' + task.id + '\',\'done\')" style="flex:1;padding:14px;background:var(--green);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:48px">Completata</button>';
+        html += '<button onclick="teamTaskAction(\'' + task.id + '\',\'blocked\')" style="flex:1;padding:14px;background:var(--red);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);min-height:48px">Bloccata</button>';
+    }
+    html += '</div>';
+    // Bottone solo commento
+    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="width:100%;padding:12px;background:var(--surface);color:var(--accent);border:1px solid var(--accent);border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);margin-top:8px">Invia commento</button>';
+
+    html += '</div>';
+    return html;
+}
+
+function teamOpenTask(taskId) {
+    _teamOpenTaskId = taskId;
+    renderTeamView();
+    window.scrollTo(0, 0);
+}
+
+function teamGoHome() {
+    _teamOpenTaskId = null;
+    renderTeamView();
+    window.scrollTo(0, 0);
+}
+
+function teamTaskAction(taskId, newStatus) {
+    var noteEl = document.getElementById('teamTaskNote');
+    var note = noteEl ? noteEl.value.trim() : '';
+    if (!note && !newStatus) { alert('Scrivi un commento prima di inviare.'); return; }
+
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    var ta = myActions.taskActions[taskId];
+    if (newStatus) ta.status = newStatus;
+    if (!ta.updates) ta.updates = [];
+    ta.updates.push({ note: note || '', status: newStatus, at: new Date().toISOString() });
+
+    teamPushActions(function(ok) {
+        if (ok) {
+            renderTeamView();
+        } else {
+            alert('Errore nel salvataggio. Riprova.');
+        }
+    });
+}
+
+function _teamRefresh() {
+    loadTeamData(function() { renderTeamView(); });
+}
+
+function teamToggleTheme() {
+    document.body.classList.toggle('dark');
+    safeSetItem('pb_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    renderTeamView();
+}
+
 function renderCEOHome() {
     var projects = getProjects().filter(function(p) { return p.status !== 'completato'; });
     var allTasks = projects.flatMap(function(p) { return (p.tasks||[]).map(function(t) { return Object.assign({}, t, {projectName: p.name}); }); });
@@ -4202,6 +4583,7 @@ var GH_DATA_FILE = 'data.json';     // Dati pubblicati per CEO (manuale)
 var GH_CEO_FILE = 'ceo.json';       // Azioni CEO → COO
 // Token spezzato per evitare il blocco di GitHub Push Protection
 var CEO_FIXED_TOKEN = ['github_pat_11B6ZF','TYY066hGOchOWkwr_RzWAnZJB','jfBjV1Nhg5cDfxeuBxX6XoxAS2','b8WbSPN6tO45JI2SEoVa0hG0C'].join('');
+var GH_TEAM_FILE = 'team-actions.json'; // Azioni team members → COO
 
 function getGHToken() { return safeGetItem('pb_gh_token'); }
 function setGHToken(t) { safeSetItem('pb_gh_token', t); }
@@ -4537,6 +4919,33 @@ function render() {
             window._ceoAutoRefreshTimer = setInterval(function() {
                 loadCEOData(function() { renderCEOView(); }, true);
             }, 30000);
+        }
+        return;
+    }
+    // TEAM mode — vista task personali
+    if (TEAM_MODE) {
+        document.getElementById('header').style.display = 'none';
+        if (!TEAM_MEMBER_NAME) {
+            document.getElementById('mainContent').innerHTML = '<div class="ceo-container" style="text-align:center;padding-top:60px"><div style="font-size:18px;font-weight:700;color:var(--red)">Membro non riconosciuto.</div><div style="font-size:14px;color:var(--text-muted);margin-top:8px">URL validi: ?team=kevin, ?team=mattiafs, ?team=max, ?team=manlio, ?team=daniele</div></div>';
+            return;
+        }
+        if (!safeGetItem('pb_gh_token_team')) {
+            _showTeamOnboarding();
+            return;
+        }
+        if (!_teamData) {
+            var mc = document.getElementById('mainContent');
+            mc.innerHTML = '<div class="ceo-container" style="text-align:center;padding-top:60px"><div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:12px">Caricamento...</div><div style="font-size:13px;color:var(--text-muted)">Sto scaricando le tue task</div></div>';
+            window.scrollTo(0, 0);
+            loadTeamData(function() { render(); });
+            return;
+        }
+        renderTeamView();
+        // Auto-refresh ogni 45s
+        if (!window._teamAutoRefreshTimer) {
+            window._teamAutoRefreshTimer = setInterval(function() {
+                loadTeamData(function() { renderTeamView(); });
+            }, 45000);
         }
         return;
     }
