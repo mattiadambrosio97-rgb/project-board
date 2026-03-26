@@ -1341,6 +1341,8 @@
             /* Hide copy-data button text, show icon only */
             .copy-data-btn { font-size: 0 !important; padding: 8px !important; }
             .copy-data-btn::before { content: '\1F4CB'; font-size: 14px; }
+            .ceo-publish-btn { font-size: 12px !important; padding: 6px 10px !important; }
+            .ceo-publish-btn::before { content: none !important; }
 
             /* Calendar nav — tighter */
             .calendar-nav { gap: 6px; }
@@ -1481,8 +1483,9 @@
         </div>
         <div class="header-right" id="headerRight">
             <button class="add-btn" id="addBtn" onclick="handleAdd()">+ Nuovo</button>
+            <button class="add-btn" id="addTaskBtn" onclick="quickAddTask()" style="background:var(--surface);color:var(--accent);border:1px solid var(--accent);box-shadow:none">+ Task</button>
             <button class="icon-btn desktop-only" title="Backup" onclick="openBackupModal()">&#128190;</button>
-            <button class="copy-data-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
+            <button class="copy-data-btn ceo-publish-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
             <button class="icon-btn desktop-only" title="Anteprima CEO" onclick="previewCEO()">&#128065;</button>
             <button class="copy-data-btn desktop-only" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
             <span id="syncIndicator" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>
@@ -2833,6 +2836,24 @@ function handleAdd() {
     } else {
         openTaskModal(null, state.currentProjectId);
     }
+}
+
+function quickAddTask() {
+    if (state.currentView !== 'global') {
+        openTaskModal(null, state.currentProjectId);
+        return;
+    }
+    var projects = getProjects().filter(function(p){ return p.status === 'attivo'; });
+    if (projects.length === 0) { _showToast('Nessun progetto attivo'); return; }
+    var html = '<div style="padding:20px">';
+    html += '<div style="font-size:18px;font-weight:800;margin-bottom:14px;color:var(--text)">Nuova task — scegli progetto</div>';
+    html += '<div style="display:flex;flex-direction:column;gap:8px">';
+    projects.forEach(function(p) {
+        html += '<button onclick="closeProjectModal();openTaskModal(null,\'' + p.id + '\')" style="padding:12px 16px;border:1px solid var(--border);border-radius:10px;background:var(--surface);color:var(--text);font-size:15px;font-weight:600;cursor:pointer;font-family:var(--font);text-align:left;transition:all 0.15s">' + esc(p.name) + '</button>';
+    });
+    html += '</div></div>';
+    document.getElementById('projectModalInner').innerHTML = html;
+    document.getElementById('projectModal').classList.add('open');
 }
 
 // ========== CEO MODE ==========
@@ -4686,6 +4707,7 @@ function renderHeader() {
     const desc = document.getElementById('headerDesc');
     const addBtn = document.getElementById('addBtn');
 
+    var addTaskBtn = document.getElementById('addTaskBtn');
     if (state.currentView === 'global') {
         var _h = new Date().getHours();
         var _greet = _h < 12 ? 'Buongiorno' : (_h < 18 ? 'Buon pomeriggio' : 'Buonasera');
@@ -4693,6 +4715,7 @@ function renderHeader() {
         title.innerHTML = _greet + ', Mattia';
         desc.textContent = '';
         addBtn.textContent = '+ Progetto';
+        if (addTaskBtn) addTaskBtn.style.display = '';
     } else {
         const p = getProjects().find(pr => pr.id === state.currentProjectId);
         if (!p) { goGlobal(); return; }
@@ -4700,6 +4723,7 @@ function renderHeader() {
         title.innerHTML = `${esc(p.name)} <span class="status-badge status-${p.status||'draft'}" onclick="cycleProjectStatus('${p.id}')" style="font-size:11px;margin-left:8px;">${(p.status||'draft').replace('-',' ')}</span>`;
         desc.textContent = p.description || '';
         addBtn.textContent = '+ Task';
+        if (addTaskBtn) addTaskBtn.style.display = 'none';
     }
 }
 
@@ -7063,9 +7087,9 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     // ── Sezione avanzata (collapsibile) ──
     const hasAdvanced = task.nextCheck || task.doneWhen || task.dependsLabel || (task.tags||[]).length > 0 || task.recurrence || (task.activityLog||[]).length > 0;
     html += `<button class="modal-section-toggle" onclick="toggleModalExtra()" style="margin-bottom:8px">
-        <span class="toggle-arrow ${hasAdvanced?'open':''}" id="extraArrow">&#9654;</span> Dettagli avanzati
+        <span class="toggle-arrow" id="extraArrow">&#9654;</span> Dettagli avanzati${hasAdvanced ? ' <span style="font-size:10px;color:var(--accent);margin-left:4px">●</span>' : ''}
     </button>`;
-    html += `<div class="modal-extra ${hasAdvanced?'':'collapsed'}" id="modalExtra" style="max-height:2000px">`;
+    html += `<div class="modal-extra collapsed" id="modalExtra" style="max-height:2000px">`;
 
     // Prossimo check + Fatto quando
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">';
