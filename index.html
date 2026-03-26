@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260326_2000';
+    var APP_VERSION = '20260326_2100';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3600,6 +3600,7 @@ var _teamData = null; // loaded from data.json (same as CEO)
 var _teamActions = null; // { memberName: { taskActions: { taskId: { status, updates: [...] } } } }
 var _teamOpenTaskId = null;
 var _teamViewTab = 0; // 0=Lista, 1=Board
+var _teamDragTaskId = null;
 
 function _showTeamOnboarding() {
     var mc = document.getElementById('mainContent');
@@ -3767,25 +3768,25 @@ function renderTeamHome() {
     var cooRepliedMy = myTasks.filter(function(i) { return i.cooHasReplied; }).length;
 
     html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
-    html += '<div style="flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center">';
+    html += '<div onclick="teamFilterByStatus(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
     html += '<div style="font-size:24px;font-weight:800;color:var(--text)">' + totalMy + '</div>';
     html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600">Da fare</div></div>';
     if (overdueMy > 0) {
-        html += '<div style="flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center">';
+        html += '<div onclick="teamFilterByStatus(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueMy + '</div>';
         html += '<div style="font-size:13px;color:var(--red);font-weight:600">Scadute</div></div>';
     }
     if (blockedMy > 0) {
-        html += '<div style="flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center">';
+        html += '<div onclick="teamFilterByStatus(\'blocked\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedMy + '</div>';
         html += '<div style="font-size:13px;color:var(--red);font-weight:600">Bloccate</div></div>';
     }
     if (cooRepliedMy > 0) {
-        html += '<div style="flex:1;min-width:80px;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:12px;padding:12px;text-align:center">';
+        html += '<div onclick="teamFilterByStatus(\'in_progress\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
         html += '<div style="font-size:24px;font-weight:800;color:var(--accent)">' + cooRepliedMy + '</div>';
         html += '<div style="font-size:13px;color:var(--accent);font-weight:600">Risposte</div></div>';
     }
-    html += '<div style="flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center">';
+    html += '<div onclick="teamFilterByStatus(\'done\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
     html += '<div style="font-size:24px;font-weight:800;color:var(--green)">' + completedTasks.length + '</div>';
     html += '<div style="font-size:13px;color:var(--green);font-weight:600">Completate</div></div>';
     html += '</div>';
@@ -3800,24 +3801,40 @@ function renderTeamHome() {
     var allMyTasks = myTasks.concat(completedTasks.map(function(c) { return { task: c.task, projectName: c.projectName, projectId: '', cooHasReplied: false }; }));
 
     if (_teamViewTab === 0) {
-        // ===== VISTA LISTA =====
-        if (myTasks.length === 0) {
+        // ===== VISTA LISTA — raggruppata per stato =====
+        if (myTasks.length === 0 && completedTasks.length === 0) {
             html += '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:16px;font-weight:600">Nessuna task assegnata al momento</div>';
         } else {
+            var listGroups = [
+                { key: 'blocked', label: 'Bloccate', color: 'var(--red)', items: [] },
+                { key: 'todo', label: 'Da fare', color: 'var(--slate)', items: [] },
+                { key: 'in_progress', label: 'In corso', color: 'var(--blue,#2563EB)', items: [] },
+                { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal)', items: [] }
+            ];
             myTasks.forEach(function(item) {
-                html += _renderTeamTaskCard(item, todayStr);
+                var st = item.task.status || 'todo';
+                var grp = listGroups.find(function(g) { return g.key === st; });
+                if (grp) grp.items.push(item);
+                else listGroups[1].items.push(item); // fallback to "Da fare"
             });
-        }
-        // Completate (collassate)
-        if (completedTasks.length > 0) {
-            html += '<details style="margin-top:20px"><summary style="font-size:15px;font-weight:700;color:var(--text-muted);cursor:pointer;margin-bottom:10px">Completate (' + completedTasks.length + ')</summary>';
-            completedTasks.forEach(function(item) {
-                html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:6px;opacity:0.6">';
-                html += '<div style="font-size:14px;font-weight:600;color:var(--text);text-decoration:line-through">' + esc(item.task.title) + '</div>';
-                html += '<div style="font-size:12px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
-                html += '</div>';
+            listGroups.forEach(function(grp) {
+                if (grp.items.length === 0) return;
+                html += '<div style="font-size:15px;font-weight:800;color:' + grp.color + ';margin-bottom:8px;margin-top:16px;display:flex;align-items:center;gap:6px">' + grp.label + ' <span style="background:' + grp.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + grp.items.length + '</span></div>';
+                grp.items.forEach(function(item) {
+                    html += _renderTeamTaskCard(item, todayStr);
+                });
             });
-            html += '</details>';
+            // Completate (collassate)
+            if (completedTasks.length > 0) {
+                html += '<details style="margin-top:16px"><summary style="font-size:15px;font-weight:800;color:var(--green);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:6px">Completate <span style="background:var(--green);color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + completedTasks.length + '</span></summary>';
+                completedTasks.forEach(function(item) {
+                    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:6px;opacity:0.6">';
+                    html += '<div style="font-size:14px;font-weight:600;color:var(--text);text-decoration:line-through">' + esc(item.task.title) + '</div>';
+                    html += '<div style="font-size:12px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
+                    html += '</div>';
+                });
+                html += '</details>';
+            }
         }
     } else {
         // ===== VISTA BOARD (Kanban) =====
@@ -3831,18 +3848,19 @@ function renderTeamHome() {
         html += '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch">';
         columns.forEach(function(col) {
             var colTasks = allMyTasks.filter(function(i) { return (i.task.status || 'todo') === col.key; });
-            html += '<div style="min-width:220px;flex:1;background:' + col.bg + ';border:1px solid var(--border);border-radius:12px;padding:10px">';
+            html += '<div data-team-col="' + col.key + '" style="min-width:220px;flex:1;background:' + col.bg + ';border:1px solid var(--border);border-radius:12px;padding:10px;transition:outline 0.2s">';
             html += '<div style="font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
             html += col.label;
             if (colTasks.length > 0) html += '<span style="background:' + col.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + colTasks.length + '</span>';
             html += '</div>';
+            html += '<div style="min-height:40px;border-radius:8px;transition:background 0.2s" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')">';
             if (colTasks.length === 0) {
-                html += '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:16px 0">—</div>';
+                html += '<div style="font-size:13px;color:var(--text-muted);text-align:center;padding:16px 0">Trascina qui</div>';
             } else {
                 colTasks.forEach(function(item) {
                     var t = item.task;
                     var isOverdue = t.dueDate && t.dueDate < todayStr && t.status !== 'done';
-                    html += '<div onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+                    html += '<div draggable="true" ondragstart="onTeamDragStart(event,\'' + t.id + '\')" ondragend="onTeamDragEnd()" onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:grab;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;transition:transform 0.1s,opacity 0.2s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
                     if (item.cooHasReplied) html += '<div style="font-size:10px;font-weight:800;color:var(--accent);margin-bottom:4px">RISPOSTA DA MATTIA</div>';
                     html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">' + esc(t.title) + '</div>';
                     html += '<div style="font-size:11px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
@@ -3855,6 +3873,7 @@ function renderTeamHome() {
                     html += '</div>';
                 });
             }
+            html += '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -4053,6 +4072,54 @@ function teamToggleTheme() {
     document.body.classList.toggle('dark');
     safeSetItem('pb_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
     renderTeamView();
+}
+
+function onTeamDragStart(e, taskId) {
+    _teamDragTaskId = taskId;
+    e.dataTransfer.effectAllowed = 'move';
+    e.target.classList.add('dragging');
+}
+function onTeamDragOver(e) {
+    e.preventDefault();
+    e.currentTarget.classList.add('drag-over');
+}
+function onTeamDragLeaveCol(e) {
+    e.currentTarget.classList.remove('drag-over');
+}
+function onTeamDrop(e, newStatus) {
+    e.preventDefault();
+    e.currentTarget.classList.remove('drag-over');
+    if (!_teamDragTaskId) return;
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[_teamDragTaskId]) myActions.taskActions[_teamDragTaskId] = { updates: [] };
+    myActions.taskActions[_teamDragTaskId].status = newStatus;
+    _teamDragTaskId = null;
+    document.querySelectorAll('.dragging').forEach(function(el) { el.classList.remove('dragging'); });
+    teamPushActions(function(ok) {
+        if (ok) renderTeamView();
+        else alert('Errore nel salvataggio. Riprova.');
+    });
+}
+function onTeamDragEnd() {
+    _teamDragTaskId = null;
+    document.querySelectorAll('.dragging').forEach(function(el) { el.classList.remove('dragging'); });
+    document.querySelectorAll('.drag-over').forEach(function(el) { el.classList.remove('drag-over'); });
+}
+
+function teamFilterByStatus(statusKey) {
+    _teamViewTab = 1; // vai a Board
+    renderTeamView();
+    // Scroll alla colonna corrispondente
+    setTimeout(function() {
+        var col = document.querySelector('[data-team-col="' + statusKey + '"]');
+        if (col) {
+            col.style.outline = '2px solid var(--accent)';
+            col.style.outlineOffset = '2px';
+            col.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+            setTimeout(function() { col.style.outline = ''; col.style.outlineOffset = ''; }, 1500);
+        }
+    }, 100);
 }
 
 function renderCEOHome() {
