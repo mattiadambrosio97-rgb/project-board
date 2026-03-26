@@ -9,10 +9,16 @@
     <title>Project Command Center — Mattia D'Ambrosio</title>
     <script>
     if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(regs){regs.forEach(function(r){r.unregister()});});}
-    // Impedisci a Safari di ripristinare la posizione di scroll salvata
     if('scrollRestoration' in history) history.scrollRestoration = 'manual';
     window.scrollTo(0,0);
+    // Rileva CEO mode PRIMA del rendering — evita flash del header COO
+    (function(){
+        var isCeo = new URLSearchParams(window.location.search).get('ceo') === '1';
+        try { if (isCeo) localStorage.setItem('pb_is_ceo','1'); else isCeo = localStorage.getItem('pb_is_ceo')==='1'; } catch(e){}
+        if (isCeo) document.documentElement.classList.add('is-ceo');
+    })();
     </script>
+    <style>.is-ceo .header { display: none !important; }</style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
@@ -4317,7 +4323,7 @@ function render() {
     if (calWeekDay) safeSessionSet('pb_calWeekDay', calWeekDay);
     if (calYear) safeSessionSet('pb_calYear', calYear);
     if (calMonth !== undefined && calMonth !== null) safeSessionSet('pb_calMonth', calMonth);
-    const mc = document.getElementById('mainContent');
+    var mc = document.getElementById('mainContent');
     renderHeader();
     if (state.currentView === 'global') {
         mc.innerHTML = renderGlobalWrapper();
