@@ -3891,36 +3891,36 @@ function renderTeamHome() {
 
 function _renderTeamTaskCard(item, todayStr) {
     var t = item.task;
-    var isBlocked = t.status === 'blocked';
-    var isOverdue = t.dueDate && t.dueDate < todayStr;
+    var effSt = item.memberStatus || t.status || 'todo';
+    var isBlocked = effSt === 'blocked';
+    var isOverdue = t.dueDate && t.dueDate < todayStr && effSt !== 'done';
     var isDueToday = t.dueDate && t.dueDate === todayStr;
     var borderColor = item.cooHasReplied ? 'var(--accent)' : isBlocked ? 'var(--red)' : isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--border)';
     var bgColor = item.cooHasReplied ? 'var(--accent-soft,#FFF1ED)' : isBlocked ? 'var(--red-bg,#FEF2F2)' : isOverdue ? 'var(--red-bg,#FEF2F2)' : isDueToday ? 'var(--orange-bg,#FFF7ED)' : 'var(--surface)';
     var h = '';
     h += '<div onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:pointer;background:' + bgColor + ';border:1px solid ' + borderColor + ';border-radius:12px;padding:14px 16px;margin-bottom:10px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
-    h += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;flex-wrap:wrap">';
-    if (item.cooHasReplied) h += '<span style="background:var(--accent);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">RISPOSTA DA MATTIA</span>';
-    if (isBlocked) h += '<span style="background:var(--red);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
-    else if (isOverdue) h += '<span style="background:var(--red);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
-    else if (isDueToday) h += '<span style="background:var(--orange);color:#fff;font-size:12px;font-weight:800;border-radius:4px;padding:2px 6px">OGGI</span>';
-    h += '<span style="font-size:13px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</span>';
+    // Badges (risposta, scaduta, ecc.)
+    var badges = '';
+    if (item.cooHasReplied) badges += '<span style="background:var(--accent);color:#fff;font-size:11px;font-weight:800;border-radius:4px;padding:2px 6px">RISPOSTA DA MATTIA</span>';
+    if (isBlocked) badges += '<span style="background:var(--red);color:#fff;font-size:11px;font-weight:800;border-radius:4px;padding:2px 6px">BLOCCATA</span>';
+    else if (isOverdue) badges += '<span style="background:var(--red);color:#fff;font-size:11px;font-weight:800;border-radius:4px;padding:2px 6px">SCADUTA</span>';
+    else if (isDueToday) badges += '<span style="background:var(--orange);color:#fff;font-size:11px;font-weight:800;border-radius:4px;padding:2px 6px">OGGI</span>';
+    if (badges) h += '<div style="display:flex;gap:6px;margin-bottom:6px;flex-wrap:wrap">' + badges + '</div>';
+    // Progetto
+    h += '<div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:4px">' + esc(item.projectName) + '</div>';
+    // Titolo task
+    h += '<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.3">' + esc(t.title) + '</div>';
+    // Descrizione (anteprima 2 righe)
+    if (t.note) {
+        h += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
+    }
+    // Scadenza in fondo
     if (t.dueDate) {
         var dLeft = daysUntil(t.dueDate);
         var dateFormatted = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
         var dateColor = isOverdue ? 'var(--red)' : isDueToday ? 'var(--orange)' : 'var(--text-muted)';
         var dateLabel = isOverdue ? 'scaduta da ' + Math.abs(dLeft) + 'g' : isDueToday ? 'oggi' : dateFormatted + ' (' + dLeft + 'g)';
-        h += '<span style="font-size:13px;font-weight:700;color:' + dateColor + ';margin-left:auto">&#128197; ' + dateLabel + '</span>';
-    }
-    h += '</div>';
-    h += '<div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:2px">' + esc(t.title) + '</div>';
-    if (t.note) {
-        h += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.4;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
-    }
-    var ta = (_getTeamMemberActions().taskActions || {})[t.id];
-    if (ta && ta.status) {
-        var stLabel = ta.status === 'in_progress' ? 'In corso' : ta.status === 'done' ? 'Completata' : ta.status === 'blocked' ? 'Bloccata' : ta.status;
-        var stColor = ta.status === 'in_progress' ? 'var(--yellow,#F59E0B)' : ta.status === 'done' ? 'var(--green)' : 'var(--red)';
-        h += '<div style="margin-top:6px;font-size:12px;font-weight:700;color:' + stColor + '">Il tuo stato: ' + stLabel + '</div>';
+        h += '<div style="font-size:12px;font-weight:700;color:' + dateColor + ';margin-top:2px">Scadenza: ' + dateLabel + '</div>';
     }
     h += '</div>';
     return h;
