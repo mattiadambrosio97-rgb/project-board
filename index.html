@@ -4032,8 +4032,36 @@ function renderTeamTaskDetail() {
     html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="padding:12px 18px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
     html += '</div>';
 
+    // ── Note private (solo localStorage, non sincronizzate) ──
+    var privateNotes = _getTeamPrivateNotes(task.id);
+    html += '<div style="margin-top:16px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px">';
+    html += '<div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:8px;display:flex;align-items:center;gap:6px">&#128274; Note private <span style="font-size:10px;font-weight:500;font-style:italic">(solo tu le vedi)</span></div>';
+    html += '<textarea id="teamPrivateNote_' + task.id + '" rows="3" placeholder="Appunti personali, promemoria..." style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical">' + esc(privateNotes) + '</textarea>';
+    html += '<button onclick="teamSavePrivateNote(\'' + task.id + '\')" style="margin-top:6px;padding:8px 16px;background:var(--surface);color:var(--text-secondary);border:1px solid var(--border);border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--font)">Salva nota</button>';
+    html += '</div>';
+
     html += '</div>';
     return html;
+}
+
+function _getTeamPrivateNotes(taskId) {
+    try {
+        var notes = JSON.parse(localStorage.getItem('team_private_notes') || '{}');
+        return notes[taskId] || '';
+    } catch(e) { return ''; }
+}
+
+function teamSavePrivateNote(taskId) {
+    var el = document.getElementById('teamPrivateNote_' + taskId);
+    if (!el) return;
+    var notes = {};
+    try { notes = JSON.parse(localStorage.getItem('team_private_notes') || '{}'); } catch(e) {}
+    var val = el.value.trim();
+    if (val) { notes[taskId] = val; } else { delete notes[taskId]; }
+    localStorage.setItem('team_private_notes', JSON.stringify(notes));
+    // Feedback visivo
+    var btn = el.nextElementSibling;
+    if (btn) { btn.textContent = 'Salvata!'; btn.style.color = 'var(--green)'; btn.style.borderColor = 'var(--green)'; setTimeout(function() { btn.textContent = 'Salva nota'; btn.style.color = ''; btn.style.borderColor = ''; }, 1500); }
 }
 
 function teamOpenTask(taskId) {
