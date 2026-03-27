@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0225';
+    var APP_VERSION = '20260327_0300';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3053,10 +3053,10 @@ function _renderCeoTaskInline(taskId, projectId) {
             var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
             var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
             var name = isCeo ? 'Tu' : 'Mattia (COO)';
-            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:13px">';
+            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:16px">';
             html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
-            html += ' <span style="font-size:11px;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px;line-height:1.5">' + escLink(msg.note) + '</div>';
+            html += ' <span style="font-size:13px;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px;line-height:1.45;font-size:16px">' + escLink(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -3141,10 +3141,10 @@ function _renderCeoResInline(resId) {
             var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
             var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
             var name = isCeo ? 'Tu' : 'Mattia (COO)';
-            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:13px">';
+            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:16px">';
             html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
-            html += ' <span style="font-size:11px;color:var(--text-muted)">' + mDate + '</span>';
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.5">' + escLink(msg.note) + '</div>';
+            html += ' <span style="font-size:13px;color:var(--text-muted)">' + mDate + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.45;font-size:16px">' + escLink(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -3407,10 +3407,10 @@ function _ceoOpenTaskModal(taskId, projectId) {
             var bgCol = isCeo ? 'var(--bg)' : 'var(--accent-soft,#FFF1ED)';
             var nameCol = isCeo ? 'var(--blue)' : 'var(--accent)';
             var name = isCeo ? 'Tu' : 'Mattia (COO)';
-            html += '<div style="padding:8px 12px;background:' + bgCol + ';border-radius:8px;margin-bottom:4px;font-size:12px">';
+            html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:5px;font-size:16px">';
             html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
-            html += ' <span style="font-size:10px;font-weight:600;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px">' + esc(msg.note) + '</div>';
+            html += ' <span style="font-size:13px;font-weight:600;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px;font-size:16px;line-height:1.45">' + escLink(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -3796,10 +3796,11 @@ function renderTeamHome() {
     });
     html += '</div>';
 
-    // Tab Lista / Board
+    // Tab Lista / Board / Progetti
     html += '<div style="display:flex;gap:0;margin-bottom:16px;border-bottom:2px solid var(--border)">';
     html += '<button onclick="setTeamTab(0)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 0 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 0 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Lista</button>';
     html += '<button onclick="setTeamTab(1)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 1 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 1 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Board</button>';
+    html += '<button onclick="setTeamTab(2)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 2 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 2 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Progetti</button>';
     html += '</div>';
 
     // Tutte le task (attive + completate) per la board
@@ -3880,6 +3881,41 @@ function renderTeamHome() {
             html += '</div>';
         });
         html += '</div>';
+    } else if (_teamViewTab === 2) {
+        // ===== VISTA PROGETTI — task raggruppate per progetto =====
+        var projectGroups = {};
+        myTasks.concat(completedTasks).forEach(function(item) {
+            var pid = item.projectId;
+            if (!projectGroups[pid]) projectGroups[pid] = { name: item.projectName, id: pid, tasks: [] };
+            projectGroups[pid].tasks.push(item);
+        });
+        var projList = Object.keys(projectGroups).map(function(k) { return projectGroups[k]; });
+        projList.sort(function(a, b) { return a.name.localeCompare(b.name); });
+        if (projList.length === 0) {
+            html += '<div style="text-align:center;padding:40px 20px;color:var(--text-muted);font-size:16px;font-weight:600">Nessun progetto con task assegnate</div>';
+        } else {
+            projList.forEach(function(proj) {
+                var activeTasks = proj.tasks.filter(function(i) { return i.memberStatus !== 'done'; });
+                var doneTasks = proj.tasks.filter(function(i) { return i.memberStatus === 'done'; });
+                html += '<div style="margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow-sm)">';
+                html += '<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px">' + esc(proj.name) + '</div>';
+                html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">' + activeTasks.length + ' attive' + (doneTasks.length > 0 ? ', ' + doneTasks.length + ' completate' : '') + '</div>';
+                if (activeTasks.length > 0) {
+                    activeTasks.forEach(function(item) {
+                        html += _renderTeamTaskCard(item, todayStr);
+                    });
+                }
+                if (doneTasks.length > 0) {
+                    html += '<details style="margin-top:8px"><summary style="font-size:13px;font-weight:700;color:var(--green);cursor:pointer;user-select:none">Completate (' + doneTasks.length + ')</summary>';
+                    doneTasks.forEach(function(item) {
+                        html += '<div onclick="teamOpenTask(\'' + item.task.id + '\')" style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-top:6px;opacity:0.6">';
+                        html += '<div style="font-size:14px;font-weight:600;color:var(--text);text-decoration:line-through">' + esc(item.task.title) + '</div></div>';
+                    });
+                    html += '</details>';
+                }
+                html += '</div>';
+            });
+        }
     }
 
     html += '</div>';
@@ -4016,9 +4052,9 @@ function renderTeamTaskDetail() {
             var timeStr = new Date(m.at).toLocaleString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
             html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:8px">';
             html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%;position:relative">';
-            html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
-            if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + escLink(m.note) + '</div>';
-            if (isTeam) html += '<button onclick="teamDeleteOwnMsg(\'' + task.id + '\',\'' + m.at + '\',true)" style="position:absolute;top:4px;right:6px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;opacity:0.3;padding:0" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.3\';this.style.color=\'var(--text-muted)\'">&times;</button>';
+            html += '<div style="font-size:13px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
+            if (m.note) html += '<div style="font-size:16px;color:var(--text);line-height:1.45;white-space:pre-wrap">' + escLink(m.note) + '</div>';
+            if (isTeam) html += '<button onclick="teamDeleteOwnMsg(\'' + task.id + '\',\'' + m.at + '\',true)" style="position:absolute;top:4px;right:6px;background:none;border:none;color:var(--red);cursor:pointer;font-size:18px;opacity:0.6;padding:4px 6px;min-width:28px;min-height:28px" onmouseenter="this.style.opacity=\'1\'" onmouseleave="this.style.opacity=\'0.6\'">&times;</button>';
             html += '</div></div>';
         });
         html += '</div>';
@@ -8462,9 +8498,10 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     html += `<div class="modal-field" style="margin-bottom:12px"><span class="modal-label">Scadenza</span>
         <input type="date" class="modal-input" id="tmDue" value="${task.dueDate||''}" style="cursor:pointer"></div>`;
 
-    // Note
+    // Note — espanse automaticamente per leggere tutto il contenuto
+    var noteRows = Math.max(4, Math.min(12, Math.ceil((task.note||'').length / 60)));
     html += `<div class="modal-field" style="margin-bottom:12px"><span class="modal-label">Note</span>
-        <textarea class="modal-textarea" id="tmNote" rows="2" placeholder="Appunti, contesto, blocchi...">${esc(task.note||'')}</textarea>
+        <textarea class="modal-textarea" id="tmNote" rows="${noteRows}" placeholder="Appunti, contesto, blocchi..." style="font-size:15px;line-height:1.5;min-height:100px">${esc(task.note||'')}</textarea>
     </div>`;
 
     // ── Istruzioni per Alberto — solo se assegnata a lui o ha ceoNote ──
@@ -8511,8 +8548,8 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     }
     html += '</div>';
     html += '<div style="display:flex;gap:6px;margin-top:6px">';
-    html += '<textarea id="cooTaskReplyInput_' + task.id + '" rows="1" placeholder="Scrivi un messaggio..." data-max-h="100" style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--surface);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="chatAutoResize(this)" onkeydown="chatKeyHandler(event,function(){cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')})"></textarea>';
-    html += '<button onclick="cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')" style="padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia</button>';
+    html += '<textarea id="cooTaskReplyInput_' + task.id + '" rows="1" placeholder="Scrivi un messaggio..." data-max-h="100" style="flex:1;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:var(--font);background:var(--surface);color:var(--text);resize:none;overflow:hidden;min-height:40px;max-height:100px;line-height:1.4" oninput="chatAutoResize(this)" onkeydown="chatKeyHandler(event,function(){cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')})"></textarea>';
+    html += '<button onclick="cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')" style="padding:10px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia</button>';
     html += '</div></div>';
 
     // ── Sezione avanzata (collapsibile) ──
@@ -8989,9 +9026,9 @@ function showCeoUpdatedTasks() {
         html += '<div style="padding:14px 16px;background:var(--blue-bg,#EFF6FF);border:1px solid var(--blue);border-radius:10px;margin-bottom:10px">';
         html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
         html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + esc(t.projectName) + (updateDate ? ' &middot; ' + updateDate : '') + '</div>';
-        if (updateNote) html += '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--blue)"><strong>Alberto:</strong> ' + esc(updateNote) + '</div>';
+        if (updateNote) html += '<div style="font-size:16px;color:var(--text-secondary);padding:10px 14px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--blue);line-height:1.45"><strong>Alberto:</strong> ' + escLink(updateNote) + '</div>';
         html += '<div style="display:flex;gap:6px;margin-bottom:8px">';
-        html += '<textarea id="ceoUpdReply_' + t.id + '" rows="1" placeholder="Rispondi ad Alberto..." data-max-h="100" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="chatAutoResize(this)" onkeydown="chatKeyHandler(event,function(){cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')})"></textarea>';
+        html += '<textarea id="ceoUpdReply_' + t.id + '" rows="1" placeholder="Rispondi ad Alberto..." data-max-h="100" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="chatAutoResize(this)" onkeydown="chatKeyHandler(event,function(){cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')})"></textarea>';
         html += '<button onclick="cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
         html += '</div>';
         html += '<button onclick="markDoneFromCeoPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-bottom:6px">Segna come completata</button>';
@@ -9149,9 +9186,9 @@ function showCeoProjectNotes() {
                 var label = isCeo ? 'Alberto' : 'Mattia';
                 var color = isCeo ? 'var(--purple,#8B5CF6)' : 'var(--blue)';
                 var bg = isCeo ? 'var(--surface)' : 'var(--blue-bg,#EFF6FF)';
-                html += '<div style="padding:8px 12px;background:' + bg + ';border-radius:8px;margin-bottom:4px;border-left:3px solid ' + color + '">';
-                html += '<span style="font-size:11px;font-weight:700;color:' + color + '">' + label + '</span> <span style="font-size:10px;color:var(--text-muted)">' + msgDate + '</span>';
-                html += '<div style="font-size:13px;color:var(--text);margin-top:2px">' + escLink(msg.note) + '</div>';
+                html += '<div style="padding:10px 14px;background:' + bg + ';border-radius:8px;margin-bottom:5px;border-left:3px solid ' + color + '">';
+                html += '<span style="font-size:13px;font-weight:700;color:' + color + '">' + label + '</span> <span style="font-size:13px;color:var(--text-muted)">' + msgDate + '</span>';
+                html += '<div style="font-size:16px;color:var(--text);margin-top:3px;line-height:1.45">' + escLink(msg.note) + '</div>';
                 html += '</div>';
             });
             html += '</div>';
@@ -9159,7 +9196,7 @@ function showCeoProjectNotes() {
 
         // Input risposta
         html += '<div style="display:flex;gap:6px">';
-        html += '<textarea id="cooProjectReply_' + p.id + '" rows="1" placeholder="Rispondi ad Alberto..." data-max-h="100" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="chatAutoResize(this)" onkeydown="chatKeyHandler(event,function(){cooRespondToProjectNote(\'' + p.id + '\')})"></textarea>';
+        html += '<textarea id="cooProjectReply_' + p.id + '" rows="1" placeholder="Rispondi ad Alberto..." data-max-h="100" style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:15px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="chatAutoResize(this)" onkeydown="chatKeyHandler(event,function(){cooRespondToProjectNote(\'' + p.id + '\')})"></textarea>';
         html += '<button onclick="cooRespondToProjectNote(\'' + p.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
         html += '</div>';
         html += '<button onclick="cooAckProjectNote(\'' + p.id + '\')" style="width:100%;margin-top:6px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text-muted)">Segna come letto</button>';
