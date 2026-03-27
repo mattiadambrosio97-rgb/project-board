@@ -4028,7 +4028,7 @@ function renderTeamTaskDetail() {
 
     // Input commento (stile chat: input + bottone inline, invio per mandare)
     html += '<div style="display:flex;gap:8px;margin-top:8px">';
-    html += '<input id="teamTaskNote" type="text" placeholder="Scrivi un messaggio..." style="flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();teamTaskAction(\'' + task.id + '\',null)}">';
+    html += '<textarea id="teamTaskNote" rows="1" placeholder="Scrivi un messaggio..." style="flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:44px;max-height:120px;line-height:1.4" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,120)+\'px\'" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();teamTaskAction(\'' + task.id + '\',null)}"></textarea>';
     html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="padding:12px 18px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
     html += '</div>';
 
@@ -7575,8 +7575,8 @@ function renderProjectDashboard(p) {
         html += `<div style="font-size:12px;color:var(--text-muted);padding:4px 0;margin-bottom:8px;font-style:italic">Nessuna nota ancora — scrivi la prima</div>`;
     }
     html += `<div style="display:flex;gap:8px">`;
-    html += `<input id="cooProjectNote_${p.id}" type="text" placeholder="Scrivi una nota sul progetto..." style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key==='Enter')cooSendProjectNote('${p.id}')">`;
-    html += `<button onclick="cooSendProjectNote('${p.id}')" style="padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>`;
+    html += `<textarea id="cooProjectNote_${p.id}" rows="1" placeholder="Scrivi una nota sul progetto..." style="flex:1;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:14px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:42px;max-height:100px;line-height:1.4" oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,100)+'px'" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();cooSendProjectNote('${p.id}')}"></textarea>`;
+    html += `<button onclick="cooSendProjectNote('${p.id}')" style="padding:10px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap;align-self:flex-end">Invia</button>`;
     html += `</div></div>`;
 
     // ── Task raggruppate per status (stile CEO, con assignee, cliccabili) ──
@@ -8477,7 +8477,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
                 var sl = msg.status === 'in_progress' ? 'In corso' : msg.status === 'done' ? 'Completata' : msg.status === 'blocked' ? 'Bloccata' : msg.status;
                 html += ' <span style="font-size:10px;font-weight:700;color:' + msg.color + '">(' + sl + ')</span>';
             }
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px;white-space:pre-wrap">' + esc(msg.note) + '</div>';
             html += '</div>';
             html += '<button onclick="if(confirm(\'Eliminare questo messaggio?\'))cooDeleteTaskMsg(\'' + task.id + '\',\'' + p.id + '\',\'' + msgSource + '\',\'' + msg.at + '\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0 2px;flex-shrink:0;opacity:0.4" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.4\';this.style.color=\'var(--text-muted)\'">&times;</button>';
             html += '</div>';
@@ -8489,7 +8489,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
         html += '<div style="font-size:12px;color:var(--text-muted);padding:4px 0;font-style:italic">Nessun messaggio ancora</div>';
     }
     html += '<div style="display:flex;gap:6px;margin-top:6px">';
-    html += '<input id="cooTaskReplyInput_' + task.id + '" type="text" placeholder="Scrivi un messaggio..." style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--surface);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')">';
+    html += '<textarea id="cooTaskReplyInput_' + task.id + '" rows="1" placeholder="Scrivi un messaggio..." style="flex:1;padding:8px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--surface);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\'" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')}"></textarea>';
     html += '<button onclick="cooRespondToTask(\'' + task.id + '\',\'' + p.id + '\')" style="padding:8px 12px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia</button>';
     html += '</div></div>';
 
@@ -8969,7 +8969,7 @@ function showCeoUpdatedTasks() {
         html += '<div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">' + esc(t.projectName) + (updateDate ? ' &middot; ' + updateDate : '') + '</div>';
         if (updateNote) html += '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--blue)"><strong>Alberto:</strong> ' + esc(updateNote) + '</div>';
         html += '<div style="display:flex;gap:6px;margin-bottom:8px">';
-        html += '<input id="ceoUpdReply_' + t.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')">';
+        html += '<textarea id="ceoUpdReply_' + t.id + '" rows="1" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\'" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')}"></textarea>';
         html += '<button onclick="cooRespondFromPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
         html += '</div>';
         html += '<button onclick="markDoneFromCeoPopup(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--green);color:#fff;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:var(--font);margin-bottom:6px">Segna come completata</button>';
@@ -9008,7 +9008,7 @@ function showTeamUpdatedTasks() {
         if (updateStatus) html += '<div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px">Stato: ' + updateStatus + '</div>';
         if (updateNote) html += '<div style="font-size:13px;color:var(--text-secondary);padding:8px 12px;background:var(--surface);border-radius:8px;margin-bottom:10px;border-left:3px solid var(--green)"><strong>' + esc(updateFrom) + ':</strong> ' + esc(updateNote) + '</div>';
         html += '<div style="display:flex;gap:6px;margin-bottom:8px">';
-        html += '<input id="teamUpdReply_' + t.id + '" type="text" placeholder="Rispondi..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToTeam(\'' + t.id + '\',\'' + t.projectId + '\')">';
+        html += '<textarea id="teamUpdReply_' + t.id + '" rows="1" placeholder="Rispondi..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\'" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();cooRespondToTeam(\'' + t.id + '\',\'' + t.projectId + '\')}"></textarea>';
         html += '<button onclick="cooRespondToTeam(\'' + t.id + '\',\'' + t.projectId + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
         html += '</div>';
         html += '<button onclick="cooAckTeamUpdate(\'' + t.id + '\',\'' + t.projectId + '\')" style="width:100%;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text)">Segna come letto</button>';
@@ -9138,7 +9138,7 @@ function showCeoProjectNotes() {
 
         // Input risposta
         html += '<div style="display:flex;gap:6px">';
-        html += '<input id="cooProjectReply_' + p.id + '" type="text" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\')cooRespondToProjectNote(\'' + p.id + '\')">';
+        html += '<textarea id="cooProjectReply_' + p.id + '" rows="1" placeholder="Rispondi ad Alberto..." style="flex:1;padding:8px 10px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text);resize:none;overflow:hidden;min-height:36px;max-height:100px;line-height:1.4" oninput="this.style.height=\'auto\';this.style.height=Math.min(this.scrollHeight,100)+\'px\'" onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();cooRespondToProjectNote(\'' + p.id + '\')}"></textarea>';
         html += '<button onclick="cooRespondToProjectNote(\'' + p.id + '\')" style="padding:8px 14px;background:var(--accent);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
         html += '</div>';
         html += '<button onclick="cooAckProjectNote(\'' + p.id + '\')" style="width:100%;margin-top:6px;padding:8px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);color:var(--text-muted)">Segna come letto</button>';
@@ -9269,7 +9269,7 @@ function cooRespondToTask(taskId, projectId) {
         var mDate = new Date().toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
         var msgHtml = '<div style="padding:5px 8px;background:var(--accent-soft,#FFF1ED);border-radius:6px;margin-bottom:3px;font-size:12px;display:flex;align-items:flex-start;gap:4px">';
         msgHtml += '<div style="flex:1"><span style="font-weight:700;color:var(--accent)">Tu</span> <span style="font-size:10px;color:var(--text-muted)">' + mDate + '</span>';
-        msgHtml += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(note) + '</div></div></div>';
+        msgHtml += '<div style="color:var(--text-secondary);margin-top:2px;white-space:pre-wrap">' + esc(note) + '</div></div></div>';
         scrollEl.insertAdjacentHTML('beforeend', msgHtml);
         scrollEl.scrollTop = scrollEl.scrollHeight;
     }
