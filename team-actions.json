@@ -141,8 +141,12 @@
       "compl_t6_ty_page_postriscatto": {
         "updates": [],
         "status": "da_verificare"
+      },
+      "compl_t8_foglio_manlio": {
+        "updates": [],
+        "status": "in_progress"
       }
     }
   },
-  "lastUpdate": "2026-03-27T08:20:40.845Z"
+  "lastUpdate": "2026-03-27T08:20:41.982Z"
 }
