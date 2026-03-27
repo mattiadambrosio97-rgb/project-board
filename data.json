@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T07:56:40.461Z",
+  "publishedAt": "2026-03-27T07:57:40.085Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -328,10 +328,10 @@
         {
           "id": "compl_t2_copy_raccolta",
           "title": "Copy 10 email sequenza raccolta birthday",
-          "status": "todo",
+          "status": "in_progress",
           "assignee": "Mattia",
           "dueDate": "2026-03-30",
-          "estimateHours": 3,
+          "estimateHours": 0,
           "recurrence": null,
           "note": "10 email con delay progressivi: E1 giorno 0, E2 +1gg, E3 +1gg, E4 +1gg, E5 +3gg, E6-10 +30gg ciascuna. Mittente: Alberto Di Teresa. Angolo prime 4-5: \"Ti stiamo preparando qualcosa di speciale per il tuo compleanno, ci serve solo la tua data di nascita\". Angolo 6-10: variare (reminder leggero, curiosita, social proof, angoli diversi). Link alla landing page col form (Task 1).",
           "ceoNote": "",
@@ -347,7 +347,12 @@
           "comments": [],
           "createdAt": 1774597893536,
           "completedAt": null,
-          "activityLog": []
+          "activityLog": [
+            {
+              "date": "2026-03-27",
+              "text": "Stato cambiato in: In corso"
+            }
+          ]
         },
         {
           "id": "compl_t3_campagna_fase1",
