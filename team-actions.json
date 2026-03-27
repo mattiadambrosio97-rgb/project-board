@@ -58,16 +58,12 @@
         "status": "in_progress"
       },
       "task_t3_template": {
-        "updates": [
-          {
-            "note": "qergqr4",
-            "at": "2026-03-27T06:45:27.723Z"
-          }
-        ],
+        "updates": [],
         "status": "blocked",
         "deleteMessages": [
           "2026-03-26T23:15:48.070Z",
-          "2026-03-27T06:45:27.441Z"
+          "2026-03-27T06:45:27.441Z",
+          "2026-03-27T06:45:27.723Z"
         ]
       },
       "task_t2_palette": {
@@ -101,5 +97,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T06:45:30.093Z"
+  "lastUpdate": "2026-03-27T06:45:31.700Z"
 }
