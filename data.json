@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T07:24:29.805Z",
+  "publishedAt": "2026-03-27T07:26:42.521Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -49,7 +49,18 @@
               "at": "2026-03-27T07:24:09.638Z"
             }
           ],
-          "ceoHasUpdate": false
+          "ceoHasUpdate": false,
+          "teamHasUpdate": true,
+          "_teamLastUpdateAt": "2026-03-27T07:24:46.466Z",
+          "_teamLastUpdateBy": "Kevin",
+          "_teamLastUpdateNote": "boh",
+          "teamUpdates": [
+            {
+              "from": "Kevin",
+              "note": "boh",
+              "at": "2026-03-27T07:24:46.466Z"
+            }
+          ]
         },
         {
           "id": "gtm_t2_remove_ga4direct",
@@ -537,7 +548,7 @@
           "status": "todo",
           "assignee": "Kevin",
           "dueDate": "2026-03-25",
-          "estimateHours": 5,
+          "estimateHours": 0,
           "recurrence": null,
           "note": "Template carosello 5 slide per tips di guida. Serve accesso a Canva Pro.",
           "ceoNote": "Ho mandato l'invito Canva, controlla la mail",
@@ -556,6 +567,18 @@
             {
               "date": "2026-03-22",
               "text": "Stato cambiato in: Bloccata"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: Akabajsbc"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: Iwbahaizbwbc"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: Sisbauaud w c"
             }
           ],
           "teamHasUpdate": true,
@@ -574,7 +597,22 @@
               "at": "2026-03-27T07:13:32.060Z"
             }
           ],
-          "teamCompletedBy": "Kevin"
+          "teamCompletedBy": "Kevin",
+          "cooResponses": [
+            {
+              "note": "Akabajsbc",
+              "at": "2026-03-27T07:26:12.600Z"
+            },
+            {
+              "note": "Iwbahaizbwbc",
+              "at": "2026-03-27T07:26:15.534Z"
+            },
+            {
+              "note": "Sisbauaud w c",
+              "at": "2026-03-27T07:26:18.601Z"
+            }
+          ],
+          "ceoHasUpdate": false
         },
         {
           "id": "task_t4_reel",
