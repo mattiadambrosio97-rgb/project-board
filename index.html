@@ -3984,6 +3984,7 @@ function renderTeamTaskDetail() {
     var quickBtns = [
         { key: 'todo', label: 'Da fare', color: 'var(--slate,#64748B)', icon: '&#9679;' },
         { key: 'in_progress', label: 'In corso', color: 'var(--yellow,#F59E0B)', icon: '&#9654;' },
+        { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal,#14B8A6)', icon: '&#128269;' },
         { key: 'done', label: 'Fatto', color: 'var(--green)', icon: '&#10003;' },
         { key: 'blocked', label: 'Bloccata', color: 'var(--red)', icon: '&#9888;' }
     ];
@@ -4006,8 +4007,9 @@ function renderTeamTaskDetail() {
     (task.cooResponses || []).forEach(function(r) { if (r.note && r.note.trim()) allMsgs.push({ from: 'coo', note: r.note, at: r.at }); });
     allMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
 
+    html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px">Conversazione</div>';
     if (allMsgs.length > 0) {
-        html += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:10px">Conversazione</div>';
+        html += '<div id="teamChatScroll_' + task.id + '" style="max-height:250px;overflow-y:auto;margin-bottom:8px;scroll-behavior:smooth">';
         allMsgs.forEach(function(m) {
             var isTeam = m.from === 'team';
             var align = isTeam ? 'flex-end' : 'flex-start';
@@ -4016,18 +4018,23 @@ function renderTeamTaskDetail() {
             var label = isTeam ? esc(TEAM_MEMBER_NAME) : 'Mattia (COO)';
             var timeStr = new Date(m.at).toLocaleString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
             html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:8px">';
-            html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%">';
+            html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%;position:relative">';
             html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
             if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + esc(m.note) + '</div>';
+            if (isTeam) html += '<button onclick="teamDeleteOwnMsg(\'' + task.id + '\',\'' + m.at + '\')" style="position:absolute;top:4px;right:6px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;opacity:0.3;padding:0" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.3\';this.style.color=\'var(--text-muted)\'">&times;</button>';
             html += '</div></div>';
         });
+        html += '</div>';
+        html += '<script>setTimeout(function(){var el=document.getElementById("teamChatScroll_' + task.id + '");if(el)el.scrollTop=el.scrollHeight;},50)<\/script>';
+    } else {
+        html += '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;font-style:italic">Nessun messaggio ancora</div>';
     }
 
     // Input commento
-    html += '<textarea id="teamTaskNote" rows="3" placeholder="Scrivi un commento o aggiornamento..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:12px;margin-top:12px"></textarea>';
+    html += '<textarea id="teamTaskNote" rows="2" placeholder="Scrivi un messaggio..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:12px;margin-top:8px"></textarea>';
 
     // Bottone commento
-    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia commento</button>';
+    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia</button>';
 
     html += '</div>';
     return html;
@@ -4043,6 +4050,24 @@ function teamGoHome() {
     _teamOpenTaskId = null;
     renderTeamView();
     window.scrollTo(0, 0);
+}
+
+function teamDeleteOwnMsg(taskId, msgAt) {
+    if (!confirm('Eliminare questo messaggio?')) return;
+    var myActions = _getTeamMemberActions();
+    if (!myActions.taskActions) myActions.taskActions = {};
+    if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
+    // Remove the specific update by timestamp
+    if (myActions.taskActions[taskId].updates) {
+        myActions.taskActions[taskId].updates = myActions.taskActions[taskId].updates.filter(function(u) { return u.at !== msgAt; });
+    }
+    // Also flag for deletion in merged data
+    if (!myActions.taskActions[taskId].deleteMessages) myActions.taskActions[taskId].deleteMessages = [];
+    myActions.taskActions[taskId].deleteMessages.push(msgAt);
+    teamPushActions(function(ok) {
+        if (ok) renderTeamView();
+        else alert('Errore. Riprova.');
+    });
 }
 
 function teamQuickStatus(taskId, newStatus) {
@@ -5575,6 +5600,13 @@ function _cooFetchTeamActions() {
                     var lastCooResponse = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
                     var teamIsNewer = !lastCooResponse || new Date(lastTeamUpdate.at) > new Date(lastCooResponse.at);
 
+                    // Gestisci cancellazione messaggi dal team member
+                    if (ta.deleteMessages && ta.deleteMessages.length > 0 && t.teamUpdates) {
+                        var before = t.teamUpdates.length;
+                        t.teamUpdates = t.teamUpdates.filter(function(u) { return ta.deleteMessages.indexOf(u.at) === -1; });
+                        if (t.teamUpdates.length !== before) needSave = true;
+                    }
+
                     if (teamIsNewer) {
                         // Status update dal membro
                         if (ta.status === 'done' && t.status !== 'done' && t.status !== 'da_verificare') {
@@ -5586,6 +5618,12 @@ function _cooFetchTeamActions() {
                             needSave = true;
                         } else if (ta.status === 'blocked' && t.status !== 'blocked') {
                             t.status = 'blocked';
+                            needSave = true;
+                        } else if (ta.status === 'da_verificare' && t.status !== 'da_verificare' && t.status !== 'done') {
+                            t.status = 'da_verificare';
+                            needSave = true;
+                        } else if (ta.status === 'todo' && t.status !== 'todo') {
+                            t.status = 'todo';
                             needSave = true;
                         }
 
@@ -8380,11 +8418,19 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     (task.cooResponses || []).forEach(function(r) { allTaskMsgs.push({ from: 'Tu', note: r.note, type: 'response', at: r.at, color: 'var(--accent)', bg: 'var(--accent-soft,#FFF1ED)' }); });
     allTaskMsgs.sort(function(a, b) { return new Date(a.at) - new Date(b.at); });
     html += '<div style="margin-bottom:12px;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:10px">';
-    html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);margin-bottom:6px;text-transform:uppercase">Conversazione</div>';
+    html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">';
+    html += '<div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase">Conversazione</div>';
     if (allTaskMsgs.length > 0) {
+        html += '<button onclick="if(confirm(\'Pulire tutta la conversazione di questa task?\'))cooClearTaskChat(\'' + task.id + '\',\'' + p.id + '\')" style="font-size:10px;color:var(--text-muted);background:none;border:1px solid var(--border);border-radius:6px;padding:2px 8px;cursor:pointer;font-family:var(--font)" onmouseenter="this.style.borderColor=\'var(--red)\';this.style.color=\'var(--red)\'" onmouseleave="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text-muted)\'">Pulisci chat</button>';
+    }
+    html += '</div>';
+    if (allTaskMsgs.length > 0) {
+        html += '<div id="taskChatScroll_' + task.id + '" style="max-height:200px;overflow-y:auto;margin-bottom:6px;scroll-behavior:smooth">';
         allTaskMsgs.forEach(function(msg) {
             var mDate = new Date(msg.at).toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-            html += '<div style="padding:5px 8px;background:' + msg.bg + ';border-radius:6px;margin-bottom:3px;font-size:12px">';
+            var msgSource = msg.from === 'Tu' ? 'coo' : (msg.from === 'Alberto' ? 'ceo' : 'team');
+            html += '<div style="padding:5px 8px;background:' + msg.bg + ';border-radius:6px;margin-bottom:3px;font-size:12px;display:flex;align-items:flex-start;gap:4px">';
+            html += '<div style="flex:1">';
             html += '<span style="font-weight:700;color:' + msg.color + '">' + esc(msg.from) + '</span>';
             html += ' <span style="font-size:10px;color:var(--text-muted)">' + mDate + '</span>';
             if (msg.status) {
@@ -8393,7 +8439,12 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
             }
             if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px">' + esc(msg.note) + '</div>';
             html += '</div>';
+            html += '<button onclick="if(confirm(\'Eliminare questo messaggio?\'))cooDeleteTaskMsg(\'' + task.id + '\',\'' + p.id + '\',\'' + msgSource + '\',\'' + msg.at + '\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0 2px;flex-shrink:0;opacity:0.4" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.4\';this.style.color=\'var(--text-muted)\'">&times;</button>';
+            html += '</div>';
         });
+        html += '</div>';
+        // Auto-scroll to bottom
+        html += '<script>setTimeout(function(){var el=document.getElementById("taskChatScroll_' + task.id + '");if(el)el.scrollTop=el.scrollHeight;},50)<\/script>';
     } else {
         html += '<div style="font-size:12px;color:var(--text-muted);padding:4px 0;font-style:italic">Nessun messaggio ancora</div>';
     }
@@ -9174,6 +9225,44 @@ function cooRespondToTask(taskId, projectId) {
     saveProjects(projects);
     _autoPublishForCEO();
     _showToast('Risposta inviata!');
+    closeTaskModal();
+    render();
+    setTimeout(function() { openTaskModal(taskId, projectId); }, 150);
+}
+
+function cooClearTaskChat(taskId, projectId) {
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) return;
+    var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
+    if (!t) return;
+    t.ceoUpdates = [];
+    t.teamUpdates = [];
+    t.cooResponses = [];
+    saveProjects(projects);
+    _autoPublishForCEO();
+    _showToast('Chat pulita');
+    closeTaskModal();
+    render();
+    setTimeout(function() { openTaskModal(taskId, projectId); }, 150);
+}
+
+function cooDeleteTaskMsg(taskId, projectId, msgFrom, msgAt) {
+    var projects = getProjects();
+    var p = projects.find(function(pr) { return pr.id === projectId; });
+    if (!p) return;
+    var t = (p.tasks||[]).find(function(tk) { return tk.id === taskId; });
+    if (!t) return;
+    if (msgFrom === 'coo') {
+        t.cooResponses = (t.cooResponses||[]).filter(function(r) { return r.at !== msgAt; });
+    } else if (msgFrom === 'ceo') {
+        t.ceoUpdates = (t.ceoUpdates||[]).filter(function(u) { return u.at !== msgAt; });
+    } else {
+        t.teamUpdates = (t.teamUpdates||[]).filter(function(u) { return u.at !== msgAt; });
+    }
+    saveProjects(projects);
+    _autoPublishForCEO();
+    _showToast('Messaggio eliminato');
     closeTaskModal();
     render();
     setTimeout(function() { openTaskModal(taskId, projectId); }, 150);
