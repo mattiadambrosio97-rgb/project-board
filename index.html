@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0350';
+    var APP_VERSION = '20260327_0355';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -5723,10 +5723,6 @@ function _cooFetchTeamActions() {
 
                     var lastTeamUpdate = ta.updates[ta.updates.length - 1];
                     var lastCooResponse = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
-                    var lastCooStatusAt = t._cooStatusAt ? new Date(t._cooStatusAt) : null;
-                    var teamUpdateTime = new Date(lastTeamUpdate.at);
-                    var teamIsNewer = (!lastCooResponse || teamUpdateTime > new Date(lastCooResponse.at)) && (!lastCooStatusAt || teamUpdateTime > lastCooStatusAt);
-
                     // Gestisci cancellazione messaggi dal team member
                     if (ta.deleteMessages && ta.deleteMessages.length > 0 && t.teamUpdates) {
                         var before = t.teamUpdates.length;
@@ -5734,6 +5730,12 @@ function _cooFetchTeamActions() {
                         if (t.teamUpdates.length !== before) needSave = true;
                     }
 
+                    // COO ha SEMPRE priorità sullo stato: se _cooStatusAt è impostato e >= team update, skip
+                    var lastCooResponse = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+                    var teamUpdateTime = new Date(lastTeamUpdate.at);
+                    var cooHasOverridden = t._cooStatusAt && t._cooStatusAt >= lastTeamUpdate.at;
+                    var cooHasResponded = lastCooResponse && new Date(lastCooResponse.at) >= teamUpdateTime;
+                    var teamIsNewer = !cooHasOverridden && !cooHasResponded;
                     if (teamIsNewer) {
                         // Status update dal membro
                         if (ta.status === 'done' && t.status !== 'done' && t.status !== 'da_verificare') {
