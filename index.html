@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0300';
+    var APP_VERSION = '20260327_0310';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3034,7 +3034,7 @@ function _renderCeoTaskInline(taskId, projectId) {
         html += '<div style="font-size:15px;color:var(--text);line-height:1.7">' + esc(t.ceoNote) + '</div>';
         html += '</div>';
     } else if (t.note) {
-        html += '<div style="padding:14px;background:var(--bg);border-radius:10px;margin-bottom:20px;font-size:14px;color:var(--text-secondary);line-height:1.6">' + esc(t.note) + '</div>';
+        html += '<div style="padding:14px;background:var(--bg);border-radius:10px;margin-bottom:20px;font-size:14px;color:var(--text-secondary);line-height:1.6;white-space:pre-wrap">' + escLink(t.note) + '</div>';
     }
 
     // Conversazione
@@ -3388,7 +3388,7 @@ function _ceoOpenTaskModal(taskId, projectId) {
         html += '<div style="font-size:14px;color:var(--text);line-height:1.6">' + esc(t.ceoNote) + '</div>';
         html += '</div>';
     } else if (t.note) {
-        html += '<div style="padding:12px 14px;background:var(--bg);border-radius:8px;margin-bottom:16px;font-size:13px;color:var(--text-secondary);line-height:1.5">' + esc(t.note) + '</div>';
+        html += '<div style="padding:12px 14px;background:var(--bg);border-radius:8px;margin-bottom:16px;font-size:14px;color:var(--text-secondary);line-height:1.5;white-space:pre-wrap">' + escLink(t.note) + '</div>';
     }
 
     // Thread conversazione CEO ↔ COO (cronologico)
@@ -4003,7 +4003,7 @@ function renderTeamTaskDetail() {
     }
 
     if (task.note) {
-        html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.5;margin-top:8px;white-space:pre-wrap">' + esc(task.note) + '</div>';
+        html += '<div style="font-size:16px;color:var(--text-secondary);line-height:1.45;margin-top:8px;white-space:pre-wrap">' + escLink(task.note) + '</div>';
     }
 
     // Dropdown stato
