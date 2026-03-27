@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T07:26:43.979Z",
+  "publishedAt": "2026-03-27T07:41:06.820Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -12,7 +12,7 @@
           "id": "gtm_t1_server_container",
           "title": "Fix server container GTM-T99G83CD",
           "status": "todo",
-          "assignee": "Kevin",
+          "assignee": "Mattia",
           "dueDate": "2026-03-29",
           "estimateHours": 0,
           "recurrence": null,
@@ -37,30 +37,20 @@
             {
               "date": "2026-03-27",
               "text": "Risposta inviata ad Alberto: Come vogliamo fare qui?"
-            }
-          ],
-          "cooResponses": [
-            {
-              "note": "prova",
-              "at": "2026-03-27T06:32:22.765Z"
             },
             {
-              "note": "Come vogliamo fare qui?",
-              "at": "2026-03-27T07:24:09.638Z"
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: Bella risposta"
             }
           ],
+          "cooResponses": [],
           "ceoHasUpdate": false,
           "teamHasUpdate": true,
           "_teamLastUpdateAt": "2026-03-27T07:24:46.466Z",
           "_teamLastUpdateBy": "Kevin",
           "_teamLastUpdateNote": "boh",
-          "teamUpdates": [
-            {
-              "from": "Kevin",
-              "note": "boh",
-              "at": "2026-03-27T07:24:46.466Z"
-            }
-          ]
+          "teamUpdates": [],
+          "ceoUpdates": []
         },
         {
           "id": "gtm_t2_remove_ga4direct",
@@ -548,7 +538,7 @@
           "status": "todo",
           "assignee": "Kevin",
           "dueDate": "2026-03-25",
-          "estimateHours": 0,
+          "estimateHours": 5,
           "recurrence": null,
           "note": "Template carosello 5 slide per tips di guida. Serve accesso a Canva Pro.",
           "ceoNote": "Ho mandato l'invito Canva, controlla la mail",
@@ -582,19 +572,14 @@
             }
           ],
           "teamHasUpdate": true,
-          "_teamLastUpdateAt": "2026-03-27T07:13:32.060Z",
+          "_teamLastUpdateAt": "2026-03-27T07:39:59.767Z",
           "_teamLastUpdateBy": "Kevin",
-          "_teamLastUpdateNote": "https://mattiadambrosio97-rgb.github.io/project-board/?team=kevin",
+          "_teamLastUpdateNote": "ok",
           "teamUpdates": [
             {
               "from": "Kevin",
-              "note": "https://mattiadambrosio97-rgb.github.io/project-board/?team=kevin",
-              "at": "2026-03-27T07:03:43.901Z"
-            },
-            {
-              "from": "Kevin",
-              "note": "https://mattiadambrosio97-rgb.github.io/project-board/?team=kevin",
-              "at": "2026-03-27T07:13:32.060Z"
+              "note": "ok",
+              "at": "2026-03-27T07:39:59.767Z"
             }
           ],
           "teamCompletedBy": "Kevin",
