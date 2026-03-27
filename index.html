@@ -3881,7 +3881,7 @@ function renderTeamHome() {
                 colTasks.forEach(function(item) {
                     var t = item.task;
                     var isOverdue = t.dueDate && t.dueDate < todayStr && t.status !== 'done';
-                    html += '<div draggable="true" ondragstart="onTeamDragStart(event,\'' + t.id + '\')" ondragend="onTeamDragEnd(event)" onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:grab;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;transition:transform 0.1s,opacity 0.2s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+                    html += '<div data-team-task-id="' + t.id + '" draggable="true" ondragstart="onTeamDragStart(event,\'' + t.id + '\')" ondragend="onTeamDragEnd(event)" onclick="teamOpenTask(\'' + t.id + '\')" style="cursor:grab;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:6px;transition:transform 0.1s,opacity 0.2s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
                     if (item.cooHasReplied) html += '<div style="font-size:10px;font-weight:800;color:var(--accent);margin-bottom:4px">FEEDBACK DA LEGGERE</div>';
                     html += '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">' + esc(t.title) + '</div>';
                     html += '<div style="font-size:11px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
@@ -4177,9 +4177,18 @@ function onTeamDrop(e, newStatus) {
     myActions.taskActions[taskId].status = newStatus;
     _teamDragTaskId = null;
     document.querySelectorAll('[data-team-col]').forEach(function(c) { c.style.borderColor = 'transparent'; c.style.background = ''; });
+    // Aggiornamento ottimistico: sposta la card nel DOM subito
+    var cardEl = document.querySelector('[data-team-task-id="' + taskId + '"]');
+    var targetCol = document.querySelector('[data-team-col="' + newStatus + '"]');
+    if (cardEl && targetCol) {
+        cardEl.style.opacity = '';
+        cardEl.style.transform = '';
+        targetCol.appendChild(cardEl);
+    }
+    // Poi sincronizza in background
     teamPushActions(function(ok) {
-        if (ok) renderTeamView();
-        else alert('Errore nel salvataggio. Riprova.');
+        if (!ok) alert('Errore nel salvataggio. Riprova.');
+        renderTeamView();
     });
 }
 function onTeamDragEnd(e) {
