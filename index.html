@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0355';
+    var APP_VERSION = '20260327_0930';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3732,7 +3732,7 @@ function renderTeamHome() {
             var lastMyUpdate = (ta && ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
             var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
             var cooHasReplied = lastCooResp && (!lastMyUpdate || new Date(lastCooResp.at) > new Date(lastMyUpdate.at));
-            var item = { task: t, projectName: p.name, projectId: p.id, memberStatus: effectiveStatus, cooHasReplied: cooHasReplied, lastCooResp: lastCooResp };
+            var item = { task: t, projectName: p.name, projectId: p.id, projectDesc: p.description || '', memberStatus: effectiveStatus, cooHasReplied: cooHasReplied, lastCooResp: lastCooResp };
             if (effectiveStatus === 'done') {
                 completedTasks.push(item);
             } else {
@@ -3910,7 +3910,7 @@ function renderTeamHome() {
         var projectGroups = {};
         myTasks.concat(completedTasks).forEach(function(item) {
             var pid = item.projectId;
-            if (!projectGroups[pid]) projectGroups[pid] = { name: item.projectName, id: pid, tasks: [] };
+            if (!projectGroups[pid]) projectGroups[pid] = { name: item.projectName, id: pid, desc: item.projectDesc || '', tasks: [] };
             projectGroups[pid].tasks.push(item);
         });
         var projList = Object.keys(projectGroups).map(function(k) { return projectGroups[k]; });
@@ -3923,6 +3923,7 @@ function renderTeamHome() {
                 var doneTasks = proj.tasks.filter(function(i) { return i.memberStatus === 'done'; });
                 html += '<div style="margin-bottom:24px;background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;box-shadow:var(--shadow-sm)">';
                 html += '<div style="font-size:17px;font-weight:800;color:var(--text);margin-bottom:4px">' + esc(proj.name) + '</div>';
+                if (proj.desc) html += '<div style="font-size:14px;color:var(--text-secondary);line-height:1.45;margin-bottom:8px;white-space:pre-line">' + escLink(proj.desc) + '</div>';
                 html += '<div style="font-size:13px;color:var(--text-muted);margin-bottom:12px">' + activeTasks.length + ' attive' + (doneTasks.length > 0 ? ', ' + doneTasks.length + ' completate' : '') + '</div>';
                 if (activeTasks.length > 0) {
                     activeTasks.forEach(function(item) {
