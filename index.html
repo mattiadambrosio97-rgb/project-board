@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0310';
+    var APP_VERSION = '20260327_0315';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3842,7 +3842,7 @@ function renderTeamHome() {
                 html += '</details>';
             }
         }
-    } else {
+    } else if (_teamViewTab === 1) {
         // ===== VISTA BOARD (Kanban) =====
         var columns = [
             { key: 'todo', label: 'Da fare', color: 'var(--slate)', bg: 'var(--bg)' },
