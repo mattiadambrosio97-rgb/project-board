@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0345';
+    var APP_VERSION = '20260327_0350';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -5723,7 +5723,9 @@ function _cooFetchTeamActions() {
 
                     var lastTeamUpdate = ta.updates[ta.updates.length - 1];
                     var lastCooResponse = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
-                    var teamIsNewer = !lastCooResponse || new Date(lastTeamUpdate.at) > new Date(lastCooResponse.at);
+                    var lastCooStatusAt = t._cooStatusAt ? new Date(t._cooStatusAt) : null;
+                    var teamUpdateTime = new Date(lastTeamUpdate.at);
+                    var teamIsNewer = (!lastCooResponse || teamUpdateTime > new Date(lastCooResponse.at)) && (!lastCooStatusAt || teamUpdateTime > lastCooStatusAt);
 
                     // Gestisci cancellazione messaggi dal team member
                     if (ta.deleteMessages && ta.deleteMessages.length > 0 && t.teamUpdates) {
@@ -8389,6 +8391,7 @@ function onDropGlobal(e, newStatus) {
         if (!task.activityLog) task.activityLog = [];
         task.activityLog.push({ date: today(), text: 'Stato cambiato in: ' + (STATUS_LABELS[newStatus] || newStatus) });
         task.status = newStatus;
+        task._cooStatusAt = new Date().toISOString();
         if (task.status === 'done' && !task.completedAt) task.completedAt = Date.now();
         if (task.status !== 'done') task.completedAt = null;
         saveProjects(projects);
@@ -8426,6 +8429,7 @@ function onDrop(e, projectId, newStatus) {
     if (task && task.status !== newStatus) {
         const oldStatus = task.status;
         task.status = newStatus;
+        task._cooStatusAt = new Date().toISOString();
         if (newStatus === 'done' && !task.completedAt) {
             task.completedAt = Date.now();
         }
@@ -8451,6 +8455,7 @@ function cycleTaskStatus(taskId, projectId) {
     const oldStatus = task.status;
     task.status = STATUS_LIST[(idx + 1) % STATUS_LIST.length];
     if (oldStatus !== task.status) {
+        task._cooStatusAt = new Date().toISOString();
         if (!task.activityLog) task.activityLog = [];
         task.activityLog.push({ date: today(), text: 'Stato cambiato in: ' + (STATUS_LABELS[task.status] || task.status) });
     }
@@ -8472,6 +8477,7 @@ function changeTaskStatus(taskId, projectId, newStatus) {
         task.activityLog.push({ date: today(), text: 'Stato cambiato in: ' + (STATUS_LABELS[newStatus] || newStatus) });
     }
     task.status = newStatus;
+    task._cooStatusAt = new Date().toISOString();
     if (task.status === 'done' && !task.completedAt) task.completedAt = Date.now();
     if (task.status !== 'done') task.completedAt = null;
     saveProjects(projects);
@@ -8750,8 +8756,10 @@ function saveTask(taskId, projectId, isNew) {
             taskData.createdAt = existing.createdAt;
             taskData.completedAt = existing.completedAt;
             taskData.activityLog = existing.activityLog || [];
+            taskData._cooStatusAt = existing._cooStatusAt || null;
             // Auto-log status change
             if (existing.status !== taskData.status) {
+                taskData._cooStatusAt = new Date().toISOString();
                 taskData.activityLog.push({ date: today(), text: 'Stato cambiato in: ' + (STATUS_LABELS[taskData.status] || taskData.status) });
             }
             if (taskData.status === 'done' && !taskData.completedAt) taskData.completedAt = Date.now();
