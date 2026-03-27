@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T06:44:20.062Z",
+  "publishedAt": "2026-03-27T07:24:29.805Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -12,9 +12,9 @@
           "id": "gtm_t1_server_container",
           "title": "Fix server container GTM-T99G83CD",
           "status": "todo",
-          "assignee": "Mattia",
+          "assignee": "Kevin",
           "dueDate": "2026-03-29",
-          "estimateHours": 3,
+          "estimateHours": 0,
           "recurrence": null,
           "note": "Sblocca tutto il resto. Il server container attuale non inoltra correttamente i dati a GA4. Richiede accesso GTM UI.",
           "ceoNote": "",
@@ -33,12 +33,20 @@
             {
               "date": "2026-03-27",
               "text": "Risposta inviata ad Alberto: prova"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: Come vogliamo fare qui?"
             }
           ],
           "cooResponses": [
             {
               "note": "prova",
               "at": "2026-03-27T06:32:22.765Z"
+            },
+            {
+              "note": "Come vogliamo fare qui?",
+              "at": "2026-03-27T07:24:09.638Z"
             }
           ],
           "ceoHasUpdate": false
@@ -526,7 +534,7 @@
         {
           "id": "task_t3_template",
           "title": "Template post Instagram (carosello)",
-          "status": "da_verificare",
+          "status": "todo",
           "assignee": "Kevin",
           "dueDate": "2026-03-25",
           "estimateHours": 5,
@@ -551,14 +559,19 @@
             }
           ],
           "teamHasUpdate": true,
-          "_teamLastUpdateAt": "2026-03-26T23:15:48.070Z",
+          "_teamLastUpdateAt": "2026-03-27T07:13:32.060Z",
           "_teamLastUpdateBy": "Kevin",
-          "_teamLastUpdateNote": "afdvqervqe",
+          "_teamLastUpdateNote": "https://mattiadambrosio97-rgb.github.io/project-board/?team=kevin",
           "teamUpdates": [
             {
               "from": "Kevin",
-              "note": "afdvqervqe",
-              "at": "2026-03-26T23:15:48.070Z"
+              "note": "https://mattiadambrosio97-rgb.github.io/project-board/?team=kevin",
+              "at": "2026-03-27T07:03:43.901Z"
+            },
+            {
+              "from": "Kevin",
+              "note": "https://mattiadambrosio97-rgb.github.io/project-board/?team=kevin",
+              "at": "2026-03-27T07:13:32.060Z"
             }
           ],
           "teamCompletedBy": "Kevin"
@@ -610,7 +623,7 @@
         {
           "id": "task_t5_stories",
           "title": "Pack stories highlights (6 copertine)",
-          "status": "blocked",
+          "status": "todo",
           "assignee": "Kevin",
           "dueDate": "2026-03-27",
           "estimateHours": 3,
