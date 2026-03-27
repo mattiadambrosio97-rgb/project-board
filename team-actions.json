@@ -36,16 +36,12 @@
         "status": "blocked"
       },
       "task_t5_stories": {
-        "updates": [
-          {
-            "note": "Che devo fare qui?",
-            "at": "2026-03-27T06:16:43.255Z"
-          }
-        ],
+        "updates": [],
         "status": "blocked",
         "deleteMessages": [
           "2026-03-27T06:03:12.072Z",
-          "2026-03-26T23:14:23.027Z"
+          "2026-03-26T23:14:23.027Z",
+          "2026-03-27T06:16:43.255Z"
         ]
       },
       "task_t1_logo": {
@@ -92,5 +88,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T06:25:23.495Z"
+  "lastUpdate": "2026-03-27T06:25:27.790Z"
 }
