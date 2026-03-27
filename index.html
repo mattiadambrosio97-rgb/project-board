@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260326_2100';
+    var APP_VERSION = '20260327_0100';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3662,7 +3662,7 @@ function loadTeamData(callback, silent) {
     }).catch(function() { if (callback) callback(); });
 }
 
-function teamPushActions(callback) {
+function teamPushActions(callback, _retry) {
     var token = safeGetItem('pb_gh_token_team');
     if (!token) { if (callback) callback(false); return; }
     if (!_teamActions) _teamActions = {};
@@ -3680,8 +3680,13 @@ function teamPushActions(callback) {
             body: JSON.stringify(body)
         });
     }).then(function(r) {
-        if (callback) callback(r.ok);
-    }).catch(function() { if (callback) callback(false); });
+        if (r.ok) { if (callback) callback(true); }
+        else if (!_retry) { setTimeout(function() { teamPushActions(callback, true); }, 500); }
+        else { if (callback) callback(false); }
+    }).catch(function() {
+        if (!_retry) { setTimeout(function() { teamPushActions(callback, true); }, 500); }
+        else { if (callback) callback(false); }
+    });
 }
 
 function _getTeamMemberActions() {
@@ -3706,19 +3711,23 @@ function renderTeamHome() {
     var isDark = document.body.classList.contains('dark');
     var myActions = _getTeamMemberActions();
 
-    // Raccogli task assegnate a questo membro
+    // Raccogli task assegnate a questo membro — usa stato effettivo (locale > COO)
     var myTasks = [];
+    var completedTasks = [];
     projects.forEach(function(p) {
         if (p.status === 'completato') return;
         (p.tasks || []).forEach(function(t) {
-            if (t.assignee === TEAM_MEMBER_NAME && t.status !== 'done') {
-                var ta = myActions.taskActions[t.id];
-                var memberStatus = (ta && ta.status) || null;
-                // Check se COO ha risposto dopo il nostro ultimo aggiornamento
-                var lastMyUpdate = (ta && ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
-                var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
-                var cooHasReplied = lastCooResp && (!lastMyUpdate || new Date(lastCooResp.at) > new Date(lastMyUpdate.at));
-                myTasks.push({ task: t, projectName: p.name, projectId: p.id, memberStatus: memberStatus, cooHasReplied: cooHasReplied, lastCooResp: lastCooResp });
+            if (t.assignee !== TEAM_MEMBER_NAME) return;
+            var ta = myActions.taskActions[t.id];
+            var effectiveStatus = (ta && ta.status) ? ta.status : (t.status || 'todo');
+            var lastMyUpdate = (ta && ta.updates && ta.updates.length > 0) ? ta.updates[ta.updates.length - 1] : null;
+            var lastCooResp = (t.cooResponses && t.cooResponses.length > 0) ? t.cooResponses[t.cooResponses.length - 1] : null;
+            var cooHasReplied = lastCooResp && (!lastMyUpdate || new Date(lastCooResp.at) > new Date(lastMyUpdate.at));
+            var item = { task: t, projectName: p.name, projectId: p.id, memberStatus: effectiveStatus, cooHasReplied: cooHasReplied, lastCooResp: lastCooResp };
+            if (effectiveStatus === 'done') {
+                completedTasks.push(item);
+            } else {
+                myTasks.push(item);
             }
         });
     });
@@ -3727,21 +3736,11 @@ function renderTeamHome() {
     myTasks.sort(function(a, b) {
         var aReply = a.cooHasReplied ? 0 : 1, bReply = b.cooHasReplied ? 0 : 1;
         if (aReply !== bReply) return aReply - bReply;
-        var ta = a.task, tb = b.task;
-        var aBlk = ta.status === 'blocked' ? 0 : 1, bBlk = tb.status === 'blocked' ? 0 : 1;
+        var aBlk = a.memberStatus === 'blocked' ? 0 : 1, bBlk = b.memberStatus === 'blocked' ? 0 : 1;
         if (aBlk !== bBlk) return aBlk - bBlk;
-        var aOvr = (ta.dueDate && ta.dueDate < todayStr) ? 0 : 1, bOvr = (tb.dueDate && tb.dueDate < todayStr) ? 0 : 1;
+        var aOvr = (a.task.dueDate && a.task.dueDate < todayStr) ? 0 : 1, bOvr = (b.task.dueDate && b.task.dueDate < todayStr) ? 0 : 1;
         if (aOvr !== bOvr) return aOvr - bOvr;
-        return (ta.dueDate || '9999').localeCompare(tb.dueDate || '9999');
-    });
-
-    var completedTasks = [];
-    projects.forEach(function(p) {
-        (p.tasks || []).forEach(function(t) {
-            if (t.assignee === TEAM_MEMBER_NAME && t.status === 'done') {
-                completedTasks.push({ task: t, projectName: p.name });
-            }
-        });
+        return (a.task.dueDate || '9999').localeCompare(b.task.dueDate || '9999');
     });
 
     // Saluto
@@ -3762,15 +3761,13 @@ function renderTeamHome() {
     html += '</div>';
     html += '</div>';
 
-    // Stats rapide — usa lo stato effettivo (team action override)
-    function _effectiveStatus(item) {
-        var ta = (myActions.taskActions || {})[item.task.id];
-        return (ta && ta.status) ? ta.status : (item.task.status || 'todo');
-    }
-    var todoMy = myTasks.filter(function(i) { return _effectiveStatus(i) === 'todo'; }).length;
-    var inProgressMy = myTasks.filter(function(i) { return _effectiveStatus(i) === 'in_progress'; }).length;
-    var blockedMy = myTasks.filter(function(i) { return _effectiveStatus(i) === 'blocked'; }).length;
-    var overdueMy = myTasks.filter(function(i) { return i.task.dueDate && i.task.dueDate < todayStr && _effectiveStatus(i) !== 'done'; }).length;
+    // Stats rapide — basate su memberStatus (già filtrate: myTasks = attive, completedTasks = done)
+    function _effectiveStatus(item) { return item.memberStatus || item.task.status || 'todo'; }
+    var totalMy = myTasks.length;
+    var todoMy = myTasks.filter(function(i) { return i.memberStatus === 'todo'; }).length;
+    var inProgressMy = myTasks.filter(function(i) { return i.memberStatus === 'in_progress'; }).length;
+    var blockedMy = myTasks.filter(function(i) { return i.memberStatus === 'blocked'; }).length;
+    var overdueMy = myTasks.filter(function(i) { return i.task.dueDate && i.task.dueDate < todayStr; }).length;
     var cooRepliedMy = myTasks.filter(function(i) { return i.cooHasReplied; }).length;
 
     html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
@@ -3808,15 +3805,8 @@ function renderTeamHome() {
     html += '<button onclick="setTeamTab(1)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 1 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 1 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Board</button>';
     html += '</div>';
 
-    // Tutte le task (attive + completate) per la board — usa stato locale se presente
-    var allMyTasks = myTasks.map(function(item) {
-        var effectiveStatus = item.memberStatus || item.task.status || 'todo';
-        return { task: Object.assign({}, item.task, { _effectiveStatus: effectiveStatus }), projectName: item.projectName, projectId: item.projectId || '', cooHasReplied: item.cooHasReplied };
-    }).concat(completedTasks.map(function(c) {
-        var ta2 = (myActions.taskActions || {})[c.task.id];
-        var es = (ta2 && ta2.status) || c.task.status || 'done';
-        return { task: Object.assign({}, c.task, { _effectiveStatus: es }), projectName: c.projectName, projectId: '', cooHasReplied: false };
-    }));
+    // Tutte le task (attive + completate) per la board
+    var allMyTasks = myTasks.concat(completedTasks);
 
     if (_teamViewTab === 0) {
         // ===== VISTA LISTA — raggruppata per stato =====
@@ -3827,7 +3817,7 @@ function renderTeamHome() {
                 { key: 'blocked', label: 'Bloccate', color: 'var(--red)', items: [] },
                 { key: 'todo', label: 'Da fare', color: 'var(--slate)', items: [] },
                 { key: 'in_progress', label: 'In corso', color: 'var(--yellow,#F59E0B)', items: [] },
-                { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal)', items: [] }
+                { key: 'da_verificare', label: 'Da verificare', color: 'var(--purple,#7C3AED)', items: [] }
             ];
             myTasks.forEach(function(item) {
                 var st = _effectiveStatus(item);
@@ -3842,11 +3832,11 @@ function renderTeamHome() {
                     html += _renderTeamTaskCard(item, todayStr);
                 });
             });
-            // Completate (collassate)
+            // Archivio completate (accordion chiusa di default)
             if (completedTasks.length > 0) {
-                html += '<details style="margin-top:16px"><summary style="font-size:15px;font-weight:800;color:var(--green);cursor:pointer;margin-bottom:8px;display:flex;align-items:center;gap:6px">Completate <span style="background:var(--green);color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + completedTasks.length + '</span></summary>';
+                html += '<details style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px"><summary style="font-size:15px;font-weight:800;color:var(--green);cursor:pointer;margin-bottom:10px;display:flex;align-items:center;gap:6px;user-select:none">Archivio completate <span style="background:var(--green);color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + completedTasks.length + '</span></summary>';
                 completedTasks.forEach(function(item) {
-                    html += '<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:6px;opacity:0.6">';
+                    html += '<div onclick="teamOpenTask(\'' + item.task.id + '\')" style="cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:6px;opacity:0.6;transition:opacity 0.15s" onmouseenter="this.style.opacity=\'0.9\'" onmouseleave="this.style.opacity=\'0.6\'">';
                     html += '<div style="font-size:14px;font-weight:600;color:var(--text);text-decoration:line-through">' + esc(item.task.title) + '</div>';
                     html += '<div style="font-size:12px;color:var(--text-muted)">' + esc(item.projectName) + '</div>';
                     html += '</div>';
@@ -3860,7 +3850,7 @@ function renderTeamHome() {
             { key: 'todo', label: 'Da fare', color: 'var(--slate)', bg: 'var(--bg)' },
             { key: 'in_progress', label: 'In corso', color: 'var(--yellow)', bg: 'var(--yellow-bg,#FFFBEB)' },
             { key: 'blocked', label: 'Bloccate', color: 'var(--red)', bg: 'var(--red-bg,#FEF2F2)' },
-            { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal)', bg: 'var(--teal-bg,#F0FDFA)' },
+            { key: 'da_verificare', label: 'Da verificare', color: 'var(--purple,#7C3AED)', bg: 'var(--purple-bg,#F5F3FF)' },
             { key: 'done', label: 'Completate', color: 'var(--green)', bg: 'var(--green-bg,#F0FDF4)' }
         ];
         html += '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch">';
