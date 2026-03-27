@@ -137,8 +137,12 @@
       "compl_t3_campagna_fase1": {
         "updates": [],
         "status": "blocked"
+      },
+      "compl_t6_ty_page_postriscatto": {
+        "updates": [],
+        "status": "da_verificare"
       }
     }
   },
-  "lastUpdate": "2026-03-27T08:18:42.421Z"
+  "lastUpdate": "2026-03-27T08:18:43.446Z"
 }
