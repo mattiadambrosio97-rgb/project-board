@@ -600,8 +600,8 @@
         .status-chip-done::before { background: var(--green); }
         .status-chip-blocked { background: var(--red-bg); color: var(--red); }
         .status-chip-blocked::before { background: var(--red); }
-        .status-chip-da_verificare { background: var(--teal-bg); color: var(--teal); }
-        .status-chip-da_verificare::before { background: var(--teal); }
+        .status-chip-da_verificare { background: var(--purple-bg, #F5F3FF); color: var(--purple, #7C3AED); }
+        .status-chip-da_verificare::before { background: var(--purple, #7C3AED); }
         .list-add-row {
             padding: 10px 12px; border: none; background: none;
             color: var(--text-muted); font-size: 13px; font-weight: 500;
@@ -1449,7 +1449,7 @@
                 <button class="add-btn desktop-only" id="addBtnDesktop" onclick="handleAdd()">+ Nuovo</button>
                 <button class="add-btn desktop-only" id="addTaskBtnDesktop" onclick="quickAddTask()" style="background:var(--surface);color:var(--accent);border:1px solid var(--accent);box-shadow:none">+ Task</button>
                 <button class="icon-btn desktop-only" title="Backup" onclick="openBackupModal()">&#128190;</button>
-                <button class="copy-data-btn ceo-publish-btn desktop-only" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640; CEO</button>
+                <button class="copy-data-btn ceo-publish-btn desktop-only" title="Invia aggiornamenti" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#9650; Invia</button>
                 <button class="icon-btn desktop-only" title="Anteprima CEO" onclick="previewCEO()">&#128065;</button>
                 <button class="copy-data-btn desktop-only" title="Copia dati per Claude" onclick="copyDataForClaude()">&#128202; Copia dati</button>
                 <span id="syncIndicator" style="font-size:11px;color:var(--text-muted);font-weight:600;white-space:nowrap"></span>
@@ -1460,7 +1460,7 @@
             <div class="header-actions-row mobile-only" id="headerActionsRow">
                 <button class="add-btn" id="addBtn" onclick="handleAdd()">+ Nuovo</button>
                 <button class="add-btn" id="addTaskBtn" onclick="quickAddTask()" style="background:var(--surface);color:var(--accent);border:1px solid var(--accent);box-shadow:none">+ Task</button>
-                <button class="copy-data-btn ceo-publish-btn" title="Pubblica per CEO" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#128640;</button>
+                <button class="copy-data-btn ceo-publish-btn" title="Invia aggiornamenti" onclick="publishForCEO()" style="background:var(--green-bg);color:var(--green);border-color:var(--green)">&#9650; Invia</button>
                 <button class="copy-data-btn" title="Vedi vista CEO" onclick="previewCEO()" style="background:var(--surface);color:var(--text);border:1px solid var(--border)">&#128065;</button>
                 <button class="icon-btn" title="Aggiorna" onclick="_smartRefresh()" style="font-size:16px">&#8635;</button>
                 <button class="icon-btn" id="themeToggleBtnMobile" onclick="toggleTheme()" title="Tema" style="font-size:16px"></button>
@@ -1542,7 +1542,7 @@ const TABS_MOBILE = ['Dash', 'Board', 'Lista', 'Cal', 'Team', 'Mie task', 'Recap
 function isMobile() { return window.innerWidth <= 768; }
 const STATUS_LIST = ['todo', 'in_progress', 'blocked', 'da_verificare', 'done'];
 const STATUS_LABELS = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccata', da_verificare: 'Da verificare', done: 'Completata' };
-const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--yellow)', blocked: 'var(--red)', da_verificare: 'var(--teal)', done: 'var(--green)' };
+const STATUS_COLORS = { todo: 'var(--slate)', in_progress: 'var(--yellow)', blocked: 'var(--red)', da_verificare: 'var(--purple,#7C3AED)', done: 'var(--green)' };
 const PROJECT_STATUSES = ['attivo', 'in-pausa', 'completato'];
 
 // ========== PM ANALYSIS (generata dinamicamente) ==========
@@ -3984,7 +3984,7 @@ function renderTeamTaskDetail() {
     var quickBtns = [
         { key: 'todo', label: 'Da fare', color: 'var(--slate,#64748B)', icon: '&#9679;' },
         { key: 'in_progress', label: 'In corso', color: 'var(--yellow,#F59E0B)', icon: '&#9654;' },
-        { key: 'da_verificare', label: 'Da verificare', color: 'var(--teal,#14B8A6)', icon: '&#128269;' },
+        { key: 'da_verificare', label: 'Da verificare', color: 'var(--purple,#7C3AED)', icon: '&#128269;' },
         { key: 'done', label: 'Fatto', color: 'var(--green)', icon: '&#10003;' },
         { key: 'blocked', label: 'Bloccata', color: 'var(--red)', icon: '&#9888;' }
     ];
@@ -4021,7 +4021,7 @@ function renderTeamTaskDetail() {
             html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%;position:relative">';
             html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
             if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + esc(m.note) + '</div>';
-            if (isTeam) html += '<button onclick="teamDeleteOwnMsg(\'' + task.id + '\',\'' + m.at + '\')" style="position:absolute;top:4px;right:6px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;opacity:0.3;padding:0" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.3\';this.style.color=\'var(--text-muted)\'">&times;</button>';
+            if (isTeam) html += '<button onclick="teamDeleteOwnMsg(\'' + task.id + '\',\'' + m.at + '\',true)" style="position:absolute;top:4px;right:6px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;opacity:0.3;padding:0" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.3\';this.style.color=\'var(--text-muted)\'">&times;</button>';
             html += '</div></div>';
         });
         html += '</div>';
@@ -4030,11 +4030,11 @@ function renderTeamTaskDetail() {
         html += '<div style="font-size:13px;color:var(--text-muted);padding:8px 0;font-style:italic">Nessun messaggio ancora</div>';
     }
 
-    // Input commento
-    html += '<textarea id="teamTaskNote" rows="2" placeholder="Scrivi un messaggio..." style="width:100%;padding:14px;border:1px solid var(--border);border-radius:12px;font-size:16px;font-family:var(--font);background:var(--bg);color:var(--text);box-sizing:border-box;resize:vertical;margin-bottom:12px;margin-top:8px"></textarea>';
-
-    // Bottone commento
-    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="width:100%;padding:14px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font)">Invia</button>';
+    // Input commento (stile chat: input + bottone inline, invio per mandare)
+    html += '<div style="display:flex;gap:8px;margin-top:8px">';
+    html += '<input id="teamTaskNote" type="text" placeholder="Scrivi un messaggio..." style="flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px;font-family:var(--font);background:var(--bg);color:var(--text)" onkeydown="if(event.key===\'Enter\'){event.preventDefault();teamTaskAction(\'' + task.id + '\',null)}">';
+    html += '<button onclick="teamTaskAction(\'' + task.id + '\',null)" style="padding:12px 18px;background:var(--accent);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);white-space:nowrap">Invia</button>';
+    html += '</div>';
 
     html += '</div>';
     return html;
@@ -4052,8 +4052,8 @@ function teamGoHome() {
     window.scrollTo(0, 0);
 }
 
-function teamDeleteOwnMsg(taskId, msgAt) {
-    if (!confirm('Eliminare questo messaggio?')) return;
+function teamDeleteOwnMsg(taskId, msgAt, skipConfirm) {
+    if (!skipConfirm && !confirm('Eliminare questo messaggio?')) return;
     var myActions = _getTeamMemberActions();
     if (!myActions.taskActions) myActions.taskActions = {};
     if (!myActions.taskActions[taskId]) myActions.taskActions[taskId] = { updates: [] };
@@ -4255,7 +4255,7 @@ function initTeamTouchDrag() {
 
 function teamBoardColumnPopup(statusKey) {
     var statusLabels = { todo: 'Da fare', in_progress: 'In corso', blocked: 'Bloccate', da_verificare: 'Da verificare', done: 'Completate' };
-    var statusColors = { todo: 'var(--slate)', in_progress: 'var(--yellow)', blocked: 'var(--red)', da_verificare: 'var(--teal)', done: 'var(--green)' };
+    var statusColors = { todo: 'var(--slate)', in_progress: 'var(--yellow)', blocked: 'var(--red)', da_verificare: 'var(--purple,#7C3AED)', done: 'var(--green)' };
     var label = statusLabels[statusKey] || statusKey;
     var color = statusColors[statusKey] || 'var(--text)';
     var projects = (_teamData && _teamData.projects) || [];
@@ -5184,7 +5184,7 @@ function publishForCEO(retryCount) {
             _appData._hasUnpublished = false;
             _updateCeoPublishBadge();
             _updateSyncIndicator();
-            _showToast('Pubblicato per il CEO!');
+            _showToast('Aggiornamenti inviati!');
         } else {
             return r.json().then(function(err) {
                 if (err.message && err.message.indexOf('Bad credentials') !== -1) {
@@ -8520,6 +8520,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
     // ── Azioni: Salva grande, Elimina piccolo ──
     html += `<div style="margin-top:16px;display:flex;flex-direction:column;gap:8px">`;
     html += `<button class="btn-save" onclick="saveTask('${task.id}','${p.id}',${isNew})" style="width:100%;padding:14px;font-size:15px;border-radius:10px">Salva</button>`;
+    html += `<button onclick="saveTask('${task.id}','${p.id}',${isNew});setTimeout(publishForCEO,300)" style="width:100%;padding:12px;font-size:14px;border-radius:10px;background:var(--green-bg);color:var(--green);border:1px solid var(--green);font-weight:700;cursor:pointer;font-family:var(--font)">&#9650; Salva e Invia</button>`;
     if (!isNew) {
         html += `<div style="display:flex;justify-content:center;gap:16px;padding:4px 0">`;
         html += `<button onclick="closeTaskModal()" style="background:none;border:none;color:var(--text-muted);font-size:13px;cursor:pointer;font-family:var(--font);padding:4px 8px">Annulla</button>`;
@@ -8715,6 +8716,7 @@ function openProjectModal(projectId) {
         <div class="modal-actions-right">
             <button class="btn-cancel" onclick="closeProjectModal()">Annulla</button>
             <button class="btn-save" onclick="saveProject('${p.id}',${isNew})">Salva</button>
+            <button onclick="saveProject('${p.id}',${isNew});setTimeout(publishForCEO,300)" style="padding:8px 16px;background:var(--green-bg);color:var(--green);border:1px solid var(--green);border-radius:8px;font-weight:700;cursor:pointer;font-family:var(--font);font-size:13px">&#9650; Salva e Invia</button>
         </div>
     </div>`;
 
