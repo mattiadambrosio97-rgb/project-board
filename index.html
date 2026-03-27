@@ -3056,7 +3056,7 @@ function _renderCeoTaskInline(taskId, projectId) {
             html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:13px">';
             html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
             html += ' <span style="font-size:11px;color:var(--text-muted)">' + typeLabel + ' &middot; ' + dateStr + '</span>';
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px;line-height:1.5">' + esc(msg.note) + '</div>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:4px;line-height:1.5">' + escLink(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -3144,7 +3144,7 @@ function _renderCeoResInline(resId) {
             html += '<div style="padding:10px 14px;background:' + bgCol + ';border-radius:10px;margin-bottom:6px;font-size:13px">';
             html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
             html += ' <span style="font-size:11px;color:var(--text-muted)">' + mDate + '</span>';
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.5">' + esc(msg.note) + '</div>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.5">' + escLink(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -3263,7 +3263,7 @@ function _ceoOpenResourceModal(resId) {
             html += '<div style="padding:8px 12px;background:' + bgCol + ';border-radius:8px;margin-bottom:4px;font-size:12px">';
             html += '<span style="font-weight:700;color:' + nameCol + '">' + name + '</span>';
             html += ' <span style="font-size:10px;font-weight:600;color:var(--text-muted)">' + mDate + '</span>';
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + esc(msg.note) + '</div>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + escLink(msg.note) + '</div>';
             html += '</div>';
         });
         html += '</div>';
@@ -4017,7 +4017,7 @@ function renderTeamTaskDetail() {
             html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:8px">';
             html += '<div style="background:' + bg + ';border:1px solid ' + border + ';border-radius:12px;padding:10px 14px;max-width:85%;position:relative">';
             html += '<div style="font-size:12px;font-weight:700;color:var(--text-muted);margin-bottom:4px">' + label + ' &middot; ' + timeStr + '</div>';
-            if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + esc(m.note) + '</div>';
+            if (m.note) html += '<div style="font-size:14px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + escLink(m.note) + '</div>';
             if (isTeam) html += '<button onclick="teamDeleteOwnMsg(\'' + task.id + '\',\'' + m.at + '\',true)" style="position:absolute;top:4px;right:6px;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:12px;opacity:0.3;padding:0" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.3\';this.style.color=\'var(--text-muted)\'">&times;</button>';
             html += '</div></div>';
         });
@@ -4929,7 +4929,7 @@ function renderCEOProject(pid) {
             html += '<div style="display:flex;justify-content:' + align + ';margin-bottom:6px">';
             html += '<div style="max-width:80%;background:' + bg + ';border:1px solid ' + border + '33;border-radius:10px;padding:8px 12px">';
             html += '<div style="font-size:11px;font-weight:700;color:' + labelColor + ';margin-bottom:2px">' + label + ' &middot; ' + msgDate + '</div>';
-            html += '<div style="font-size:13px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + esc(msg.note) + '</div>';
+            html += '<div style="font-size:13px;color:var(--text);line-height:1.4;white-space:pre-wrap">' + escLink(msg.note) + '</div>';
             html += '</div></div>';
         });
         html += '</div>';
@@ -7589,7 +7589,7 @@ function renderProjectDashboard(p) {
             html += `<div style="padding:8px 12px;background:${bgCol};border-radius:8px;margin-bottom:5px;font-size:13px">
                 <span style="font-weight:700;color:${nameCol}">${name}</span>
                 <span style="font-size:11px;color:var(--text-muted)"> &middot; ${msgDate}</span>
-                ${msg.note ? '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + esc(msg.note) + '</div>' : ''}
+                ${msg.note ? '<div style="color:var(--text-secondary);margin-top:3px;line-height:1.4">' + escLink(msg.note) + '</div>' : ''}
             </div>`;
         });
         html += `</div>`;
@@ -8499,7 +8499,7 @@ function openTaskModal(taskId, projectId, unused, defaultStatus) {
                 var sl = msg.status === 'in_progress' ? 'In corso' : msg.status === 'done' ? 'Completata' : msg.status === 'blocked' ? 'Bloccata' : msg.status;
                 html += ' <span style="font-size:10px;font-weight:700;color:' + msg.color + '">(' + sl + ')</span>';
             }
-            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px;white-space:pre-wrap">' + esc(msg.note) + '</div>';
+            if (msg.note) html += '<div style="color:var(--text-secondary);margin-top:2px;white-space:pre-wrap">' + escLink(msg.note) + '</div>';
             html += '</div>';
             html += '<button onclick="if(confirm(\'Eliminare questo messaggio?\'))cooDeleteTaskMsg(\'' + task.id + '\',\'' + p.id + '\',\'' + msgSource + '\',\'' + msg.at + '\')" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:11px;padding:0 2px;flex-shrink:0;opacity:0.4" onmouseenter="this.style.opacity=\'1\';this.style.color=\'var(--red)\'" onmouseleave="this.style.opacity=\'0.4\';this.style.color=\'var(--text-muted)\'">&times;</button>';
             html += '</div>';
@@ -9152,7 +9152,7 @@ function showCeoProjectNotes() {
                 var bg = isCeo ? 'var(--surface)' : 'var(--blue-bg,#EFF6FF)';
                 html += '<div style="padding:8px 12px;background:' + bg + ';border-radius:8px;margin-bottom:4px;border-left:3px solid ' + color + '">';
                 html += '<span style="font-size:11px;font-weight:700;color:' + color + '">' + label + '</span> <span style="font-size:10px;color:var(--text-muted)">' + msgDate + '</span>';
-                html += '<div style="font-size:13px;color:var(--text);margin-top:2px">' + esc(msg.note) + '</div>';
+                html += '<div style="font-size:13px;color:var(--text);margin-top:2px">' + escLink(msg.note) + '</div>';
                 html += '</div>';
             });
             html += '</div>';
@@ -9291,7 +9291,7 @@ function cooRespondToTask(taskId, projectId) {
         var mDate = new Date().toLocaleDateString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
         var msgHtml = '<div style="padding:5px 8px;background:var(--accent-soft,#FFF1ED);border-radius:6px;margin-bottom:3px;font-size:12px;display:flex;align-items:flex-start;gap:4px">';
         msgHtml += '<div style="flex:1"><span style="font-weight:700;color:var(--accent)">Tu</span> <span style="font-size:10px;color:var(--text-muted)">' + mDate + '</span>';
-        msgHtml += '<div style="color:var(--text-secondary);margin-top:2px;white-space:pre-wrap">' + esc(note) + '</div></div></div>';
+        msgHtml += '<div style="color:var(--text-secondary);margin-top:2px;white-space:pre-wrap">' + escLink(note) + '</div></div></div>';
         scrollEl.insertAdjacentHTML('beforeend', msgHtml);
         scrollEl.scrollTop = scrollEl.scrollHeight;
     }
@@ -9592,6 +9592,11 @@ function esc(str) {
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+function escLink(str) {
+    if (!str) return '';
+    var safe = esc(str);
+    return safe.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;word-break:break-all" onclick="event.stopPropagation()">$1</a>');
 }
 
 // Escape only — close modals/go back
