@@ -58,7 +58,12 @@
         "status": "in_progress"
       },
       "task_t3_template": {
-        "updates": [],
+        "updates": [
+          {
+            "note": "QERG",
+            "at": "2026-03-27T06:50:06.825Z"
+          }
+        ],
         "status": "blocked",
         "deleteMessages": [
           "2026-03-26T23:15:48.070Z",
@@ -105,5 +110,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T06:49:39.725Z"
+  "lastUpdate": "2026-03-27T06:50:06.825Z"
 }
