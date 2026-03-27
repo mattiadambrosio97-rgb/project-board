@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T06:43:22.214Z",
+  "publishedAt": "2026-03-27T06:44:20.062Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -292,23 +292,16 @@
             {
               "date": "2026-03-27",
               "text": "Risposta inviata ad Alberto: proviamo cosi, ok"
-            }
-          ],
-          "cooResponses": [
-            {
-              "note": "rsgnsn",
-              "at": "2026-03-27T06:24:15.254Z"
             },
             {
-              "note": "dhmdt",
-              "at": "2026-03-27T06:24:18.319Z"
-            },
-            {
-              "note": "proviamo cosi, ok",
-              "at": "2026-03-27T06:24:21.841Z"
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: e poi"
             }
           ],
-          "ceoHasUpdate": false
+          "cooResponses": [],
+          "ceoHasUpdate": false,
+          "ceoUpdates": [],
+          "teamUpdates": []
         },
         {
           "id": "task_t2_palette",
