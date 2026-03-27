@@ -58,7 +58,12 @@
         "status": "in_progress"
       },
       "task_t3_template": {
-        "updates": [],
+        "updates": [
+          {
+            "note": "ok",
+            "at": "2026-03-27T07:39:59.767Z"
+          }
+        ],
         "status": "todo",
         "deleteMessages": [
           "2026-03-26T23:15:48.070Z",
@@ -127,5 +132,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T07:24:46.466Z"
+  "lastUpdate": "2026-03-27T07:39:59.767Z"
 }
