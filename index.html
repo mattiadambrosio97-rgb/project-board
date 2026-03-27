@@ -7435,26 +7435,11 @@ function renderProjectDashboard(p) {
     const total = tasks.length;
     const pct = total ? Math.round(done / total * 100) : 0;
     const todayStr = today();
+    const feedbackTasks = tasks.filter(t => t.teamHasUpdate);
 
     let html = '';
 
-    // ── Stats a 2x2 griglia su mobile ──
-    html += `<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:12px">`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','todo')"><div class="dash-stat-value" style="color:var(--slate)">${todo}</div><div class="dash-stat-label">Da fare</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','in_progress')"><div class="dash-stat-value" style="color:var(--yellow)">${inProgress}</div><div class="dash-stat-label">In corso</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','blocked')"><div class="dash-stat-value" style="color:var(--red)">${blocked}</div><div class="dash-stat-label">Bloccate</div></div>`;
-    html += `<div class="dash-stat-card" style="cursor:pointer;text-align:center;touch-action:manipulation" onclick="showTasksByStatus('${p.id}','done')"><div class="dash-stat-value" style="color:var(--green)">${done}</div><div class="dash-stat-label">Completate</div></div>`;
-    html += `</div>`;
-
-    // ── Progress bar multi-colore (stile CEO) ──
-    html += `<div style="height:10px;background:var(--border);border-radius:5px;overflow:hidden;margin-bottom:16px;display:flex">`;
-    if (done > 0) html += `<div style="width:${done/total*100}%;background:var(--green);transition:width 0.3s"></div>`;
-    if (inProgress > 0) html += `<div style="width:${inProgress/total*100}%;background:var(--yellow);transition:width 0.3s"></div>`;
-    if (blocked > 0) html += `<div style="width:${blocked/total*100}%;background:var(--red);transition:width 0.3s"></div>`;
-    if (todo > 0) html += `<div style="width:${todo/total*100}%;background:var(--border);transition:width 0.3s"></div>`;
-    html += `</div>`;
-
-    // ── Scadenza globale progetto ──
+    // ── Scadenza progetto (PRIMA DI TUTTO) ──
     if (p.launchDate) {
         const diff = daysDiff(p.launchDate);
         const urgent = diff <= 7 && diff >= 0;
@@ -7463,21 +7448,51 @@ function renderProjectDashboard(p) {
         const borderCol = overdue ? 'var(--red)' : urgent ? 'var(--accent)' : 'var(--border)';
         const bgCol = overdue ? 'var(--red-bg)' : urgent ? 'var(--accent-soft)' : 'var(--surface)';
         const labelCol = overdue ? 'var(--red)' : urgent ? 'var(--accent)' : 'var(--text-muted)';
-        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px solid ${borderCol};background:${bgCol};margin-bottom:16px;">
-            <span style="font-size:22px;">${overdue ? '&#9888;' : '&#127937;'}</span>
-            <div style="flex:1;">
-                <div style="font-size:10px;font-weight:700;color:${labelCol};text-transform:uppercase;letter-spacing:0.5px;">Scadenza progetto</div>
-                <div style="font-size:16px;font-weight:800;color:var(--text);">${dateStr}</div>
-                <div style="font-size:12px;color:${labelCol};font-weight:600;">${overdue ? Math.abs(diff)+' giorni fa' : diff === 0 ? 'OGGI' : diff+' giorni rimasti'}</div>
-            </div>
-            <button onclick="openProjectModal('${p.id}')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--surface);cursor:pointer;font-size:11px;font-weight:600;font-family:var(--font);color:var(--text-secondary);transition:all 0.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-secondary)'">Modifica</button>
+        html += `<div style="text-align:center;padding:14px 16px;border-radius:12px;border:1px solid ${borderCol};background:${bgCol};margin-bottom:14px;">
+            <div style="font-size:10px;font-weight:700;color:${labelCol};text-transform:uppercase;letter-spacing:0.5px;">${overdue ? '&#9888; ' : ''}Scadenza progetto</div>
+            <div style="font-size:17px;font-weight:800;color:var(--text);margin-top:2px">${dateStr}</div>
+            <div style="font-size:13px;color:${labelCol};font-weight:700;margin-top:2px">${overdue ? 'Scaduto da ' + Math.abs(diff)+' giorni' : diff === 0 ? 'OGGI' : diff+' giorni rimasti'}</div>
         </div>`;
-    } else {
-        html += `<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:12px;border:1px dashed var(--border);background:var(--surface);margin-bottom:16px;cursor:pointer;" onclick="openProjectModal('${p.id}')">
-            <span style="font-size:20px;">&#128197;</span>
+    }
+
+    // ── Stats compatte in riga unica ──
+    const statItems = [
+        { key: 'todo', n: todo, label: 'Da fare', color: 'var(--slate)' },
+        { key: 'in_progress', n: inProgress, label: 'In corso', color: 'var(--yellow)' },
+        { key: 'blocked', n: blocked, label: 'Bloccate', color: 'var(--red)' },
+        { key: 'done', n: done, label: 'Completate', color: 'var(--green)' }
+    ];
+    html += `<div style="display:flex;gap:6px;margin-bottom:10px">`;
+    statItems.forEach(s => {
+        html += `<div onclick="showTasksByStatus('${p.id}','${s.key}')" style="cursor:pointer;flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:8px 4px;text-align:center;transition:transform 0.1s;touch-action:manipulation" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
+            <div style="font-size:22px;font-weight:800;color:${s.color};line-height:1.1">${s.n}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--text-secondary);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px">${s.label}</div>
+        </div>`;
+    });
+    // Feedback richiesto (solo se ci sono task con teamHasUpdate)
+    if (feedbackTasks.length > 0) {
+        html += `<div onclick="showTeamUpdatesPanel()" style="cursor:pointer;flex:1;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:10px;padding:8px 4px;text-align:center;transition:transform 0.1s;touch-action:manipulation" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform=''">
+            <div style="font-size:22px;font-weight:800;color:var(--accent);line-height:1.1">${feedbackTasks.length}</div>
+            <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.3px;margin-top:2px">Feedback</div>
+        </div>`;
+    }
+    html += `</div>`;
+
+    // ── Progress bar multi-colore ──
+    html += `<div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:14px;display:flex">`;
+    if (done > 0) html += `<div style="width:${done/total*100}%;background:var(--green);transition:width 0.3s"></div>`;
+    if (inProgress > 0) html += `<div style="width:${inProgress/total*100}%;background:var(--yellow);transition:width 0.3s"></div>`;
+    if (blocked > 0) html += `<div style="width:${blocked/total*100}%;background:var(--red);transition:width 0.3s"></div>`;
+    if (todo > 0) html += `<div style="width:${todo/total*100}%;background:var(--border);transition:width 0.3s"></div>`;
+    html += `</div>`;
+
+    // ── Nessuna scadenza ──
+    if (!p.launchDate) {
+        html += `<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:10px;border:1px dashed var(--border);background:var(--surface);margin-bottom:14px;cursor:pointer;" onclick="openProjectModal('${p.id}')">
+            <span style="font-size:16px;">&#128197;</span>
             <div>
-                <div style="font-size:13px;font-weight:600;color:var(--text-muted);">Nessuna scadenza impostata</div>
-                <div style="font-size:11px;color:var(--accent);font-weight:600;">Clicca per impostare &rarr;</div>
+                <div style="font-size:12px;font-weight:600;color:var(--text-muted);">Nessuna scadenza impostata</div>
+                <div style="font-size:11px;color:var(--accent);font-weight:600;">Imposta &rarr;</div>
             </div>
         </div>`;
     }
