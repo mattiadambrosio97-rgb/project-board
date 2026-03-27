@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0330';
+    var APP_VERSION = '20260327_0340';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -7815,9 +7815,21 @@ function renderTaskCard(t, p) {
         html += `<div style="display:flex;align-items:center;gap:6px;margin-top:4px;padding:4px 8px;background:var(--blue-bg,#EFF6FF);border:1px solid var(--blue);border-radius:6px;font-size:11px;font-weight:700;color:var(--blue)">&#128172; Alberto ha risposto — richiede tua attenzione</div>`;
     }
 
-    // Quick "Fatto" button
+    // Quick status buttons
     if (!isDone) {
-        html += `<button class="quick-done-btn" onclick="event.stopPropagation();changeTaskStatus('${t.id}','${p.id}','done')" title="Segna come completata">&#10003; Fatto</button>`;
+        html += `<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px" onclick="event.stopPropagation()">`;
+        var _qStatuses = [
+            { key: 'todo', label: 'Da fare', color: 'var(--slate)', bg: 'var(--bg)' },
+            { key: 'in_progress', label: 'In corso', color: 'var(--yellow)', bg: 'var(--yellow-bg,#FFFBEB)' },
+            { key: 'blocked', label: 'Bloccata', color: 'var(--red)', bg: 'var(--red-bg,#FEF2F2)' },
+            { key: 'da_verificare', label: 'Da verificare', color: 'var(--purple)', bg: 'var(--purple-bg,#F5F3FF)' },
+            { key: 'done', label: 'Fatto', color: 'var(--green)', bg: 'var(--green-bg,#F0FDF4)' }
+        ];
+        _qStatuses.forEach(function(s) {
+            if (s.key === t.status) return;
+            html += '<button onclick="changeTaskStatus(\'' + t.id + '\',\'' + p.id + '\',\'' + s.key + '\')" style="flex:1;min-width:60px;padding:5px 6px;border:1px solid ' + s.color + ';border-radius:6px;background:' + s.bg + ';color:' + s.color + ';font-size:11px;font-weight:700;cursor:pointer;font-family:var(--font)">' + s.label + '</button>';
+        });
+        html += '</div>';
     }
 
     html += '</div></div>';
