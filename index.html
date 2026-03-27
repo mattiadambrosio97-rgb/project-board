@@ -1331,6 +1331,7 @@
         /* ===== NEXT CHECK ALERT ===== */
         /* ===== CEO DASHBOARD STYLES ===== */
         .ceo-container { padding: 32px 40px; max-width: 900px; margin: 0 auto; }
+        .ceo-container.wide-board { max-width: 1400px; padding-left: 24px; padding-right: 24px; }
         .ceo-projects-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
         @media (max-width: 768px) {
             .ceo-container { padding: 20px 16px 30px 16px; max-width: 100%; }
@@ -3747,7 +3748,7 @@ function renderTeamHome() {
     var _hour = new Date().getHours();
     var _greeting = _hour < 12 ? 'Buongiorno' : _hour < 18 ? 'Buon pomeriggio' : 'Buonasera';
 
-    var html = '<div class="ceo-container">';
+    var html = '<div class="ceo-container' + (_teamViewTab === 1 ? ' wide-board' : '') + '">';
 
     // Header
     html += '<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:20px">';
@@ -3856,7 +3857,7 @@ function renderTeamHome() {
         html += '<div style="display:flex;gap:10px;overflow-x:auto;padding-bottom:10px;-webkit-overflow-scrolling:touch">';
         columns.forEach(function(col) {
             var colTasks = allMyTasks.filter(function(i) { return _effectiveStatus(i) === col.key; });
-            html += '<div data-team-col="' + col.key + '" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')" style="min-width:220px;flex:1;background:' + col.bg + ';border:2px dashed transparent;border-radius:12px;padding:10px;min-height:120px;transition:border-color 0.15s,background 0.15s">';
+            html += '<div data-team-col="' + col.key + '" ondragover="onTeamDragOver(event)" ondragleave="onTeamDragLeaveCol(event)" ondrop="onTeamDrop(event,\'' + col.key + '\')" style="min-width:160px;flex:1;background:' + col.bg + ';border:2px dashed transparent;border-radius:12px;padding:10px;min-height:120px;transition:border-color 0.15s,background 0.15s">';
             html += '<div onclick="teamBoardColumnPopup(\'' + col.key + '\')" style="cursor:pointer;font-size:14px;font-weight:800;color:' + col.color + ';margin-bottom:10px;display:flex;align-items:center;gap:6px">';
             html += col.label;
             if (colTasks.length > 0) html += '<span style="background:' + col.color + ';color:#fff;font-size:11px;font-weight:800;border-radius:10px;padding:1px 8px">' + colTasks.length + '</span>';
