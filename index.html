@@ -4357,7 +4357,6 @@ function teamPopupReply(taskId) {
 function teamRispostePopup() {
     var projects = (_teamData && _teamData.projects) || [];
     var myActions = _getTeamMemberActions();
-    var todayStr = today();
     var tasks = [];
     projects.forEach(function(p) {
         if (p.status === 'completato') return;
@@ -4371,6 +4370,12 @@ function teamRispostePopup() {
             }
         });
     });
+    // 1 task → apri direttamente il dettaglio
+    if (tasks.length === 1) {
+        teamOpenTask(tasks[0].task.id);
+        return;
+    }
+    // 0 o multiple → lista cliccabile, ogni click apre il dettaglio (con chat + bottoni)
     var h = '<div style="position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px" onclick="if(event.target===this)this.remove()" id="teamColPopup">';
     h += '<div style="background:var(--surface);border-radius:16px;max-width:480px;width:100%;max-height:80vh;overflow-y:auto;padding:24px 20px;box-shadow:0 8px 30px rgba(0,0,0,.2)">';
     h += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">';
@@ -4382,34 +4387,14 @@ function teamRispostePopup() {
     } else {
         tasks.forEach(function(item) {
             var t = item.task;
-            var isOverdue = t.dueDate && t.dueDate < todayStr;
-            h += '<div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px">';
-            // Titolo cliccabile
-            h += '<div onclick="document.getElementById(\'teamColPopup\').remove();teamOpenTask(\'' + t.id + '\')" style="cursor:pointer">';
-            h += '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
-            h += '<div style="font-size:12px;color:var(--text-muted);font-weight:600">' + esc(item.projectName) + '</div>';
-            if (t.dueDate) {
-                var dateFormatted = new Date(t.dueDate + 'T00:00:00').toLocaleDateString('it-IT', {day:'numeric', month:'short'});
-                var dateColor = isOverdue ? 'var(--red)' : 'var(--text-muted)';
-                h += '<div style="font-size:12px;font-weight:700;color:' + dateColor + ';margin-top:4px">Scadenza: ' + dateFormatted + (isOverdue ? ' (scaduta)' : '') + '</div>';
-            }
-            if (t.note) h += '<div style="font-size:12px;color:var(--text-secondary);margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + esc(t.note) + '</div>';
-            h += '</div>';
-            // Feedback di Mattia
+            var respTime = new Date(item.lastResp.at).toLocaleString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
+            h += '<div onclick="document.getElementById(\'teamColPopup\').remove();teamOpenTask(\'' + t.id + '\')" style="cursor:pointer;background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:8px;transition:transform 0.1s" onmouseenter="this.style.transform=\'translateY(-1px)\'" onmouseleave="this.style.transform=\'\'">';
+            h += '<div style="font-size:14px;font-weight:700;color:var(--accent);margin-bottom:2px">' + esc(item.projectName) + '</div>';
+            h += '<div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px">' + esc(t.title) + '</div>';
             if (item.lastResp.note) {
-                var respTime = new Date(item.lastResp.at).toLocaleString('it-IT', {day:'numeric', month:'short', hour:'2-digit', minute:'2-digit'});
-                h += '<div style="background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:8px;padding:8px 10px;margin-top:8px">';
-                h += '<div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:2px">Mattia &middot; ' + respTime + '</div>';
-                h += '<div style="font-size:13px;color:var(--text);line-height:1.4">' + esc(item.lastResp.note) + '</div>';
-                h += '</div>';
+                h += '<div style="font-size:13px;color:var(--text-secondary);line-height:1.3;margin-bottom:4px;font-style:italic">"' + esc(item.lastResp.note) + '"</div>';
             }
-            // Commento + bottoni
-            h += '<div style="display:flex;gap:6px;margin-top:8px;align-items:center"><input type="text" id="fbComment_' + t.id + '" placeholder="Commento..." style="flex:1;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:13px;font-family:var(--font);background:var(--bg);color:var(--text)"><button onclick="teamPopupReply(\'' + t.id + '\')" style="padding:6px 12px;border:none;border-radius:6px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;cursor:pointer">Invia</button></div>';
-            h += '<div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">';
-            h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'in_progress\',\'_feedback\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--yellow,#F59E0B);color:#fff;font-size:12px;font-weight:700;cursor:pointer">In corso</button>';
-            h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'todo\',\'_feedback\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--slate);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Da fare</button>';
-            h += '<button onclick="teamPopupQuickStatus(\'' + t.id + '\',\'done\',\'_feedback\')" style="flex:1;min-width:80px;padding:6px 10px;border:none;border-radius:6px;background:var(--green);color:#fff;font-size:12px;font-weight:700;cursor:pointer">Fatto</button>';
-            h += '</div>';
+            h += '<div style="font-size:11px;color:var(--text-muted)">' + respTime + '</div>';
             h += '</div>';
         });
     }
