@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0315';
+    var APP_VERSION = '20260327_0320';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -3607,7 +3607,8 @@ function daysUntil(dateStr) {
 var _teamData = null; // loaded from data.json (same as CEO)
 var _teamActions = null; // { memberName: { taskActions: { taskId: { status, updates: [...] } } } }
 var _teamOpenTaskId = null;
-var _teamViewTab = 0; // 0=Lista, 1=Board
+var _teamViewTab = 0; // 0=Lista, 1=Board, 2=Progetti
+var _teamFilterProject = ''; // '' = tutti, altrimenti projectId
 var _teamDragTaskId = null;
 
 function _showTeamOnboarding() {
@@ -3802,6 +3803,29 @@ function renderTeamHome() {
     html += '<button onclick="setTeamTab(1)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 1 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 1 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Board</button>';
     html += '<button onclick="setTeamTab(2)" style="flex:1;padding:10px;border:none;background:none;font-size:15px;font-weight:700;cursor:pointer;font-family:var(--font);color:' + (_teamViewTab === 2 ? 'var(--accent)' : 'var(--text-muted)') + ';border-bottom:2px solid ' + (_teamViewTab === 2 ? 'var(--accent)' : 'transparent') + ';margin-bottom:-2px">Progetti</button>';
     html += '</div>';
+
+    // Filtro per progetto
+    var projectNames = {};
+    myTasks.concat(completedTasks).forEach(function(item) {
+        if (!projectNames[item.projectId]) projectNames[item.projectId] = item.projectName;
+    });
+    var projKeys = Object.keys(projectNames);
+    if (projKeys.length > 1) {
+        html += '<div style="margin-bottom:12px">';
+        html += '<select id="teamProjectFilter" onchange="_teamFilterProject=this.value;renderTeamView()" style="width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:10px;font-size:15px;font-family:var(--font);background:var(--surface);color:var(--text);cursor:pointer;appearance:auto">';
+        html += '<option value=""' + (_teamFilterProject === '' ? ' selected' : '') + '>Tutti i progetti</option>';
+        projKeys.sort(function(a, b) { return projectNames[a].localeCompare(projectNames[b]); });
+        projKeys.forEach(function(pid) {
+            html += '<option value="' + pid + '"' + (_teamFilterProject === pid ? ' selected' : '') + '>' + esc(projectNames[pid]) + '</option>';
+        });
+        html += '</select></div>';
+    }
+
+    // Applica filtro progetto
+    if (_teamFilterProject) {
+        myTasks = myTasks.filter(function(i) { return i.projectId === _teamFilterProject; });
+        completedTasks = completedTasks.filter(function(i) { return i.projectId === _teamFilterProject; });
+    }
 
     // Tutte le task (attive + completate) per la board
     var allMyTasks = myTasks.concat(completedTasks);
