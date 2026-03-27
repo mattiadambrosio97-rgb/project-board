@@ -4349,8 +4349,8 @@ function teamPopupReply(taskId) {
         if (!ok) { alert('Errore. Riprova.'); return; }
         var popup = document.getElementById('teamColPopup');
         if (popup) popup.remove();
-        renderTeamView();
-        teamRispostePopup();
+        // Apri direttamente il dettaglio della task per cambiare stato
+        teamOpenTask(taskId);
     });
 }
 
