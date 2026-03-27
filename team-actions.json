@@ -38,17 +38,14 @@
       "task_t5_stories": {
         "updates": [
           {
-            "note": "wrgqrgreq",
-            "at": "2026-03-26T23:14:23.027Z"
-          },
-          {
             "note": "Che devo fare qui?",
             "at": "2026-03-27T06:16:43.255Z"
           }
         ],
         "status": "blocked",
         "deleteMessages": [
-          "2026-03-27T06:03:12.072Z"
+          "2026-03-27T06:03:12.072Z",
+          "2026-03-26T23:14:23.027Z"
         ]
       },
       "task_t1_logo": {
@@ -95,5 +92,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T06:25:21.031Z"
+  "lastUpdate": "2026-03-27T06:25:23.495Z"
 }
