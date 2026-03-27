@@ -36,7 +36,12 @@
         "status": "blocked"
       },
       "task_t5_stories": {
-        "updates": [],
+        "updates": [
+          {
+            "note": "ok",
+            "at": "2026-03-27T06:26:16.222Z"
+          }
+        ],
         "status": "da_verificare",
         "deleteMessages": [
           "2026-03-27T06:03:12.072Z",
@@ -88,5 +93,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T06:25:30.167Z"
+  "lastUpdate": "2026-03-27T06:26:16.222Z"
 }
