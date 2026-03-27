@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T08:25:46.410Z",
+  "publishedAt": "2026-03-27T08:30:06.781Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -11,7 +11,7 @@
         {
           "id": "gtm_t1_server_container",
           "title": "Fix server container GTM-T99G83CD",
-          "status": "todo",
+          "status": "blocked",
           "assignee": "Mattia",
           "dueDate": "2026-03-27",
           "estimateHours": 0,
@@ -140,7 +140,12 @@
           "comments": [],
           "createdAt": 1774591203105,
           "completedAt": null,
-          "activityLog": [],
+          "activityLog": [
+            {
+              "date": "2026-03-27",
+              "text": "Stato cambiato in: Da fare"
+            }
+          ],
           "teamHasUpdate": true,
           "_teamLastUpdateAt": "2026-03-27T08:25:15.044Z",
           "_teamLastUpdateBy": "Kevin",
@@ -489,9 +494,9 @@
           "status": "todo",
           "assignee": "Kevin",
           "dueDate": "2026-03-31",
-          "estimateHours": 2,
+          "estimateHours": 0,
           "recurrence": null,
-          "note": "1. Crea una campagna su Keap Campaign Builder\n2. Trigger: Date Field sul campo birthday — deve scattare 3 giorni PRIMA del compleanno\n3. Struttura della sequenza:\n   - Giorno -3 (cioe il giorno in cui scatta il trigger): Email anticipazione — invio alle 8 di mattina\n   - Giorno 0 (compleanno): Email auguri + CTA \"Voglio il mio regalo!\" → link che applica il tag di riscatto e porta alla thank you page (Task 6) — invio alle 8 di mattina\n   - Giorno +3: Email reminder — invio alle 8 di mattina\n   - Giorno +7: Email ultima chance — invio alle 8 di mattina\n   - Mezzanotte del giorno +7: applica il tag \"Compleanno Scaduto\" a chi e' ancora nella sequenza (cioe chi NON ha riscattato)\n4. Regola di uscita: chi riceve il tag di riscatto (quello della Task 6) esce dalla sequenza in qualsiasi momento\n5. La campagna deve girare ogni anno automaticamente",
+          "note": "1. Crea una campagna su Keap Campaign Builder\n2. Trigger: Date Field sul campo birthday — deve scattare 3 giorni PRIMA del compleanno\n3. Struttura della sequenza:\n   - Giorno -3 (cioe il giorno in cui scatta il trigger): Email anticipazione — invio alle 8 di mattina\n   - Giorno 0 (compleanno): Email auguri + CTA \"Voglio il mio regalo!\" → link che applica il tag di riscatto e porta alla thank you page (Task 6) — invio alle 8 di mattina\n   - Giorno +3: Email reminder — invio alle 8 di mattina\n   - Giorno +7: Email ultima chance — invio alle 8 di mattina\n   - Mezzanotte del giorno +7: applica il tag \"Compleanno Scaduto\" a chi e' ancora nella sequenza (cioe chi NON ha riscattato)\n4. Regola di uscita: chi riceve il tag di riscatto (quello della Task 6) esce dalla sequenza in qualsiasi momento",
           "ceoNote": "",
           "nextCheck": "",
           "doneWhen": "Campagna configurata: trigger Date Field, 4 email, tag Compleanno Scaduto, ciclo annuale",
@@ -502,8 +507,8 @@
             "compleanni"
           ],
           "dependsOn": [
-            "compl_t6_ty_page_postriscatto",
-            "compl_t5_copy_compleanno"
+            "compl_t5_copy_compleanno",
+            "compl_t6_ty_page_postriscatto"
           ],
           "comments": [],
           "createdAt": 1774597893536,
