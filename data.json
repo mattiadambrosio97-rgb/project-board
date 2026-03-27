@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T06:02:53.960Z",
+  "publishedAt": "2026-03-27T06:43:22.214Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -29,7 +29,19 @@
           "comments": [],
           "createdAt": 1774591203105,
           "completedAt": null,
-          "activityLog": []
+          "activityLog": [
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: prova"
+            }
+          ],
+          "cooResponses": [
+            {
+              "note": "prova",
+              "at": "2026-03-27T06:32:22.765Z"
+            }
+          ],
+          "ceoHasUpdate": false
         },
         {
           "id": "gtm_t2_remove_ga4direct",
@@ -223,7 +235,14 @@
           "completedAt": null,
           "activityLog": []
         }
-      ]
+      ],
+      "cooProjectResponses": [
+        {
+          "note": "Ricordiamo x y e z",
+          "at": "2026-03-27T06:16:02.439Z"
+        }
+      ],
+      "ceoHasProjectNote": false
     },
     {
       "id": "proj_test_rebrand",
@@ -261,8 +280,35 @@
             {
               "date": "2026-03-27",
               "text": "Come stiamo messi?"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: rsgnsn"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: dhmdt"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: proviamo cosi, ok"
             }
-          ]
+          ],
+          "cooResponses": [
+            {
+              "note": "rsgnsn",
+              "at": "2026-03-27T06:24:15.254Z"
+            },
+            {
+              "note": "dhmdt",
+              "at": "2026-03-27T06:24:18.319Z"
+            },
+            {
+              "note": "proviamo cosi, ok",
+              "at": "2026-03-27T06:24:21.841Z"
+            }
+          ],
+          "ceoHasUpdate": false
         },
         {
           "id": "task_t2_palette",
@@ -400,10 +446,10 @@
           "createdAt": 1774563947933,
           "completedAt": null,
           "activityLog": [],
-          "teamHasUpdate": false,
-          "_teamLastUpdateAt": "2026-03-26T22:37:12.340Z",
+          "teamHasUpdate": true,
+          "_teamLastUpdateAt": "2026-03-27T06:03:41.016Z",
           "_teamLastUpdateBy": "Kevin",
-          "_teamLastUpdateNote": "",
+          "_teamLastUpdateNote": "Kok interessante",
           "teamUpdates": [
             {
               "from": "Kevin",
@@ -416,6 +462,11 @@
               "note": "",
               "status": "in_progress",
               "at": "2026-03-26T22:37:12.340Z"
+            },
+            {
+              "from": "Kevin",
+              "note": "Kok interessante",
+              "at": "2026-03-27T06:03:41.016Z"
             }
           ],
           "cooResponses": [
@@ -428,7 +479,7 @@
         {
           "id": "id_1774564812015_ritklo",
           "title": "Landing 2",
-          "status": "blocked",
+          "status": "todo",
           "assignee": "Kevin",
           "dueDate": "",
           "estimateHours": 0,
@@ -522,7 +573,7 @@
         {
           "id": "task_t4_reel",
           "title": "3 Reel \"Before/After\" coaching",
-          "status": "todo",
+          "status": "in_progress",
           "assignee": "Kevin",
           "dueDate": "2026-04-05",
           "estimateHours": 6,
@@ -542,9 +593,9 @@
           "completedAt": null,
           "activityLog": [],
           "teamHasUpdate": true,
-          "_teamLastUpdateAt": "2026-03-27T05:58:53.568Z",
+          "_teamLastUpdateAt": "2026-03-27T06:14:48.247Z",
           "_teamLastUpdateBy": "Kevin",
-          "_teamLastUpdateNote": "ok",
+          "_teamLastUpdateNote": "E QUI?",
           "teamUpdates": [
             {
               "from": "Kevin",
@@ -555,6 +606,11 @@
               "from": "Kevin",
               "note": "ok",
               "at": "2026-03-27T05:58:53.568Z"
+            },
+            {
+              "from": "Kevin",
+              "note": "E QUI?",
+              "at": "2026-03-27T06:14:48.247Z"
             }
           ]
         },
@@ -587,25 +643,58 @@
             {
               "date": "2026-03-25",
               "text": "Stato cambiato in: Da verificare"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: erhert"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: werhewrh"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: erwherherh"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Risposta inviata ad Alberto: erherherh"
             }
           ],
-          "teamHasUpdate": false,
-          "_teamLastUpdateAt": "2026-03-26T23:14:23.027Z",
+          "teamHasUpdate": true,
+          "_teamLastUpdateAt": "2026-03-27T06:26:16.222Z",
           "_teamLastUpdateBy": "Kevin",
-          "_teamLastUpdateNote": "wrgqrgreq",
+          "_teamLastUpdateNote": "ok",
           "teamUpdates": [
             {
               "from": "Kevin",
-              "note": "wrgqrgreq",
-              "at": "2026-03-26T23:14:23.027Z"
+              "note": "ok",
+              "at": "2026-03-27T06:26:16.222Z"
             }
           ],
           "cooResponses": [
             {
               "note": "SIu",
               "at": "2026-03-26T23:14:36.382Z"
+            },
+            {
+              "note": "erhert",
+              "at": "2026-03-27T06:17:08.855Z"
+            },
+            {
+              "note": "werhewrh",
+              "at": "2026-03-27T06:17:10.919Z"
+            },
+            {
+              "note": "erwherherh",
+              "at": "2026-03-27T06:17:12.511Z"
+            },
+            {
+              "note": "erherherh",
+              "at": "2026-03-27T06:17:14.263Z"
             }
-          ]
+          ],
+          "ceoHasUpdate": false
         }
       ]
     }
