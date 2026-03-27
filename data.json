@@ -1,5 +1,5 @@
 {
-  "publishedAt": "2026-03-27T08:17:21.054Z",
+  "publishedAt": "2026-03-27T08:25:37.235Z",
   "projects": [
     {
       "id": "proj_gtm_tracking",
@@ -120,7 +120,7 @@
         {
           "id": "gtm_t3_gads_labels",
           "title": "Google Ads conversion labels su 5 siti",
-          "status": "todo",
+          "status": "blocked",
           "assignee": "Kevin",
           "dueDate": "2026-03-29",
           "estimateHours": 0,
@@ -140,7 +140,19 @@
           "comments": [],
           "createdAt": 1774591203105,
           "completedAt": null,
-          "activityLog": []
+          "activityLog": [],
+          "teamHasUpdate": true,
+          "_teamLastUpdateAt": "2026-03-27T08:25:15.044Z",
+          "_teamLastUpdateBy": "Kevin",
+          "_teamLastUpdateNote": "Stato aggiornato: Bloccata",
+          "teamUpdates": [
+            {
+              "from": "Kevin",
+              "note": "Stato aggiornato: Bloccata",
+              "status": "blocked",
+              "at": "2026-03-27T08:25:15.044Z"
+            }
+          ]
         },
         {
           "id": "gtm_t4_capi_tokens",
@@ -348,6 +360,22 @@
           "createdAt": 1774597893536,
           "completedAt": null,
           "activityLog": [
+            {
+              "date": "2026-03-27",
+              "text": "Stato cambiato in: In corso"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Stato cambiato in: Bloccata"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Stato cambiato in: Da verificare"
+            },
+            {
+              "date": "2026-03-27",
+              "text": "Stato cambiato in: Completata"
+            },
             {
               "date": "2026-03-27",
               "text": "Stato cambiato in: In corso"
