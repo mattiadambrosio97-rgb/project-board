@@ -3780,37 +3780,20 @@ function renderTeamHome() {
     var cooRepliedMy = myTasks.filter(function(i) { return i.cooHasReplied; }).length;
 
     html += '<div style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap">';
-    html += '<div onclick="teamBoardColumnPopup(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-    html += '<div style="font-size:24px;font-weight:800;color:var(--text)">' + todoMy + '</div>';
-    html += '<div style="font-size:13px;color:var(--text-muted);font-weight:600">Da fare</div></div>';
-    if (inProgressMy > 0) {
-        html += '<div onclick="teamBoardColumnPopup(\'in_progress\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--yellow-bg,#FFFBEB);border:1px solid var(--yellow);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-        html += '<div style="font-size:24px;font-weight:800;color:var(--yellow,#F59E0B)">' + inProgressMy + '</div>';
-        html += '<div style="font-size:13px;color:var(--yellow,#F59E0B);font-weight:600">In corso</div></div>';
-    }
-    if (overdueMy > 0) {
-        html += '<div onclick="teamBoardColumnPopup(\'todo\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-        html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + overdueMy + '</div>';
-        html += '<div style="font-size:13px;color:var(--red);font-weight:600">Scadute</div></div>';
-    }
-    if (blockedMy > 0) {
-        html += '<div onclick="teamBoardColumnPopup(\'blocked\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--red-bg,#FEF2F2);border:1px solid var(--red);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-        html += '<div style="font-size:24px;font-weight:800;color:var(--red)">' + blockedMy + '</div>';
-        html += '<div style="font-size:13px;color:var(--red);font-weight:600">Bloccate</div></div>';
-    }
-    if (daVerificareMy > 0) {
-        html += '<div onclick="teamBoardColumnPopup(\'da_verificare\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--purple-bg,#F5F3FF);border:1px solid var(--purple,#7C3AED);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-        html += '<div style="font-size:24px;font-weight:800;color:var(--purple,#7C3AED)">' + daVerificareMy + '</div>';
-        html += '<div style="font-size:13px;color:var(--purple,#7C3AED);font-weight:600">Da verificare</div></div>';
-    }
-    if (cooRepliedMy > 0) {
-        html += '<div onclick="teamRispostePopup()" style="cursor:pointer;flex:1;min-width:80px;background:var(--accent-soft,#FFF1ED);border:1px solid var(--accent);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-        html += '<div style="font-size:24px;font-weight:800;color:var(--accent)">' + cooRepliedMy + '</div>';
-        html += '<div style="font-size:13px;color:var(--accent);font-weight:600">Feedback da leggere</div></div>';
-    }
-    html += '<div onclick="teamBoardColumnPopup(\'done\')" style="cursor:pointer;flex:1;min-width:80px;background:var(--green-bg,#F0FDF4);border:1px solid var(--green);border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
-    html += '<div style="font-size:24px;font-weight:800;color:var(--green)">' + completedTasks.length + '</div>';
-    html += '<div style="font-size:13px;color:var(--green);font-weight:600">Completate</div></div>';
+    var _teamStats = [
+        { key: 'todo', label: 'Da fare', n: todoMy, color: 'var(--text)', borderColor: 'var(--border)', bg: 'var(--surface)', click: "teamBoardColumnPopup('todo')" },
+        { key: 'in_progress', label: 'In corso', n: inProgressMy, color: 'var(--yellow,#F59E0B)', borderColor: 'var(--yellow)', bg: 'var(--yellow-bg,#FFFBEB)', click: "teamBoardColumnPopup('in_progress')" },
+        { key: 'blocked', label: 'Bloccate', n: blockedMy, color: 'var(--red)', borderColor: 'var(--red)', bg: 'var(--red-bg,#FEF2F2)', click: "teamBoardColumnPopup('blocked')" },
+        { key: 'da_verificare', label: 'Da verificare', n: daVerificareMy, color: 'var(--purple,#7C3AED)', borderColor: 'var(--purple,#7C3AED)', bg: 'var(--purple-bg,#F5F3FF)', click: "teamBoardColumnPopup('da_verificare')" },
+        { key: 'done', label: 'Completate', n: completedTasks.length, color: 'var(--green)', borderColor: 'var(--green)', bg: 'var(--green-bg,#F0FDF4)', click: "teamBoardColumnPopup('done')" }
+    ];
+    if (overdueMy > 0) _teamStats.splice(2, 0, { key: 'overdue', label: 'Scadute', n: overdueMy, color: 'var(--red)', borderColor: 'var(--red)', bg: 'var(--red-bg,#FEF2F2)', click: "teamBoardColumnPopup('todo')" });
+    if (cooRepliedMy > 0) _teamStats.push({ key: 'feedback', label: 'Feedback', n: cooRepliedMy, color: 'var(--accent)', borderColor: 'var(--accent)', bg: 'var(--accent-soft,#FFF1ED)', click: 'teamRispostePopup()' });
+    _teamStats.forEach(function(s) {
+        html += '<div onclick="' + s.click + '" style="cursor:pointer;flex:1;min-width:80px;background:' + s.bg + ';border:1px solid ' + s.borderColor + ';border-radius:12px;padding:12px;text-align:center;transition:transform 0.1s" onmouseenter="this.style.transform=\'scale(1.03)\'" onmouseleave="this.style.transform=\'\'">';
+        html += '<div style="font-size:24px;font-weight:800;color:' + s.color + '">' + s.n + '</div>';
+        html += '<div style="font-size:13px;color:' + s.color + ';font-weight:600">' + s.label + '</div></div>';
+    });
     html += '</div>';
 
     // Tab Lista / Board
