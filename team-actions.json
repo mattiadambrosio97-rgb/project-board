@@ -131,8 +131,14 @@
         "status": "in_progress"
       },
       "gtm_t3_gads_labels": {
-        "updates": [],
-        "status": "in_progress"
+        "updates": [
+          {
+            "note": "Stato aggiornato: Bloccata",
+            "status": "blocked",
+            "at": "2026-03-27T08:25:15.044Z"
+          }
+        ],
+        "status": "blocked"
       },
       "compl_t3_campagna_fase1": {
         "updates": [],
@@ -148,5 +154,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T08:20:41.982Z"
+  "lastUpdate": "2026-03-27T08:25:15.044Z"
 }
