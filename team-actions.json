@@ -58,7 +58,12 @@
         "status": "in_progress"
       },
       "task_t3_template": {
-        "updates": [],
+        "updates": [
+          {
+            "note": "ciao\n\nCome posso fare questa cosa?",
+            "at": "2026-03-27T07:03:18.947Z"
+          }
+        ],
         "status": "todo",
         "deleteMessages": [
           "2026-03-26T23:15:48.070Z",
@@ -114,5 +119,5 @@
       }
     }
   },
-  "lastUpdate": "2026-03-27T06:54:20.552Z"
+  "lastUpdate": "2026-03-27T07:03:18.947Z"
 }
