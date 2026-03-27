@@ -14,7 +14,7 @@
     // Rimuovi _cb (cache-buster) dall'URL dopo il reload per URL pulito
     (function(){ var u=new URL(window.location.href); if(u.searchParams.has('_cb')){ u.searchParams.delete('_cb'); history.replaceState(null,'',u.toString()); } })();
     // Auto-update: controlla se c'e' una versione nuova ogni volta che apri la pagina
-    var APP_VERSION = '20260327_0340';
+    var APP_VERSION = '20260327_0345';
     (function(){
         if(window.location.hostname.indexOf('github.io')===-1) return;
         fetch(window.location.pathname+'?_v='+Date.now(),{cache:'no-store'}).then(function(r){return r.text()}).then(function(html){
@@ -6935,6 +6935,13 @@ function renderGlobalBoard() {
                         ${(isDone && t.doneWhen) ? `<span class="done-when-badge">&#10003; ${esc(t.doneWhen)}</span>` : ''}
                         ${t.dependsLabel ? `<span class="depends-label-badge">&#128279; ${esc(t.dependsLabel)}</span>` : ''}
                         ${(()=>{ if((t.status==='in_progress'||t.status==='blocked')&&t.createdAt){ const age=Math.floor((Date.now()-t.createdAt)/(1000*60*60*24)); const lbl=t.status==='blocked'?'bloccata':'in corso'; if(age>10) return '<span class="aging-badge aging-critical">'+age+'g '+lbl+'</span>'; if(age>5) return '<span class="aging-badge aging-warn">'+age+'g '+lbl+'</span>'; } return ''; })()}
+                        ${!isDone ? (() => {
+                            var btns = '<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px" onclick="event.stopPropagation()">';
+                            [['todo','Da fare','var(--slate)','var(--bg)'],['in_progress','In corso','var(--yellow)','var(--yellow-bg,#FFFBEB)'],['blocked','Bloccata','var(--red)','var(--red-bg,#FEF2F2)'],['da_verificare','Da verificare','var(--purple)','var(--purple-bg,#F5F3FF)'],['done','Fatto','var(--green)','var(--green-bg,#F0FDF4)']].forEach(function(s){
+                                if(s[0]!==t.status) btns+='<button onclick="changeTaskStatus(\''+t.id+'\',\''+t.projectId+'\',\''+s[0]+'\')" style="flex:1;min-width:55px;padding:4px 5px;border:1px solid '+s[2]+';border-radius:6px;background:'+s[3]+';color:'+s[2]+';font-size:10px;font-weight:700;cursor:pointer;font-family:var(--font)">'+s[1]+'</button>';
+                            });
+                            return btns+'</div>';
+                        })() : ''}
                     </div>
                 </div>`;
             });
