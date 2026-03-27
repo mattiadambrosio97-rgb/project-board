@@ -129,8 +129,16 @@
       "compl_t1_form_landing": {
         "updates": [],
         "status": "todo"
+      },
+      "gtm_t3_gads_labels": {
+        "updates": [],
+        "status": "in_progress"
+      },
+      "compl_t3_campagna_fase1": {
+        "updates": [],
+        "status": "blocked"
       }
     }
   },
-  "lastUpdate": "2026-03-27T08:13:27.846Z"
+  "lastUpdate": "2026-03-27T08:18:42.421Z"
 }
